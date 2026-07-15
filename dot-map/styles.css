@@ -1,0 +1,119 @@
+:root {
+  color-scheme: light;
+  --stage: #cfd6d1;
+  --ink: #1f2422;
+  --rail: rgba(31, 36, 34, 0.18);
+  --accent: #c06a2c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--stage);
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+  background:
+    linear-gradient(90deg, rgba(239, 242, 239, 0.58), rgba(190, 200, 195, 0.36)),
+    var(--stage);
+  color: var(--ink);
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+
+.scroll-map {
+  height: 780vh;
+}
+
+.map-stage {
+  position: sticky;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+#mapScene {
+  display: block;
+  width: min(100vw, calc(100svh * 2209 / 2185));
+  height: min(100svh, calc(100vw * 2185 / 2209));
+  max-width: 100vw;
+  max-height: 100svh;
+  touch-action: none;
+}
+
+.hud {
+  position: fixed;
+  right: clamp(16px, 3vw, 34px);
+  bottom: clamp(16px, 3vw, 34px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.scroll-hint {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(31, 36, 34, 0.78);
+  color: #f4f2ec;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  transition: opacity 0.6s ease;
+}
+
+.scroll-hint.hidden {
+  opacity: 0;
+}
+
+.found-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(244, 242, 236, 0.85);
+  border: 1px solid rgba(31, 36, 34, 0.14);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.found-chip span {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.progress-track {
+  width: min(260px, 34vw);
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--rail);
+}
+
+.progress-track span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: var(--accent);
+}
+
+@media (max-width: 720px) {
+  .scroll-map {
+    height: 880vh;
+  }
+
+  .progress-track {
+    width: 42vw;
+  }
+}

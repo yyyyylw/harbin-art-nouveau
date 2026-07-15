@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>哈尔滨历史建筑 · 徒步探索地图</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="scrollMap" class="scroll-map">
+      <section class="map-stage" aria-label="滚动探索地图">
+        <canvas id="mapScene"></canvas>
+        <div class="hud">
+          <div id="scrollHint" class="scroll-hint">向下滚动 · 跟随小人探索</div>
+          <div class="found-chip"><span id="foundCount">0</span> / <span id="foundTotal">0</span> 已发现</div>
+          <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+        </div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

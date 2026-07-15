@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>新艺术建筑立面图解</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202725;
+      --muted: #66706c;
+      --paper: #ffffff;
+      --ground: #f3f5f2;
+      --line: #cfd8d2;
+      --teal: #1d625d;
+      --copper: #e96819;
+      --copper-soft: rgba(233, 104, 25, 0.16);
+      --shadow: 0 22px 60px rgba(24, 31, 29, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--ground);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+
+    .module {
+      min-height: 100vh;
+      padding: 22px;
+    }
+
+    .module__header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      max-width: 1800px;
+      margin: 0 auto 14px;
+      color: var(--ink);
+    }
+
+    .module__title {
+      margin: 0;
+      font-size: clamp(20px, 2.2vw, 34px);
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .module__kicker {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .map-scroll {
+      max-width: 1800px;
+      margin: 0 auto;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 12px 32px rgba(31, 44, 40, 0.08);
+    }
+
+    .facade-map {
+      position: relative;
+      width: 100%;
+      min-width: 1120px;
+      line-height: 0;
+    }
+
+    .facade-map__image {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+    }
+
+    .hotspot {
+      position: absolute;
+      left: calc(var(--x) * 1%);
+      top: calc(var(--y) * 1%);
+      width: calc(var(--w) * 1%);
+      height: calc(var(--h) * 1%);
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    .hotspot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 2px solid transparent;
+      border-radius: 3px;
+      transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .hotspot:hover::after,
+    .hotspot:focus-visible::after,
+    .hotspot.is-active::after {
+      background: var(--copper-soft);
+      border-color: rgba(233, 104, 25, 0.8);
+      box-shadow: 0 0 0 4px rgba(29, 98, 93, 0.16);
+    }
+
+    .hotspot:focus-visible {
+      outline: none;
+    }
+
+    .detail-card {
+      position: fixed;
+      z-index: 30;
+      display: none;
+      width: min(430px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      background: var(--paper);
+      border: 1px solid rgba(29, 98, 93, 0.22);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .detail-card.is-open {
+      display: block;
+    }
+
+    .detail-card__top {
+      position: sticky;
+      top: 0;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 14px 12px;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .detail-card__number {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(233, 104, 25, 0.45);
+      border-radius: 50%;
+      color: var(--copper);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .detail-card__title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.35;
+      font-weight: 680;
+      letter-spacing: 0;
+    }
+
+    .detail-card__close {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #f7f9f8;
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .detail-card__close:hover,
+    .detail-card__close:focus-visible {
+      border-color: rgba(29, 98, 93, 0.55);
+      color: var(--teal);
+      outline: none;
+    }
+
+    .detail-card__body {
+      padding: 14px;
+    }
+
+    .detail-card__text {
+      margin: 0 0 14px;
+      color: #34403c;
+      font-size: 15px;
+      line-height: 1.72;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .media-item {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      min-width: 0;
+    }
+
+    .media-item__frame {
+      width: 100%;
+      aspect-ratio: var(--ratio, 4 / 3);
+      overflow: hidden;
+      background: #f8faf9;
+      border: 1px solid #dce4df;
+      border-radius: 7px;
+    }
+
+    .media-item__image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .media-item__caption {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      background: rgba(20, 27, 25, 0.1);
+    }
+
+    .backdrop.is-open {
+      display: block;
+    }
+
+    @media (max-width: 720px) {
+      .module {
+        padding: 12px;
+      }
+
+      .module__header {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      .module__kicker {
+        margin-top: 4px;
+        white-space: normal;
+      }
+
+      .facade-map {
+        min-width: 980px;
+      }
+
+      .detail-card {
+        left: 12px !important;
+        right: 12px;
+        bottom: 12px;
+        top: auto !important;
+        width: auto;
+        max-height: 78vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="module">
+    <header class="module__header">
+      <h1 class="module__title">新艺术建筑立面图解</h1>
+      <p class="module__kicker">正立面细部索引</p>
+    </header>
+
+    <section class="map-scroll" aria-label="正立面图">
+      <div class="facade-map" id="facadeMap">
+        <img class="facade-map__image" src="正立面图222.png" width="5322" height="3241" alt="带有红框标注的新艺术建筑正立面图">
+      </div>
+    </section>
+  </main>
+
+  <div class="backdrop" id="backdrop"></div>
+
+  <aside class="detail-card" id="detailCard" role="dialog" aria-modal="false" aria-labelledby="detailTitle">
+    <div class="detail-card__top">
+      <span class="detail-card__number" id="detailNumber"></span>
+      <h2 class="detail-card__title" id="detailTitle"></h2>
+      <button class="detail-card__close" type="button" id="closeCard" aria-label="关闭">×</button>
+    </div>
+    <div class="detail-card__body">
+      <p class="detail-card__text" id="detailText"></p>
+      <div class="media-grid" id="mediaGrid"></div>
+    </div>
+  </aside>
+
+  <script>
+    const features = [
+      {
+        id: "0",
+        title: "兼具实用与美观的木制屋檐",
+        text: "屋檐不只是遮雨，木构件被做成轻巧的层次，实用里带着温和的手工感。",
+        area: { x: 6.8020, y: 42.9497, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "0-兼具实用与美观的木制屋檐.JPG", caption: "木制屋檐" }
+        ]
+      },
+      {
+        id: "1",
+        title: "方额圆角窗 / 椭圆额直角窗",
+        text: "窗洞把直线和圆角揉在一起，规整但不生硬。这样的窗型让立面多了柔和的节奏。",
+        area: { x: 11.5558, y: 51.1879, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "1-方额圆角窗.png", caption: "方额圆角窗" },
+          { src: "1-椭圆额直角窗.png", caption: "椭圆额直角窗" }
+        ]
+      },
+      {
+        id: "2",
+        title: "富有浪漫主义的雕饰",
+        text: "柱头和雕饰带一点植物感，装饰不抢戏，却把入口和转角衬得更浪漫。",
+        area: { x: 9.1695, y: 72.2308, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "2-富有浪漫主义的雕饰.JPG", caption: "浪漫主义雕饰" }
+        ]
+      },
+      {
+        id: "3",
+        title: "曲线铁艺装饰",
+        text: "铁艺最适合新艺术的线条：卷曲、伸展，像藤蔓一样把阳台和护栏带活。",
+        area: { x: 31.1725, y: 76.7356, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "3-曲线铁艺装饰.JPG", caption: "曲线铁艺装饰" },
+          { src: "3-曲线铁艺装饰1.JPG", caption: "铁艺细部" }
+        ]
+      },
+      {
+        id: "4",
+        title: "优美大方的女儿墙和金属装饰绣边",
+        text: "女儿墙的轮廓被收得很优雅，再配上细细的金属边，屋顶线就不会显得平。",
+        area: { x: 45.9226, y: 31.5026, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "4-优美大方的女儿墙和金属装饰绣边.JPG", caption: "女儿墙与金属绣边" }
+        ]
+      },
+      {
+        id: "5",
+        title: "门和曲线的结合",
+        text: "门洞边缘顺着曲线过渡，开口像被轻轻推开。硬朗的入口因此多了一点亲近感。",
+        area: { x: 45.0582, y: 68.8368, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "5-门和曲线的结合.png", caption: "门与曲线" }
+        ]
+      },
+      {
+        id: "6",
+        title: "屋顶的金属线条装饰",
+        text: "屋顶上的金属线条很细，却能把天际线拉得更精神。它让屋面从远处看也有辨识度。",
+        area: { x: 59.0567, y: 36.0383, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "6-屋顶的金属线条装饰.JPG", caption: "屋顶金属线条" }
+        ]
+      },
+      {
+        id: "7",
+        title: "优雅的窗楣",
+        text: "窗楣用弧线压住窗头，既有重量感，也不显笨重。重复出现时，整排窗会更有韵律。",
+        area: { x: 64.9004, y: 47.4545, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "7-优雅的窗楣.png", caption: "窗楣" },
+          { src: "7-优雅的窗楣1.png", caption: "窗楣细部" }
+        ]
+      },
+      {
+        id: "8",
+        title: "偶尔可见精美的人像装饰",
+        text: "人像装饰像是给建筑加了表情，远看只是点缀，近看才发现很讲究。",
+        area: { x: 85.0808, y: 33.7859, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "8-偶尔可见精美的人像装饰.JPG", caption: "人像装饰" }
+        ]
+      },
+      {
+        id: "9",
+        title: "柔和流畅的构件交接",
+        text: "这些构件交接处没有硬碰硬，而是用弧线慢慢过渡。新艺术最迷人的地方，常常就在这种细节里。",
+        area: { x: 85.0808, y: 55.6927, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "9-柔和流畅的构件交接.png", caption: "构件交接" }
+        ]
+      },
+      {
+        id: "10",
+        title: "悬挑式雨篷",
+        text: "悬挑雨篷负责遮挡风雨，也顺手把入口标出来。金属支架的曲线让功能件不只是功能件。",
+        area: { x: 86.6967, y: 72.2308, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "10-悬挑式雨篷.JPG", caption: "悬挑式雨篷" },
+          { src: "10-悬挑式雨篷.png", caption: "雨篷细部" }
+        ]
+      },
+      {
+        id: "11",
+        title: "优雅精致的室内楼梯",
+        text: "楼梯栏杆把重复的小构件做得很精细，走近时会有明显的手工质感。它让室内动线也延续了立面的装饰语言。",
+        area: { x: 54.3029, y: 76.7356, w: 5.1109, h: 5.0910 },
+        images: [
+          { src: "11-优雅精致的室内楼梯.JPG", caption: "室内楼梯" }
+        ]
+      }
+    ];
+
+    const map = document.getElementById("facadeMap");
+    const card = document.getElementById("detailCard");
+    const backdrop = document.getElementById("backdrop");
+    const closeButton = document.getElementById("closeCard");
+    const title = document.getElementById("detailTitle");
+    const number = document.getElementById("detailNumber");
+    const text = document.getElementById("detailText");
+    const mediaGrid = document.getElementById("mediaGrid");
+    let activeButton = null;
+
+    function makeHotspot(feature) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "hotspot";
+      button.dataset.id = feature.id;
+      button.style.setProperty("--x", feature.area.x);
+      button.style.setProperty("--y", feature.area.y);
+      button.style.setProperty("--w", feature.area.w);
+      button.style.setProperty("--h", feature.area.h);
+      button.setAttribute("aria-label", `${feature.id} ${feature.title}`);
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openCard(feature, button);
+      });
+      map.appendChild(button);
+    }
+
+    function renderImages(images) {
+      mediaGrid.replaceChildren();
+      images.forEach((item) => {
+        const figure = document.createElement("figure");
+        figure.className = "media-item";
+
+        const frame = document.createElement("div");
+        frame.className = "media-item__frame";
+
+        const image = document.createElement("img");
+        image.className = "media-item__image";
+        image.alt = item.caption;
+        image.loading = "lazy";
+        const syncImageRatio = () => {
+          if (image.naturalWidth && image.naturalHeight) {
+            frame.style.setProperty("--ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
+          }
+        };
+        image.addEventListener("load", syncImageRatio, { once: true });
+        image.src = item.src;
+        if (image.complete) {
+          syncImageRatio();
+        }
+
+        const caption = document.createElement("figcaption");
+        caption.className = "media-item__caption";
+        caption.textContent = item.caption;
+
+        frame.appendChild(image);
+        figure.append(frame, caption);
+        mediaGrid.appendChild(figure);
+      });
+    }
+
+    function openCard(feature, button) {
+      if (activeButton) {
+        activeButton.classList.remove("is-active");
+      }
+
+      activeButton = button;
+      activeButton.classList.add("is-active");
+
+      number.textContent = feature.id;
+      title.textContent = feature.title;
+      text.textContent = feature.text;
+      renderImages(feature.images);
+
+      card.classList.add("is-open");
+      backdrop.classList.add("is-open");
+      positionCard(button);
+    }
+
+    function positionCard(button) {
+      if (window.matchMedia("(max-width: 720px)").matches) {
+        card.style.left = "";
+        card.style.top = "";
+        return;
+      }
+
+      const gap = 14;
+      const margin = 16;
+      const trigger = button.getBoundingClientRect();
+
+      card.style.visibility = "hidden";
+      card.style.left = "0px";
+      card.style.top = "0px";
+
+      requestAnimationFrame(() => {
+        const cardRect = card.getBoundingClientRect();
+        let left = trigger.right + gap;
+        if (left + cardRect.width + margin > window.innerWidth) {
+          left = trigger.left - cardRect.width - gap;
+        }
+        left = Math.max(margin, Math.min(left, window.innerWidth - cardRect.width - margin));
+
+        let top = trigger.top + trigger.height / 2 - cardRect.height / 2;
+        top = Math.max(margin, Math.min(top, window.innerHeight - cardRect.height - margin));
+
+        card.style.left = `${left}px`;
+        card.style.top = `${top}px`;
+        card.style.visibility = "visible";
+      });
+    }
+
+    function closeCard() {
+      card.classList.remove("is-open");
+      backdrop.classList.remove("is-open");
+      card.style.visibility = "";
+      if (activeButton) {
+        activeButton.classList.remove("is-active");
+        activeButton = null;
+      }
+    }
+
+    features.forEach(makeHotspot);
+    closeButton.addEventListener("click", closeCard);
+    backdrop.addEventListener("click", closeCard);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeCard();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (activeButton && card.classList.contains("is-open")) {
+        positionCard(activeButton);
+      }
+    });
+  </script>
+</body>
+</html>

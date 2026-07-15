@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <!-- =========================================================
+    01. 基础信息 / Basic Information
+    ---------------------------------------------------------
+    这一组 meta 控制编码、移动端缩放、搜索摘要、作者和页面标题。
+    These meta tags control encoding, mobile scaling, search summary,
+    author metadata, and the browser-tab title.
+  ========================================================== -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="白色背景的长篇新闻报道模板，参考多媒体专题报道的叙事节奏。">
+  <meta name="keywords" content="新闻报道模板, 多媒体报道, 数据新闻, HTML, CSS">
+  <meta name="author" content="Your Name">
+  <title>Chapter 3｜南岗博物馆</title>
+
+  <!-- =========================================================
+    02. 社交分享信息 / Social Sharing Metadata
+  <!-- =========================================================
+    03. 页面样式 / Page Styles
+  ========================================================== -->
+  <style>
+    /* =========================================================
+      03-01. 设计变量 / Design Tokens
+      -------------------------------------------------------
+      颜色 & 字体 & 宽度 & 阴影 & 动画速度。
+      colors & fonts & widths & shadows & motion timing
+    ======================================================== */
+    :root {
+      --paper: #ffffff;
+      --paper-soft: #f5f5f2;
+      --ink: #151515;
+      --ink-muted: #55565a;
+      --ink-light: #8c8c8c;
+      --navy: #001246;
+      --navy-soft: #20245d;
+      --gold: #ffc200;
+      --red: #9d1d16;
+      --line: #d9d9da;
+      --line-soft: #eeeeee;
+      --shadow: 0 24px 70px rgba(0, 18, 70, 0.14);
+      --serif: Georgia, "Times New Roman", "Noto Serif SC", "Songti SC", serif;
+      --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      --article-width: 480px;
+      --wide-width: 1060px;
+      --radius: 6px;
+      --fast: 180ms ease;
+      --slow: 700ms ease;
+    }
+
+    /* =========================================================
+      03-02. 全局重置 / Global Reset
+      -------------------------------------------------------
+      去掉浏览器默认间距，设置白色背景和适合长文阅读的基础字体。
+      Removes default spacing, sets a white background, and establishes
+      typography suitable for long-form reading.
+    ======================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      line-height: 1.6;
+      text-rendering: optimizeLegibility;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      padding: 0;
+      border: 0;
+      font: inherit;
+      color: inherit;
+      background: none;
+      cursor: pointer;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .desktop-only {
+      display: inline;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* =========================================================
+      03-03. 顶部固定栏 / Fixed Top Bar
+      -------------------------------------------------------
+      顶部 40px 的深色固定栏，左侧是 SECTIONS，
+      中间是媒体/项目标识，右侧是分享入口。
+      40px fixed dark bar: 
+      SECTIONS on the left, publication/project identity in the center, and share buttons right.
+    ======================================================== */
+    .topbar {
+      position: fixed;
+      z-index: 80;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 68px;
+      color: var(--paper);
+      background: linear-gradient(180deg, rgba(7, 19, 29, 0.72), rgba(7, 19, 29, 0));
+      border-bottom: 0;
+      transition: background 220ms ease;
+    }
+
+    .topbar.is-compact {
+      background: rgba(7, 19, 29, 0.88);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    .brand-mark {
+      display: block;
+      flex: 0 0 auto;
+      width: 40px;
+      height: 48px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+    }
+
+    .menu-icon {
+      position: fixed;
+      z-index: 90;
+      top: 24px;
+      left: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--paper);
+      text-transform: uppercase;
+    }
+
+    .menu-symbol,
+    .menu-symbol::before,
+    .menu-symbol::after {
+      display: block;
+      width: 24px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      content: "";
+    }
+
+    .menu-symbol {
+      position: relative;
+    }
+
+    .menu-symbol::before {
+      position: absolute;
+      top: -7px;
+      left: 0;
+    }
+
+    .menu-symbol::after {
+      position: absolute;
+      top: 7px;
+      left: 0;
+    }
+
+    .menu-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .top-social {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(-50%);
+    }
+
+    .top-social button,
+    .top-social a {
+      display: inline-grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 50%;
+      padding: 0;
+      color: var(--paper);
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      overflow: hidden;
+      text-decoration: none;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .action-icon {
+      display: block;
+      width: 21px;
+      height: 21px;
+      object-fit: contain;
+      filter: invert(1);
+      pointer-events: none;
+    }
+
+    .top-social button:hover,
+    .top-social button:focus-visible,
+    .top-social a:hover,
+    .top-social a:focus-visible {
+      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .progress {
+      position: fixed;
+      z-index: 95;
+      top: 68px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: transparent;
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--gold);
+      transition: width 80ms linear;
+    }
+
+    /* =========================================================
+      03-04. 左侧抽屉目录 / Left Drawer Navigation
+    ======================================================== */
+    .drawer-backdrop {
+      position: fixed;
+      z-index: 85;
+      inset: 68px 0 0;
+      display: none;
+      background: rgba(0, 0, 0, 0.28);
+    }
+
+    .drawer-backdrop.is-open {
+      display: block;
+    }
+
+    .side-nav {
+      position: fixed;
+      z-index: 86;
+      top: 68px;
+      left: 0;
+      width: 0;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+      color: var(--paper);
+      background: var(--navy);
+      transition: width 420ms ease;
+    }
+
+    .side-nav.is-open {
+      width: min(310px, 86vw);
+    }
+
+    .side-nav-inner {
+      width: min(310px, 86vw);
+      padding: 22px 0;
+    }
+
+    .side-nav a {
+      display: block;
+      padding: 10px 18px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      transition: color var(--fast), background var(--fast), border-color var(--fast);
+      border-left: 2px solid transparent;
+    }
+
+    .side-nav a:hover,
+    .side-nav a:focus-visible {
+      color: var(--paper);
+      background: rgba(255, 255, 255, 0.08);
+      border-left-color: var(--gold);
+      outline: none;
+    }
+
+    /* =========================================================
+      03-05. 首屏 / Intro
+    ======================================================== */
+    .intro {
+      padding-top: 0;
+      text-align: center;
+      background: var(--paper);
+    }
+
+    .cover {
+      position: relative;
+      width: 100%;
+      height: min(48vw, 740px);
+      min-height: 340px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      background: #0d0d0f;
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.88) contrast(1.05);
+      transform: scale(1.03);
+      animation: coverDrift 18s ease-in-out infinite alternate;
+    }
+
+    .cover::before {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.02) 45%, rgba(0, 0, 0, 0.28)),
+        linear-gradient(90deg, rgba(0, 18, 70, 0.18), transparent 42%, rgba(157, 29, 22, 0.12));
+      content: "";
+      pointer-events: none;
+    }
+
+    .cover::after {
+      position: absolute;
+      z-index: 2;
+      right: 28px;
+      bottom: 24px;
+      width: min(260px, 38vw);
+      height: 3px;
+      background: var(--gold);
+      content: "";
+      box-shadow: 0 0 28px rgba(255, 194, 0, 0.5);
+      transform-origin: right;
+      animation: linePulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes coverDrift {
+      from {
+        transform: scale(1.03) translate3d(-0.5%, 0, 0);
+      }
+
+      to {
+        transform: scale(1.09) translate3d(0.8%, -0.5%, 0);
+      }
+    }
+
+    @keyframes linePulse {
+      0%,
+      100% {
+        transform: scaleX(0.72);
+        opacity: 0.6;
+      }
+
+      50% {
+        transform: scaleX(1);
+        opacity: 1;
+      }
+    }
+
+    .series-title {
+      margin: 0 20px 32px;
+      color: var(--navy-soft);
+      font-family: var(--serif);
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .chapter-label {
+      max-width: 680px;
+      margin: 0 auto;
+      color: #6b6869;
+      font-size: 16px;
+      font-weight: 300;
+      letter-spacing: 0.95em;
+      text-indent: 0.95em;
+      text-transform: uppercase;
+    }
+
+    .intro h1 {
+      width: min(680px, calc(100% - 40px));
+      margin: 14px auto 26px;
+      font-family: var(--serif);
+      font-size: clamp(34px, 5.4vw, 62px);
+      line-height: 1.08;
+      text-wrap: balance;
+    }
+
+    .date {
+      width: min(620px, calc(100% - 40px));
+      margin: 0 auto 16px;
+      color: var(--ink-light);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+      text-transform: uppercase;
+    }
+
+    .opening {
+      position: relative;
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto 42px;
+      color: #767676;
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 300;
+      line-height: 1.62;
+      text-align: left;
+    }
+
+    .opening::first-letter {
+      float: left;
+      padding: 8px 15px 0 3px;
+      color: var(--navy-soft);
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 0.82;
+    }
+
+    .author {
+      position: absolute;
+      top: 0;
+      left: -150px;
+      width: 100px;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    .author-pic {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      place-items: center;
+      margin: 0 auto 8px;
+      border-radius: 50%;
+      color: var(--paper);
+      background: var(--navy);
+      font-weight: 900;
+    }
+
+    .author-name::before {
+      content: "By ";
+      font-weight: 400;
+    }
+
+    /* =========================================================
+      03-06. 正文窄栏 / Narrow Article Column
+    ======================================================== */
+    .standard {
+      margin: 0;
+      background: var(--paper);
+    }
+
+    .article {
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .article h2,
+    .article h3 {
+      margin: 46px 0 12px;
+      color: var(--ink);
+      font-family: var(--serif);
+      line-height: 1.24;
+    }
+
+    .article h2 {
+      font-size: 32px;
+    }
+
+    .article h3 {
+      font-size: 23px;
+    }
+
+    .article p {
+      margin: 24px 0;
+      color: #4d4d4d;
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.56;
+    }
+
+    .article strong {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .inline-graphic {
+      width: 100%;
+      margin: 28px 0;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--paper-soft);
+    }
+
+    .caption {
+      margin-top: 9px;
+      color: var(--ink-light);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    /* =========================================================
+      03-07. 全宽内容模块 / Full-Width Content Modules
+    ======================================================== */
+    .full-content {
+      position: relative;
+      width: 100%;
+      margin: 48px auto;
+      text-align: center;
+    }
+
+    .wrapper {
+      width: min(var(--wide-width), calc(100% - 40px));
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .visual-pair .wrapper,
+    .branch-grid .wrapper,
+    .simulator-grid .wrapper {
+      display: grid;
+      gap: 18px;
+    }
+
+    .visual-pair .wrapper {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    .side {
+      min-width: 0;
+    }
+
+    .media-card {
+      position: relative;
+      min-height: 320px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: var(--paper-soft);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+    }
+
+    .media-card img {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      transition: transform 700ms ease, filter 700ms ease;
+    }
+
+    .media-card:hover img {
+      filter: saturate(1.08) contrast(1.06);
+      transform: scale(1.05);
+    }
+
+    .media-card figcaption,
+    .diagram-card figcaption {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      left: 14px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 12px;
+      text-align: left;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    .single-visual .wrapper {
+      width: min(980px, calc(100% - 40px));
+    }
+
+    .single-visual img {
+      width: 100%;
+      max-height: 650px;
+      border-radius: var(--radius);
+      object-fit: cover;
+      box-shadow: var(--shadow);
+    }
+
+    /* =========================================================
+      03-08. 图解卡片 / Explainer Cards
+    ======================================================== */
+    .branch-grid .wrapper {
+      grid-template-columns: 1fr 0.8fr 1fr;
+      align-items: center;
+    }
+
+    .diagram-card {
+      position: relative;
+      min-height: 280px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, #fcfbf7, #eeece4),
+        repeating-linear-gradient(90deg, transparent 0 32px, rgba(0, 18, 70, 0.08) 32px 34px);
+    }
+
+    .diagram-card::before {
+      position: absolute;
+      inset: 38px 34px 56px;
+      border: 14px solid var(--navy-soft);
+      border-top-width: 26px;
+      border-radius: 4px 4px 0 0;
+      content: "";
+      opacity: 0.9;
+    }
+
+    .diagram-card::after {
+      position: absolute;
+      right: 18%;
+      bottom: 58px;
+      left: 18%;
+      height: 90px;
+      background:
+        linear-gradient(90deg, transparent 0 16%, var(--red) 16% 24%, transparent 24% 40%, var(--red) 40% 48%, transparent 48% 64%, var(--red) 64% 72%, transparent 72%),
+        linear-gradient(180deg, transparent 0 42%, rgba(0, 18, 70, 0.2) 42% 46%, transparent 46%);
+      content: "";
+    }
+
+    .explain-copy {
+      padding: 22px;
+      color: var(--paper);
+      background: var(--navy);
+      border-radius: var(--radius);
+      text-align: left;
+    }
+
+    .explain-copy h3 {
+      margin: 0 0 12px;
+      font-family: var(--serif);
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .explain-copy p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .simulator-grid .wrapper {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .quake-card {
+      position: relative;
+      min-height: 250px;
+      padding: 22px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fafafa;
+      text-align: left;
+    }
+
+    .quake-card::before {
+      position: absolute;
+      right: 22px;
+      bottom: 36px;
+      left: 22px;
+      height: 116px;
+      border-bottom: 8px solid var(--navy-soft);
+      background:
+        repeating-linear-gradient(90deg, var(--red) 0 12px, transparent 12px 34px),
+        linear-gradient(180deg, transparent 0 36%, rgba(0, 18, 70, 0.13) 36% 42%, transparent 42%);
+      content: "";
+      transform-origin: bottom center;
+      animation: tremor 2.6s ease-in-out infinite;
+    }
+
+    .quake-card:nth-child(2)::before {
+      animation-delay: 220ms;
+      transform: skewX(-3deg);
+    }
+
+    .quake-card:nth-child(3)::before {
+      animation-delay: 420ms;
+    }
+
+    .quake-card h4 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 22px;
+    }
+
+    .quake-card p {
+      position: relative;
+      z-index: 1;
+      max-width: 220px;
+      margin: 10px 0 0;
+      color: var(--ink-muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    @keyframes tremor {
+      0%,
+      100% {
+        transform: translateX(0) skewX(0);
+      }
+
+      22% {
+        transform: translateX(-4px) skewX(-2deg);
+      }
+
+      48% {
+        transform: translateX(5px) skewX(3deg);
+      }
+
+      72% {
+        transform: translateX(-2px) skewX(-1deg);
+      }
+    }
+
+    /* =========================================================
+      03-09. 分享模块 / In-Article Social Block
+    ======================================================== */
+    .share-block {
+      padding: 48px 0 34px;
+    }
+
+    .share-block h4 {
+      margin: 0 0 15px;
+      color: var(--ink-muted);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    .share-row {
+      display: inline-flex;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-right: 0;
+    }
+
+    .share-row button,
+    .share-row a {
+      display: grid;
+      width: 74px;
+      height: 55px;
+      place-items: center;
+      border-right: 1px solid var(--line);
+      color: var(--navy);
+      font-size: 13px;
+      font-weight: 900;
+      transition: color var(--fast), background var(--fast);
+    }
+
+    .share-row button:hover,
+    .share-row button:focus-visible,
+    .share-row a:hover,
+    .share-row a:focus-visible {
+      color: var(--paper);
+      background: var(--navy);
+      outline: none;
+    }
+
+    /* =========================================================
+      03-10. 相关链接和专题推荐 / Related Links And Project Cards
+    ======================================================== */
+    .more-links {
+      width: min(760px, calc(100% - 40px));
+      margin: 70px auto;
+      padding: 26px 0 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .more-links h3 {
+      margin: 0 0 12px;
+      color: var(--ink-muted);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .more-links a {
+      display: block;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--navy-soft);
+      font-family: var(--serif);
+      font-size: 19px;
+      line-height: 1.35;
+      transition: color var(--fast), padding-left var(--fast);
+    }
+
+    .more-links a:hover,
+    .more-links a:focus-visible {
+      color: var(--red);
+      padding-left: 8px;
+      outline: none;
+    }
+
+    .project-panel {
+      margin: 0;
+      padding: 58px 0 64px;
+      background: var(--paper-soft);
+      border-top: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .project-heading {
+      width: min(var(--wide-width), calc(100% - 40px));
+      margin: 0 auto 24px;
+      text-align: center;
+    }
+
+    .project-heading h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 1.15;
+    }
+
+    .project-heading p {
+      margin: 8px 0 0;
+      color: var(--ink-muted);
+      font-size: 14px;
+    }
+
+    .project-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      width: min(var(--wide-width), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .project-card {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 16px;
+      min-height: 160px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: var(--paper);
+      transition: transform var(--fast), box-shadow var(--fast), border-color var(--fast);
+    }
+
+    .project-card:hover,
+    .project-card:focus-visible {
+      border-color: var(--navy-soft);
+      box-shadow: 0 16px 44px rgba(0, 18, 70, 0.12);
+      transform: translateY(-3px);
+      outline: none;
+    }
+
+    .project-thumb {
+      min-height: 130px;
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, rgba(0, 18, 70, 0.12), rgba(0, 18, 70, 0.5)),
+        url("assets/harbin-architecture-hero.png") center / cover;
+    }
+
+    .project-num {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .project-card h3 {
+      margin: 8px 0 6px;
+      font-family: var(--serif);
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .project-card p {
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* =========================================================
+      03-11. 固定章节切换 / Fixed Chapter Navigation
+    ======================================================== */
+    .chapter-switch {
+      position: fixed;
+      z-index: 70;
+      top: 50%;
+      right: 0;
+      left: 0;
+      display: none;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .chapter-switch.is-visible {
+      display: block;
+    }
+
+    .chapter-switch a {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 158px;
+      height: 46px;
+      padding: 0 14px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+      pointer-events: auto;
+      transition: color var(--fast), background var(--fast), transform var(--fast);
+    }
+
+    .chapter-switch a:hover,
+    .chapter-switch a:focus-visible {
+      color: var(--paper);
+      background: var(--navy);
+      transform: translateX(0);
+      outline: none;
+    }
+
+    .chapter-switch .previous {
+      left: 0;
+      transform: translateX(-112px);
+    }
+
+    .chapter-switch .next {
+      right: 0;
+      justify-content: flex-end;
+      transform: translateX(112px);
+      text-align: right;
+    }
+
+    .chapter-menu {
+      position: fixed;
+      z-index: 70;
+      right: 0;
+      bottom: -54px;
+      left: 0;
+      height: 50px;
+      padding: 0 18px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.94);
+      border-top: 1px solid var(--line);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: bottom var(--slow);
+    }
+
+    .chapter-menu.is-visible {
+      bottom: 0;
+    }
+
+    .chapter-menu h4,
+    .chapter-menu ul,
+    .chapter-menu li {
+      display: inline-flex;
+      align-items: center;
+      height: 100%;
+      vertical-align: top;
+    }
+
+    .chapter-menu h4 {
+      margin: 0 18px 0 0;
+      color: var(--navy-soft);
+      font-family: var(--serif);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .chapter-menu li {
+      margin: 0 10px;
+      color: var(--ink-muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .chapter-menu li.current {
+      color: var(--red);
+    }
+
+    .chapter-menu a:hover,
+    .chapter-menu a:focus-visible {
+      color: var(--ink);
+      outline: none;
+    }
+
+    /* =========================================================
+      03-12. 页脚 / Footer
+      -------------------------------------------------------
+      来源 & 署名 & 版权信息
+      sources & credits & copyright information
+    ======================================================== */
+    .site-footer {
+      padding: 52px 20px 82px;
+      color: var(--ink-muted);
+      background: var(--paper);
+      text-align: center;
+    }
+
+    .site-footer p {
+      max-width: 680px;
+      margin: 0 auto 14px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-mark {
+      display: block;
+      width: 54px;
+      height: 66px;
+      margin: 24px auto 0;
+      object-fit: contain;
+    }
+
+    /* =========================================================
+      03-13. 响应式适配 / Responsive Layout
+      -------------------------------------------------------
+      手机端取消作者左浮、隐藏桌面章节切换，并把多列视觉改成单列。
+      On mobile, the floating author card is collapsed, desktop chapter
+      switching is hidden, and multi-column visuals become single-column.
+    ======================================================== */
+    @media (max-width: 900px) {
+      .author {
+        position: relative;
+        left: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: auto;
+        margin: 0 0 14px;
+        text-align: left;
+      }
+
+      .author-pic {
+        margin: 0;
+      }
+
+      .visual-pair .wrapper,
+      .branch-grid .wrapper,
+      .simulator-grid .wrapper,
+      .project-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .media-card {
+        min-height: 280px;
+      }
+
+      .chapter-switch {
+        display: none !important;
+      }
+
+      .project-card {
+        grid-template-columns: 88px minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .desktop-only,
+      .menu-label,
+      .chapter-menu h4 {
+        display: none;
+      }
+
+      .topbar {
+        height: 62px;
+      }
+
+      .topbar-inner {
+        width: min(100% - 28px, 1180px);
+      }
+
+      .brand {
+        gap: 8px;
+        font-size: 14px;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 40px;
+      }
+
+      .menu-icon {
+        top: 23px;
+        left: 14px;
+      }
+
+      .top-social {
+        right: 0;
+        gap: 6px;
+      }
+
+      .top-social button,
+      .top-social a {
+        width: 36px;
+        height: 36px;
+      }
+
+      .action-icon {
+        width: 19px;
+        height: 19px;
+      }
+
+      .progress {
+        top: 62px;
+      }
+
+      .drawer-backdrop {
+        inset: 62px 0 0;
+      }
+
+      .side-nav {
+        top: 62px;
+        height: calc(100vh - 62px);
+      }
+
+      .cover {
+        height: 56vw;
+        min-height: 260px;
+      }
+
+      .chapter-label {
+        font-size: 13px;
+        letter-spacing: 0.45em;
+        text-indent: 0.45em;
+      }
+
+      .opening,
+      .article,
+      .wrapper,
+      .single-visual .wrapper,
+      .more-links,
+      .project-heading,
+      .project-cards {
+        width: min(100% - 28px, var(--wide-width));
+      }
+
+      .opening {
+        font-size: 18px;
+      }
+
+      .share-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: min(320px, calc(100% - 28px));
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .share-row button,
+      .share-row a {
+        width: 100%;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chapter-menu li {
+        margin: 0 5px;
+        font-size: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- =========================================================
+    04. 顶部固定栏 / Fixed Header
+  ========================================================== -->
+  <header class="topbar" id="top">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="返回顶部 / Back to top">
+        <img class="brand-mark" src="assets/ecnu-comm-logo-symbol.png" alt="" aria-hidden="true">
+        <span>哈尔滨新艺术建筑风格图鉴</span>
+      </a>
+
+      <div class="top-social" aria-label="页面操作 / Page actions">
+        <button type="button" id="shareButton" aria-label="复制页面链接 / Copy page link" title="复制链接">
+          <img class="action-icon" src="assets/share.png" alt="" aria-hidden="true">
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <button class="menu-icon" type="button" id="menuToggle" aria-controls="leftMenu" aria-expanded="false">
+    <span class="menu-symbol" aria-hidden="true"></span>
+    <span class="menu-label">Sections</span>
+    <span class="sr-only">打开目录 / Open sections</span>
+  </button>
+
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <!-- =========================================================
+    05. 左侧目录 / Left Section Drawer
+  ========================================================== -->
+  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+  <nav class="side-nav" id="leftMenu" aria-hidden="true" aria-label="报道目录 / Story sections">
+    <div class="side-nav-inner">
+      <ul>
+        <li><a href="main-webpage.html">首页</a></li>
+        <li><a href="chapter-1.html">1. 马迭尔宾馆</a></li>
+        <li><a href="chapter-2.html">2. 莫斯科商场（黑龙江省博物馆）</a></li>
+        <li><strong>3. 南岗博物馆</strong></li>
+        <li><a href="chapter-4.html">4. 秋林公司道里商店旧址</a></li>
+        <li><a href="chapter-5.html">5. 中东铁路管理局旧址</a></li>
+        <li><a href="chapter-6.html">6. 花园街405号 高级职员住宅</a></li>
+        <li><a href="chapter-7.html">7. 阿克谢耶夫洋行</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <!-- =======================================================
+      06. 首屏导语 / Intro Section
+      -------------------------------------------------------
+      请替换封面图、专题名、章节号、主标题、日期和导语
+      Replace the cover image, series title, chapter label, main title,
+      date, and opening paragraph to create a new story.
+    ======================================================== -->
+    <section class="intro" aria-labelledby="storyTitle">
+      <div class="cover">
+        <img src="assets/chapter-3-nangong-museum/nangang-museum-building.JPG" alt="nangang-museum-building">
+      </div>
+      <p class="series-title">哈尔滨新艺术建筑｜Art Nouveau architecture in Harbin</p>
+      <p class="chapter-label">Chapter 3</p>
+      <h1 id="storyTitle">南岗博物馆</h1>
+      <p class="date">2026年7月25日</p>
+      <p class="opening">
+        南岗博物馆建于1904年，位于南岗区联发街1号，原为中东铁路管理局副局长官邸，历经张景惠公馆、满铁参事住宅等历史用途，1948年曾作为第四野战军指挥部使用，在2010年修缮后改为博物馆。建筑二层，带有阁楼，砖木混合结构，主入口左侧有单层附属建筑与主体相呼应。该建筑的造型、平面与位于联发街64号的另一座新艺术风格建筑相似。建筑装饰元素多用自由曲线，构件线脚造型独特精美，窗型多变，阳台集中了模仿自然界生长繁茂的草木形态的木构件装饰，表现出飘逸潇洒、生机勃勃的动态效果。凸起于屋面的装饰柱末端也处理成曲线轮廓。
+      </p>
+    </section>
+
+    <section class="standard">
+      <div class="article">
+        <h3 id=”protection”>从历史建筑到博物馆</h3>
+        <p>
+          南岗博物馆位于南岗区联发街1号，建筑始建于1904年，为砖木结构新艺术运动风格，由地下一层、地上二层及塔楼构成，建筑面积1,830平方米。建筑外观以黄绿色调为主，窗型多姿多彩，造型飘逸潇洒，是哈尔滨新艺术运动建筑的杰出代表，被列为哈尔滨市一类保护建筑。
+        </p>
+        <p>
+          历史上，该建筑最初为中东铁路高级职员住宅（1906年起由铁路局车务处处长金茨一家居住长达13年），后先后成为两任东省特别区行政长官公馆，解放战争时期曾作为东北民主联军（第四野战军）指挥部。解放后改为花园街幼儿园。2010年南岗区按”修旧如旧”原则进行全面修缮，重点修复木制穹顶与彩色玻璃窗，同年作为博物馆免费开放。2014年被公布为黑龙江省级文物保护单位，2023年完成温湿度调控系统升级达到Ⅱ类文物保护标准，2024年8月被认定为国家三级博物馆，现为国家AAA级旅游景区，年均开放300天。
+        </p>
+      </div>
+
+      <section class="full-content visual-pair" aria-label="南岗博物馆室内装饰细部">
+        <ul class="wrapper">
+          <li class="side">
+            <figure class="media-card">
+              <img src="assets/chapter-3-nangong-museum/nangang-chandelier.jpg" alt="南岗博物馆馆内带有枝叶曲线装饰的吊灯" loading="lazy" decoding="async">
+              <figcaption>馆内吊灯以枝叶和卷曲线条组织造型，延续了新艺术风格对自然意象的偏爱。</figcaption>
+            </figure>
+          </li>
+          <li class="side">
+            <figure class="media-card">
+              <img src="assets/chapter-3-nangong-museum/nangang-stair-railing.jpg" alt="南岗博物馆楼梯上的黑色金属栏杆细部" loading="lazy" decoding="async">
+              <figcaption>楼梯栏杆以连续的植物纹样装饰金属构件，曲线在行进路径中反复出现。</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </section>
+
+      <section class="full-content single-visual" aria-label="南岗博物馆木构阳台">
+        <div class="wrapper">
+          <figure>
+            <img src="assets/chapter-3-nangong-museum/nangang-balcony.jpg" alt="南岗博物馆黄色墙面、绿色木构阳台与塔楼" loading="lazy" decoding="async">
+            <figcaption class="caption">木构阳台、塔楼和大面积窗扇共同构成富有层次的侧立面。</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <div class="article">
+        <p>
+          建筑本体也作为展品被纳入参观线路，还设置了建筑结构解析展板与互动投影装置。2023年南岗博物馆完成温湿度调控系统升级，达到Ⅱ类文物保护标准。
+        </p>
+      </div>
+    </section>
+
+    <!-- =======================================================
+      15. 桌面章节切换 / Desktop Chapter Switch
+      -------------------------------------------------------
+      中文：滚动进入正文后显示，模仿原文左右章节切换的感觉。
+      English: Appears after entering the body, echoing the reference page's
+      previous/next chapter navigation.
+    ======================================================== -->
+    <nav class="chapter-switch" id="chapterSwitch" aria-label="章节切换 / Chapter switch">
+      <a class="previous" href="#top"><strong>‹</strong><span>Cover</span></a>
+      <a class="next" href="#related"><span>Related</span><strong>›</strong></a>
+    </nav>
+
+    <!-- =======================================================
+      16. 底部章节菜单 / Bottom Chapter Menu
+      -------------------------------------------------------
+      这里不做
+    ======================================================== -->
+    <nav class="chapter-menu" id="chapterMenu" aria-label="章节切换">
+      <h4>本系列</h4>
+      <ul>
+        <li><a href="chapter-1.html">1. 马迭尔宾馆</a></li>
+        <li><a href="chapter-2.html">2. 莫斯科商场（黑龙江省博物馆）</a></li>
+        <li class="current"><a href="chapter-3.html">3. 南岗博物馆</a></li>
+        <li><a href="chapter-4.html">4. 秋林公司道里商店旧址</a></li>
+        <li><a href="chapter-5.html">5. 中东铁路管理局旧址</a></li>
+        <li><a href="chapter-6.html">6. 中东铁路高级职员住宅旧址</a></li>
+        <li><a href="chapter-7.html">7. 阿克谢耶夫洋行</a></li>
+      </ul>
+    </nav>
+  </main>
+
+  <!-- =========================================================
+    17. 页脚 / Footer
+    ---------------------------------------------------------
+    资料来源  & 署名 & 编辑信息
+    sources, credits, and editor details are recommended, especially
+    for journalism projects and coursework.
+  ========================================================== -->
+  <footer class="site-footer" id="footer">
+    <p>
+      <strong>哈尔滨新艺术建筑图鉴</strong><br>
+      南岗博物馆
+    </p>
+    <p>
+      <strong>制作人员</strong>
+    </p>
+    <p>
+      杨乐文 冯靖博 严歆雨 徐菁 苏比伊努尔·阿曼 张暖忻
+    </p>
+    <p>
+      <strong>发布日期：</strong>2026年7月25日<br>
+      <strong>图表资料：</strong>据刘大平、王岩《哈尔滨新艺术建筑》整理
+    </p>
+    <img class="footer-mark" src="assets/ecnu-comm-logo-symbol.png" alt="" aria-hidden="true">
+  </footer>
+
+  <!-- =========================================================
+    18. 页面交互脚本 / Interaction Scripts
+    ---------------------------------------------------------
+    处理抽屉目录、阅读进度、固定菜单显示和分享功能。
+    Handles drawer navigation, reading progress, fixed-menu visibility,
+    and sharing behavior.
+  ========================================================== -->
+  <script>
+    /* =======================================================
+      18-01. 获取 DOM 节点 / DOM References
+      -----------------------------------------------------
+      获取页面元素，后续函数复用这些引用。
+      Collects page elements once so later functions can reuse them.
+    ======================================================== */
+    const topbar = document.querySelector(".topbar");
+    const menuToggle = document.querySelector("#menuToggle");
+    const leftMenu = document.querySelector("#leftMenu");
+    const drawerBackdrop = document.querySelector("#drawerBackdrop");
+    const progressBar = document.querySelector("#progressBar");
+    const chapterMenu = document.querySelector("#chapterMenu");
+    const chapterSwitch = document.querySelector("#chapterSwitch");
+    const drawerLinks = document.querySelectorAll(".side-nav a");
+    var shareButton = document.querySelector("#shareButton");
+
+    /* =======================================================
+      18-02. 打开/关闭目录 / Open And Close Drawer
+      -----------------------------------------------------
+      同时更新 class 与 aria 属性，兼顾视觉交互和无障碍语义。
+      Updates both classes and aria attributes for visual behavior and
+      accessibility semantics.
+    ======================================================== */
+    function setMenu(open) {
+      menuToggle.setAttribute("aria-expanded", String(open));
+      leftMenu.setAttribute("aria-hidden", String(!open));
+      leftMenu.classList.toggle("is-open", open);
+      drawerBackdrop.classList.toggle("is-open", open);
+    }
+
+    /* =======================================================
+      18-03. 阅读进度与固定菜单 / Progress And Fixed Menus
+      -----------------------------------------------------
+      根据滚动位置更新顶部进度条，并在进入正文后显示底部章节菜单。
+      Updates the reading progress bar and reveals the bottom chapter
+      menu after the reader enters the story body.
+    ======================================================== */
+    function updateScrollState() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
+      const active = window.scrollY > 180;
+      progressBar.style.width = `${Math.min(progress, 100)}%`;
+      topbar.classList.toggle("is-compact", window.scrollY > 16);
+      chapterMenu.classList.toggle("is-visible", active);
+      chapterSwitch.classList.toggle("is-visible", active);
+    }
+
+    /* =======================================================
+      18-04. 分享功能 / Share → Copy Link
+    ======================================================== */
+    var toast = document.createElement("div");
+    toast.style.cssText = "position:fixed;z-index:999;bottom:80px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;background:rgba(7,19,29,0.9);color:#fff;font-size:14px;pointer-events:none;opacity:0;transition:opacity 0.3s ease;white-space:nowrap;";
+    toast.textContent = "链接已复制";
+    document.body.appendChild(toast);
+
+    async function copyPageLink() {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(window.location.href);
+        } else {
+          var ta = document.createElement("textarea");
+          ta.value = window.location.href;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        toast.style.opacity = "1";
+        setTimeout(function () { toast.style.opacity = "0"; }, 1800);
+      } catch (e) {}
+    }
+
+    /* =======================================================
+      18-05. 事件绑定 / Event Listeners
+    ======================================================== */
+    menuToggle.addEventListener("click", () => {
+      const open = menuToggle.getAttribute("aria-expanded") !== "true";
+      setMenu(open);
+    });
+
+    drawerBackdrop.addEventListener("click", () => setMenu(false));
+    drawerLinks.forEach((link) => link.addEventListener("click", () => setMenu(false)));
+
+    shareButton.addEventListener("click", copyPageLink);
+
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        setMenu(false);
+      }
+    });
+
+    updateScrollState();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "codex",
+  "version": "1.0.0",
+  "description": "Scroll-driven map reveal prototype",
+  "main": "index.js",
+  "scripts": {
+    "build:data": "node tools/analyze-annotations.js && node tools/validate-reveal.js",
+    "export:psd": "node tools/export-psd.js && node tools/analyze-annotations.js && node tools/validate-reveal.js",
+    "serve": "node tools/serve.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "pngjs": "^7.0.0",
+    "psd": "^3.4.0"
+  }
+}

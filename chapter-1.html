@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <!-- =========================================================
+    01. 基础信息 / Basic Information
+    ---------------------------------------------------------
+    这一组 meta 控制编码、移动端缩放、搜索摘要、作者和页面标题。
+    These meta tags control encoding, mobile scaling, search summary,
+    author metadata, and the browser-tab title.
+  ========================================================== -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="author" content="">
+  <title>Chapter 1｜马迭尔宾馆</title>
+
+  <!-- ========================================================= 
+    02. 社交分享信息 / Social Sharing Metadata
+   ========================================================= -->
+  <!--
+    03. 页面样式 / Page Styles
+   ========================================================= -->
+  <style>
+    /* =========================================================
+      03-01. 设计变量 / Design Tokens
+      -------------------------------------------------------
+      颜色 & 字体 & 宽度 & 阴影 & 动画速度。
+      colors & fonts & widths & shadows & motion timing
+    ======================================================== */
+    :root {
+      --paper: #ffffff;
+      --paper-soft: #f5f5f2;
+      --ink: #151515;
+      --ink-muted: #55565a;
+      --ink-light: #8c8c8c;
+      --navy: #001246;
+      --navy-soft: #20245d;
+      --gold: #ffc200;
+      --red: #9d1d16;
+      --line: #d9d9da;
+      --line-soft: #eeeeee;
+      --shadow: 0 24px 70px rgba(0, 18, 70, 0.14);
+      --serif: Georgia, "Times New Roman", "Noto Serif SC", "Songti SC", serif;
+      --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      --article-width: 480px;
+      --wide-width: 1060px;
+      --radius: 6px;
+      --fast: 180ms ease;
+      --slow: 700ms ease;
+    }
+
+    /* =========================================================
+      03-02. 全局重置 / Global Reset
+      -------------------------------------------------------
+      去掉浏览器默认间距，设置白色背景和适合长文阅读的基础字体。
+      Removes default spacing, sets a white background, and establishes
+      typography suitable for long-form reading.
+    ======================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      line-height: 1.6;
+      text-rendering: optimizeLegibility;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      padding: 0;
+      border: 0;
+      font: inherit;
+      color: inherit;
+      background: none;
+      cursor: pointer;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .desktop-only {
+      display: inline;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* =========================================================
+      03-03. 顶部固定栏 / Fixed Top Bar
+      -------------------------------------------------------
+      顶部 40px 的深色固定栏，左侧是 SECTIONS，
+      中间是媒体/项目标识，右侧是分享入口。
+      40px fixed dark bar;
+      SECTIONS on the left, publication/project identity in the center, and share buttons right.
+    ======================================================== */
+    .topbar {
+      position: fixed;
+      z-index: 80;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 68px;
+      color: var(--paper);
+      background: linear-gradient(180deg, rgba(7, 19, 29, 0.72), rgba(7, 19, 29, 0));
+      border-bottom: 0;
+      transition: background 220ms ease;
+    }
+
+    .topbar.is-compact {
+      background: rgba(7, 19, 29, 0.88);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    .brand-mark {
+      display: block;
+      flex: 0 0 auto;
+      width: 40px;
+      height: 48px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+    }
+
+    .menu-icon {
+      position: fixed;
+      z-index: 90;
+      top: 24px;
+      left: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--paper);
+      text-transform: uppercase;
+    }
+
+    .menu-symbol,
+    .menu-symbol::before,
+    .menu-symbol::after {
+      display: block;
+      width: 24px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      content: "";
+    }
+
+    .menu-symbol {
+      position: relative;
+    }
+
+    .menu-symbol::before {
+      position: absolute;
+      top: -7px;
+      left: 0;
+    }
+
+    .menu-symbol::after {
+      position: absolute;
+      top: 7px;
+      left: 0;
+    }
+
+    .menu-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .top-social {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(-50%);
+    }
+
+    .top-social button,
+    .top-social a {
+      display: inline-grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 50%;
+      padding: 0;
+      color: var(--paper);
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      overflow: hidden;
+      text-decoration: none;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .action-icon {
+      display: block;
+      width: 21px;
+      height: 21px;
+      object-fit: contain;
+      filter: invert(1);
+      pointer-events: none;
+    }
+
+    .top-social button:hover,
+    .top-social button:focus-visible,
+    .top-social a:hover,
+    .top-social a:focus-visible {
+      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .progress {
+      position: fixed;
+      z-index: 95;
+      top: 68px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: transparent;
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--gold);
+      transition: width 80ms linear;
+    }
+
+    /* =========================================================
+      03-04. 左侧抽屉目录 / Left Drawer Navigation
+    ======================================================== */
+    .drawer-backdrop {
+      position: fixed;
+      z-index: 85;
+      inset: 68px 0 0;
+      display: none;
+      background: rgba(0, 0, 0, 0.28);
+    }
+
+    .drawer-backdrop.is-open {
+      display: block;
+    }
+
+    .side-nav {
+      position: fixed;
+      z-index: 86;
+      top: 68px;
+      left: 0;
+      width: 0;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+      color: var(--paper);
+      background: var(--navy);
+      transition: width 420ms ease;
+    }
+
+    .side-nav.is-open {
+      width: min(310px, 86vw);
+    }
+
+    .side-nav-inner {
+      width: min(310px, 86vw);
+      padding: 22px 0;
+    }
+
+    .side-nav a {
+      display: block;
+      padding: 10px 18px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      transition: color var(--fast), background var(--fast), border-color var(--fast);
+      border-left: 2px solid transparent;
+    }
+
+    .side-nav a:hover,
+    .side-nav a:focus-visible {
+      color: var(--paper);
+      background: rgba(255, 255, 255, 0.08);
+      border-left-color: var(--gold);
+      outline: none;
+    }
+
+    /* =========================================================
+      03-05. 首屏 / Intro
+    ======================================================== */
+    .intro {
+      padding-top: 0;
+      text-align: center;
+      background: var(--paper);
+    }
+
+    .cover {
+      position: relative;
+      width: 100%;
+      height: min(48vw, 740px);
+      min-height: 340px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      background: #0d0d0f;
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.88) contrast(1.05);
+      transform: scale(1.03);
+      animation: coverDrift 18s ease-in-out infinite alternate;
+    }
+
+    .cover::before {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.02) 45%, rgba(0, 0, 0, 0.28)),
+        linear-gradient(90deg, rgba(0, 18, 70, 0.18), transparent 42%, rgba(157, 29, 22, 0.12));
+      content: "";
+      pointer-events: none;
+    }
+
+    .cover::after {
+      position: absolute;
+      z-index: 2;
+      right: 28px;
+      bottom: 24px;
+      width: min(260px, 38vw);
+      height: 3px;
+      background: var(--gold);
+      content: "";
+      box-shadow: 0 0 28px rgba(255, 194, 0, 0.5);
+      transform-origin: right;
+      animation: linePulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes coverDrift {
+      from {
+        transform: scale(1.03) translate3d(-0.5%, 0, 0);
+      }
+
+      to {
+        transform: scale(1.09) translate3d(0.8%, -0.5%, 0);
+      }
+    }
+
+    @keyframes linePulse {
+      0%,
+      100% {
+        transform: scaleX(0.72);
+        opacity: 0.6;
+      }
+
+      50% {
+        transform: scaleX(1);
+        opacity: 1;
+      }
+    }
+
+    .series-title {
+      margin: 0 20px 32px;
+      color: var(--navy-soft);
+      font-family: var(--serif);
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .chapter-label {
+      max-width: 680px;
+      margin: 0 auto;
+      color: #6b6869;
+      font-size: 16px;
+      font-weight: 300;
+      letter-spacing: 0.95em;
+      text-indent: 0.95em;
+      text-transform: uppercase;
+    }
+
+    .intro h1 {
+      width: min(680px, calc(100% - 40px));
+      margin: 14px auto 26px;
+      font-family: var(--serif);
+      font-size: clamp(34px, 5.4vw, 62px);
+      line-height: 1.08;
+      text-wrap: balance;
+    }
+
+    .date {
+      width: min(620px, calc(100% - 40px));
+      margin: 0 auto 16px;
+      color: var(--ink-light);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+      text-transform: uppercase;
+    }
+
+    .opening {
+      position: relative;
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto 42px;
+      color: #767676;
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 300;
+      line-height: 1.62;
+      text-align: left;
+    }
+
+    .opening::first-letter {
+      float: left;
+      padding: 8px 15px 0 3px;
+      color: var(--navy-soft);
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 0.82;
+    }
+
+    .author {
+      position: absolute;
+      top: 0;
+      left: -150px;
+      width: 100px;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    .author-pic {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      place-items: center;
+      margin: 0 auto 8px;
+      border-radius: 50%;
+      color: var(--paper);
+      background: var(--navy);
+      font-weight: 900;
+    }
+
+    .author-name::before {
+      content: "By ";
+      font-weight: 400;
+    }
+
+    /* =========================================================
+      03-06. 正文窄栏 / Narrow Article Column
+    ======================================================== */
+    .standard {
+      margin: 0;
+      background: var(--paper);
+    }
+
+    .article {
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .article h2,
+    .article h3 {
+      margin: 46px 0 12px;
+      color: var(--ink);
+      font-family: var(--serif);
+      line-height: 1.24;
+    }
+
+    .article h2 {
+      font-size: 32px;
+    }
+
+    .article h3 {
+      font-size: 23px;
+    }
+
+    .article p {
+      margin: 24px 0;
+      color: #4d4d4d;
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.56;
+    }
+
+    .article strong {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .inline-graphic {
+      width: 100%;
+      margin: 28px 0;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--paper-soft);
+    }
+
+    .caption {
+      margin-top: 9px;
+      color: var(--ink-light);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    /* =========================================================
+      03-07. 全宽内容模块 / Full-Width Content Modules
+    ======================================================== */
+    .full-content {
+      position: relative;
+      width: 100%;
+      margin: 48px auto;
+      text-align: center;
+    }
+
+    .wrapper {
+      width: min(var(--wide-width), calc(100% - 40px));
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .visual-pair .wrapper,
+    .branch-grid .wrapper,
+    .simulator-grid .wrapper {
+      display: grid;
+      gap: 18px;
+    }
+
+    .visual-pair .wrapper {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    .side {
+      min-width: 0;
+    }
+
+    .media-card {
+      position: relative;
+      min-height: 320px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: var(--paper-soft);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+    }
+
+    .media-card img {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      transition: transform 700ms ease, filter 700ms ease;
+    }
+
+    .media-card:hover img {
+      filter: saturate(1.08) contrast(1.06);
+      transform: scale(1.05);
+    }
+
+    .media-card figcaption,
+    .diagram-card figcaption {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      left: 14px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 12px;
+      text-align: left;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    .single-visual .wrapper {
+      width: min(980px, calc(100% - 40px));
+    }
+
+    .single-visual img {
+      width: 100%;
+      max-height: 650px;
+      border-radius: var(--radius);
+      object-fit: cover;
+      box-shadow: var(--shadow);
+    }
+
+    /* =========================================================
+      03-08. 图解卡片 / Explainer Cards
+    ======================================================== */
+    .branch-grid .wrapper {
+      grid-template-columns: 1fr 0.8fr 1fr;
+      align-items: center;
+    }
+
+    .diagram-card {
+      position: relative;
+      min-height: 280px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, #fcfbf7, #eeece4),
+        repeating-linear-gradient(90deg, transparent 0 32px, rgba(0, 18, 70, 0.08) 32px 34px);
+    }
+
+    .diagram-card::before {
+      position: absolute;
+      inset: 38px 34px 56px;
+      border: 14px solid var(--navy-soft);
+      border-top-width: 26px;
+      border-radius: 4px 4px 0 0;
+      content: "";
+      opacity: 0.9;
+    }
+
+    .diagram-card::after {
+      position: absolute;
+      right: 18%;
+      bottom: 58px;
+      left: 18%;
+      height: 90px;
+      background:
+        linear-gradient(90deg, transparent 0 16%, var(--red) 16% 24%, transparent 24% 40%, var(--red) 40% 48%, transparent 48% 64%, var(--red) 64% 72%, transparent 72%),
+        linear-gradient(180deg, transparent 0 42%, rgba(0, 18, 70, 0.2) 42% 46%, transparent 46%);
+      content: "";
+    }
+
+    .explain-copy {
+      padding: 22px;
+      color: var(--paper);
+      background: var(--navy);
+      border-radius: var(--radius);
+      text-align: left;
+    }
+
+    .explain-copy h3 {
+      margin: 0 0 12px;
+      font-family: var(--serif);
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .explain-copy p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .simulator-grid .wrapper {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .quake-card {
+      position: relative;
+      min-height: 250px;
+      padding: 22px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fafafa;
+      text-align: left;
+    }
+
+    .quake-card::before {
+      position: absolute;
+      right: 22px;
+      bottom: 36px;
+      left: 22px;
+      height: 116px;
+      border-bottom: 8px solid var(--navy-soft);
+      background:
+        repeating-linear-gradient(90deg, var(--red) 0 12px, transparent 12px 34px),
+        linear-gradient(180deg, transparent 0 36%, rgba(0, 18, 70, 0.13) 36% 42%, transparent 42%);
+      content: "";
+      transform-origin: bottom center;
+      animation: tremor 2.6s ease-in-out infinite;
+    }
+
+    .quake-card:nth-child(2)::before {
+      animation-delay: 220ms;
+      transform: skewX(-3deg);
+    }
+
+    .quake-card:nth-child(3)::before {
+      animation-delay: 420ms;
+    }
+
+    .quake-card h4 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 22px;
+    }
+
+    .quake-card p {
+      position: relative;
+      z-index: 1;
+      max-width: 220px;
+      margin: 10px 0 0;
+      color: var(--ink-muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    @keyframes tremor {
+      0%,
+      100% {
+        transform: translateX(0) skewX(0);
+      }
+
+      22% {
+        transform: translateX(-4px) skewX(-2deg);
+      }
+
+      48% {
+        transform: translateX(5px) skewX(3deg);
+      }
+
+      72% {
+        transform: translateX(-2px) skewX(-1deg);
+      }
+    }
+
+    /* =========================================================
+      03-09. 分享模块 / In-Article Social Block
+    ======================================================== */
+    .share-block {
+      padding: 48px 0 34px;
+    }
+
+    .share-block h4 {
+      margin: 0 0 15px;
+      color: var(--ink-muted);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    .share-row {
+      display: inline-flex;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-right: 0;
+    }
+
+    .share-row button,
+    .share-row a {
+      display: grid;
+      width: 74px;
+      height: 55px;
+      place-items: center;
+      border-right: 1px solid var(--line);
+      color: var(--navy);
+      font-size: 13px;
+      font-weight: 900;
+      transition: color var(--fast), background var(--fast);
+    }
+
+    .share-row button:hover,
+    .share-row button:focus-visible,
+    .share-row a:hover,
+    .share-row a:focus-visible {
+      color: var(--paper);
+      background: var(--navy);
+      outline: none;
+    }
+
+    /* =========================================================
+      03-10. 相关链接和专题推荐 / Related Links And Project Cards
+    ======================================================== */
+    .more-links {
+      width: min(760px, calc(100% - 40px));
+      margin: 70px auto;
+      padding: 26px 0 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .more-links h3 {
+      margin: 0 0 12px;
+      color: var(--ink-muted);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .more-links a {
+      display: block;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--navy-soft);
+      font-family: var(--serif);
+      font-size: 19px;
+      line-height: 1.35;
+      transition: color var(--fast), padding-left var(--fast);
+    }
+
+    .more-links a:hover,
+    .more-links a:focus-visible {
+      color: var(--red);
+      padding-left: 8px;
+      outline: none;
+    }
+
+    .project-panel {
+      margin: 0;
+      padding: 58px 0 64px;
+      background: var(--paper-soft);
+      border-top: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .project-heading {
+      width: min(var(--wide-width), calc(100% - 40px));
+      margin: 0 auto 24px;
+      text-align: center;
+    }
+
+    .project-heading h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 1.15;
+    }
+
+    .project-heading p {
+      margin: 8px 0 0;
+      color: var(--ink-muted);
+      font-size: 14px;
+    }
+
+    .project-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      width: min(var(--wide-width), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .project-card {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 16px;
+      min-height: 160px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: var(--paper);
+      transition: transform var(--fast), box-shadow var(--fast), border-color var(--fast);
+    }
+
+    .project-card:hover,
+    .project-card:focus-visible {
+      border-color: var(--navy-soft);
+      box-shadow: 0 16px 44px rgba(0, 18, 70, 0.12);
+      transform: translateY(-3px);
+      outline: none;
+    }
+
+    .project-thumb {
+      min-height: 130px;
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, rgba(0, 18, 70, 0.12), rgba(0, 18, 70, 0.5)),
+        url("assets/harbin-architecture-hero.png") center / cover;
+    }
+
+    .project-num {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .project-card h3 {
+      margin: 8px 0 6px;
+      font-family: var(--serif);
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .project-card p {
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* =========================================================
+      03-11. 固定章节切换 / Fixed Chapter Navigation
+    ======================================================== */
+    .chapter-switch {
+      position: fixed;
+      z-index: 70;
+      top: 50%;
+      right: 0;
+      left: 0;
+      display: none;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .chapter-switch.is-visible {
+      display: block;
+    }
+
+    .chapter-switch a {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 158px;
+      height: 46px;
+      padding: 0 14px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+      pointer-events: auto;
+      transition: color var(--fast), background var(--fast), transform var(--fast);
+    }
+
+    .chapter-switch a:hover,
+    .chapter-switch a:focus-visible {
+      color: var(--paper);
+      background: var(--navy);
+      transform: translateX(0);
+      outline: none;
+    }
+
+    .chapter-switch .previous {
+      left: 0;
+      transform: translateX(-112px);
+    }
+
+    .chapter-switch .next {
+      right: 0;
+      justify-content: flex-end;
+      transform: translateX(112px);
+      text-align: right;
+    }
+
+    .chapter-menu {
+      position: fixed;
+      z-index: 70;
+      right: 0;
+      bottom: -54px;
+      left: 0;
+      height: 50px;
+      padding: 0 18px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.94);
+      border-top: 1px solid var(--line);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: bottom var(--slow);
+    }
+
+    .chapter-menu.is-visible {
+      bottom: 0;
+    }
+
+    .chapter-menu h4,
+    .chapter-menu ul,
+    .chapter-menu li {
+      display: inline-flex;
+      align-items: center;
+      height: 100%;
+      vertical-align: top;
+    }
+
+    .chapter-menu h4 {
+      margin: 0 18px 0 0;
+      color: var(--navy-soft);
+      font-family: var(--serif);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .chapter-menu li {
+      margin: 0 10px;
+      color: var(--ink-muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .chapter-menu li.current {
+      color: var(--red);
+    }
+
+    .chapter-menu a:hover,
+    .chapter-menu a:focus-visible {
+      color: var(--ink);
+      outline: none;
+    }
+
+    /* =========================================================
+      03-12. 页脚 / Footer
+      -------------------------------------------------------
+      来源 & 署名 & 版权信息
+      sources & credits & copyright information
+    ======================================================== */
+    .site-footer {
+      padding: 52px 20px 82px;
+      color: var(--ink-muted);
+      background: var(--paper);
+      text-align: center;
+    }
+
+    .site-footer p {
+      max-width: 680px;
+      margin: 0 auto 14px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-mark {
+      display: block;
+      width: 54px;
+      height: 66px;
+      margin: 24px auto 0;
+      object-fit: contain;
+    }
+
+    /* =========================================================
+      03-13. 响应式适配 / Responsive Layout
+      -------------------------------------------------------
+      手机端取消作者左浮、隐藏桌面章节切换，并把多列视觉改成单列。
+      On mobile, the floating author card is collapsed, desktop chapter
+      switching is hidden, and multi-column visuals become single-column.
+    ======================================================== */
+    @media (max-width: 900px) {
+      .author {
+        position: relative;
+        left: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: auto;
+        margin: 0 0 14px;
+        text-align: left;
+      }
+
+      .author-pic {
+        margin: 0;
+      }
+
+      .visual-pair .wrapper,
+      .branch-grid .wrapper,
+      .simulator-grid .wrapper,
+      .project-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .media-card {
+        min-height: 280px;
+      }
+
+      .chapter-switch {
+        display: none !important;
+      }
+
+      .project-card {
+        grid-template-columns: 88px minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .desktop-only,
+      .menu-label,
+      .chapter-menu h4 {
+        display: none;
+      }
+
+      .topbar {
+        height: 62px;
+      }
+
+      .topbar-inner {
+        width: min(100% - 28px, 1180px);
+      }
+
+      .brand {
+        gap: 8px;
+        font-size: 14px;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 40px;
+      }
+
+      .menu-icon {
+        top: 23px;
+        left: 14px;
+      }
+
+      .top-social {
+        right: 0;
+        gap: 6px;
+      }
+
+      .top-social button,
+      .top-social a {
+        width: 36px;
+        height: 36px;
+      }
+
+      .action-icon {
+        width: 19px;
+        height: 19px;
+      }
+
+      .progress {
+        top: 62px;
+      }
+
+      .drawer-backdrop {
+        inset: 62px 0 0;
+      }
+
+      .side-nav {
+        top: 62px;
+        height: calc(100vh - 62px);
+      }
+
+      .cover {
+        height: 56vw;
+        min-height: 260px;
+      }
+
+      .chapter-label {
+        font-size: 13px;
+        letter-spacing: 0.45em;
+        text-indent: 0.45em;
+      }
+
+      .opening,
+      .article,
+      .wrapper,
+      .single-visual .wrapper,
+      .more-links,
+      .project-heading,
+      .project-cards {
+        width: min(100% - 28px, var(--wide-width));
+      }
+
+      .opening {
+        font-size: 18px;
+      }
+
+      .share-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: min(320px, calc(100% - 28px));
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .share-row button,
+      .share-row a {
+        width: 100%;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chapter-menu li {
+        margin: 0 5px;
+        font-size: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- =========================================================
+    04. 顶部固定栏 / Fixed Header
+  ========================================================== -->
+  <header class="topbar" id="top">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="返回顶部 / Back to top">
+        <img class="brand-mark" src="assets/ecnu-comm-logo-symbol.png" alt="" aria-hidden="true">
+        <span>哈尔滨新艺术建筑风格图鉴</span>
+      </a>
+
+      <div class="top-social" aria-label="页面操作 / Page actions">
+        <button type="button" id="shareButton" aria-label="复制页面链接 / Copy page link" title="复制链接">
+          <img class="action-icon" src="assets/share.png" alt="" aria-hidden="true">
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <button class="menu-icon" type="button" id="menuToggle" aria-controls="leftMenu" aria-expanded="false">
+    <span class="menu-symbol" aria-hidden="true"></span>
+    <span class="menu-label">Sections</span>
+    <span class="sr-only">打开目录 / Open sections</span>
+  </button>
+
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <!-- =========================================================
+    05. 左侧目录 / Left Section Drawer
+  ========================================================== -->
+  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+  <nav class="side-nav" id="leftMenu" aria-hidden="true" aria-label="报道目录 / Story sections">
+    <div class="side-nav-inner">
+      <ul>
+        <li><a href="main-webpage.html">首页</a></li>
+        <li><strong>1. 马迭尔宾馆</strong></li>
+        <li><a href="chapter-2.html">2. 莫斯科商场（黑龙江省博物馆）</a></li>
+        <li><a href="chapter-3.html">3. 南岗博物馆</a></li>
+        <li><a href="chapter-4.html">4. 秋林公司道里商店旧址</a></li>
+        <li><a href="chapter-5.html">5. 中东铁路管理局旧址</a></li>
+        <li><a href="chapter-6.html">6. 花园街405号 高级职员住宅</a></li>
+        <li><a href="chapter-7.html">7. 阿克谢耶夫洋行</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <!-- =======================================================
+      06. 首屏导语 / Intro Section
+      -------------------------------------------------------
+      请替换封面图、专题名、章节号、主标题、日期和导语
+      Replace the cover image, series title, chapter label, main title,
+      date, and opening paragraph to create a new story.
+    ======================================================== -->
+    <section class="intro" aria-labelledby="storyTitle">
+      <div class="cover">
+        <img src="assets/modern-hotel.jpg" alt="马迭尔宾馆外观">
+      </div>
+      <p class="series-title">哈尔滨新艺术建筑｜Art Nouveau architecture in Harbin</p>
+      <p class="chapter-label">Chapter 1</p>
+      <h1 id="storyTitle">马迭尔宾馆</h1>
+      <p class="date">2026年7月25日</p>
+      <p class="opening">
+        中央大街上，马迭尔宾馆很难被错过。它不靠高大取胜，也不靠金碧辉煌吸引人。真正让人停下脚步的，是它立面上那些柔和的曲线、起伏的女儿墙、阳台上藤蔓一样的铁艺栏杆。走近看，窗户不是整齐划一的“复制粘贴”：二层是方额圆角窗，三层又换成不同弧线的窗额；檐口的线条也不是笔直压过去，而是像植物枝蔓一样舒展、转折、回旋。这正是哈尔滨新艺术运动建筑最典型的一张脸。
+
+      </p>
+    </section>
+
+    <section class="standard">
+      <!-- =====================================================
+        07. 正文第一节 / First Article Section
+        -----------------------------------------------------
+        正文保持窄栏，让读者阅读时更集中。
+        The body uses a narrow column to keep long-form reading focused.
+      ====================================================== -->
+      <div class="article" id="water">
+        <p>
+          <strong>这正是哈尔滨新艺术运动建筑最典型的一张脸。</strong>
+          马迭尔宾馆位于道里区中央大街89号，由俄籍犹太人约瑟·开斯普投资，聘请建筑师C.A.维萨恩设计，始建于1906年，1913年全面竣工。建筑为三层砖木混合结构，地下一层，平面呈扇形，部分带有四层孟莎式阁楼。底层基座砌成仿重块石墙体并设大尺度落地窗，二三层以通高壁柱连贯，檐部做曲线花饰与曲壳檐，转角上方设异形方穹顶，三层阳台以铸铁曲线栏杆构成，女儿墙以洗练的曲线勾勒——整体为新艺术运动风格，兼有巴洛克元素。
+        </p>
+        <p>
+          历史上，马迭尔宾馆是当时哈尔滨最豪华的多功能旅馆。1933年发生”马迭尔绑票案”后落入日伪之手；1946年哈尔滨解放后改为中共中央东北局招待处；1987年恢复”马迭尔”原名并沿用至今。2013年被国务院公布为第七批全国重点文物保护单位（编号7-1687-5-080），2017年入选第二批中国20世纪建筑遗产名录，现为中华老字号，仍正常运营，拥有约150间客房，并保留18间历史名人房间。
+        </p>
+
+        <h3 id="design">马迭尔宾馆的“摩登”设计</h3>
+        <p>
+          从平面看，马迭尔宾馆呈“L”形。它的外立面没有走庄重对称的老路，而是用多变的轮廓和丰富的细部来组织节奏。最醒目的，是屋顶边缘的女儿墙。它高低起伏，曲线自由，像城市天际线里突然伸出的一段旋律。墙身和女儿墙上，还能看到同心圆与竖向线脚组合成的装饰语言，这是新艺术建筑中常见的处理方式。阳台也是重点。马迭尔三层阳台栏杆使用金属材料制作，纹样带有植物感，线条弯曲、缠绕，不是单纯的实用构件，更像立面上的一组装饰画。檐部和阳台下方的曲线支撑构件，也让整栋建筑显得轻盈、柔软。它不像一座“硬邦邦”的老楼，更像一件被慢慢雕琢出来的城市家具。
+
+        </p>
+        <h3 id="role">马迭尔的“摩登”，不只在建筑上</h3>
+        <p>
+          20世纪初的哈尔滨，是一座因铁路迅速生长起来的国际城市。中央大街一带商铺、旅馆、影院、银行林立，俄侨、犹太商人、各国侨民和本地居民在这里交汇。马迭尔宾馆曾是当时哈尔滨最豪华的旅馆之一，也长期承担着城市会客厅的角色。住店、宴饮、社交、观光，很多人的哈尔滨记忆，都曾从这栋楼里进出。时代几经转换，马迭尔的身份也不断变化。1946年后，它曾改为中共中央东北局招待处；1987年恢复“马迭尔”原名。2013年，马迭尔宾馆被列为全国重点文物保护单位。对哈尔滨来说，它早已不是一家普通酒店，而是一段城市历史的实体切片。
+        </p>
+        <figure class="inline-graphic">
+          <img src="assets/chapter-1-modern-hotel/rebuild.jpg" alt="修缮中的马迭尔宾馆" loading="lazy" decoding="async">
+          <figcaption class="caption">修缮中的马迭尔宾馆</figcaption>
+        </figure>
+
+      </div>
+
+      <div class="article" id="repair">
+      <h3>又一次站在变化节点上的马迭尔宾馆</h3>
+      <p>
+       根据现有材料，马迭尔宾馆在2025年启动全面升级改造：8月面向社会征集改造建议，9月1日起客房部和中餐厅封闭施工，相关文物影响评估也已进入招标程序。
+      </p>
+      <p>
+        此次修缮提出"修旧如旧"的原则，并计划将其打造成更具展示功能的博物馆式主题酒店，预计在2026—2027冰雪季重新开放。这次修缮，意义不只是"翻新一家老字号酒店"。
+      </p>
+      <p>
+        马迭尔的问题，其实也是哈尔滨历史建筑共同面对的问题：老建筑怎样继续使用？怎样在商业运营中不被过度消费？怎样让修缮不是简单刷墙、换窗、贴新材料，而是真正尊重原有结构、工艺和审美？一栋楼能不能修好，考验的是技术；一座城能不能留住自己的味道，考验的是态度。
+      </p>
+      </div>
+
+      <div class="article" id="legacy">
+        <h3>从一栋建筑，看见城市的选择</h3>
+        <p>
+          在哈尔滨，类似的新艺术建筑现存约60栋，主要分布在道里区和南岗区。它们有的仍在使用，有的已经残破，有的被违建遮挡，有的在过去的城市更新中消失。马迭尔因为位置醒目、知名度高、保护级别高，得到了更多关注。但更多散落在街巷里的建筑，同样需要被看见。站在中央大街上看马迭尔，看到的不只是一个拍照打卡点，也不只是“马迭尔冰棍”背后的老字号招牌。它的窗、墙、阳台和曲线，记录着哈尔滨曾经怎样接住世界潮流，又怎样把外来的建筑语言变成自己的城市表情。等施工围挡撤下，马迭尔会以什么样的面貌重新出现，仍值得期待。真正好的修缮，不该把老建筑修成崭新的仿古景观，而该让人看见时间留下的层次：它曾经摩登，也曾经沉默；它被使用、被改名、被保护，如今又被重新打量。
+        </p>
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+      15. 桌面章节切换 / Desktop Chapter Switch
+      -------------------------------------------------------
+      中文：滚动进入正文后显示，模仿原文左右章节切换的感觉。
+      English: Appears after entering the body, echoing the reference page's
+      previous/next chapter navigation.
+    ======================================================== -->
+    <nav class="chapter-switch" id="chapterSwitch" aria-label="章节切换 / Chapter switch">
+      <a class="previous" href="#top"><strong>‹</strong><span>Cover</span></a>
+      <a class="next" href="#related"><span>Related</span><strong>›</strong></a>
+    </nav>
+
+    <!-- =======================================================
+      16. 底部章节菜单 / Bottom Chapter Menu
+      -------------------------------------------------------
+      这里不做
+    ======================================================== -->
+    <nav class="chapter-menu" id="chapterMenu" aria-label="章节切换">
+      <h4>本系列</h4>
+      <ul>
+        <li class="current"><a href="chapter-1.html">1. 马迭尔宾馆</a></li>
+        <li><a href="chapter-2.html">2. 莫斯科商场（黑龙江省博物馆）</a></li>
+        <li><a href="chapter-3.html">3. 南岗博物馆</a></li>
+        <li><a href="chapter-4.html">4. 秋林公司道里商店旧址</a></li>
+        <li><a href="chapter-5.html">5. 中东铁路管理局旧址</a></li>
+        <li><a href="chapter-6.html">6. 中东铁路高级职员住宅旧址</a></li>
+        <li><a href="chapter-7.html">7. 阿克谢耶夫洋行</a></li>
+      </ul>
+    </nav>
+  </main>
+
+  <!-- =========================================================
+    17. 页脚 / Footer
+    ---------------------------------------------------------
+    资料来源  & 署名 & 编辑信息
+    sources, credits, and editor details are recommended, especially
+    for journalism projects and coursework.
+  ========================================================== -->
+  <footer class="site-footer" id="footer">
+    <p>
+      <strong>哈尔滨新艺术建筑图鉴</strong><br>
+      马迭尔宾馆
+    </p>
+    <p>
+      <strong>制作人员</strong>
+    </p>
+    <p>
+      杨乐文 冯靖博 严歆雨 徐菁 苏比伊努尔·阿曼 张暖忻
+    </p>
+    <p>
+      <strong>发布日期：</strong>2026年7月25日<br>
+      <strong>图表资料：</strong>据刘大平、王岩《哈尔滨新艺术建筑》整理
+    </p>
+    <img class="footer-mark" src="assets/ecnu-comm-logo-symbol.png" alt="" aria-hidden="true">
+  </footer>
+
+  <!-- =========================================================
+    18. 页面交互脚本 / Interaction Scripts
+    ---------------------------------------------------------
+    处理抽屉目录、阅读进度、固定菜单显示和分享功能。
+    Handles drawer navigation, reading progress, fixed-menu visibility,
+    and sharing behavior.
+  ========================================================== -->
+  <script>
+    /* =======================================================
+      18-01. 获取 DOM 节点 / DOM References
+      -----------------------------------------------------
+      获取页面元素，后续函数复用这些引用。
+      Collects page elements once so later functions can reuse them.
+    ======================================================== */
+    const topbar = document.querySelector(".topbar");
+    const menuToggle = document.querySelector("#menuToggle");
+    const leftMenu = document.querySelector("#leftMenu");
+    const drawerBackdrop = document.querySelector("#drawerBackdrop");
+    const progressBar = document.querySelector("#progressBar");
+    const chapterMenu = document.querySelector("#chapterMenu");
+    const chapterSwitch = document.querySelector("#chapterSwitch");
+    const drawerLinks = document.querySelectorAll(".side-nav a");
+    var shareButton = document.querySelector("#shareButton");
+
+    /* =======================================================
+      18-02. 打开/关闭目录 / Open And Close Drawer
+      -----------------------------------------------------
+      同时更新 class 与 aria 属性，兼顾视觉交互和无障碍语义。
+      Updates both classes and aria attributes for visual behavior and
+      accessibility semantics.
+    ======================================================== */
+    function setMenu(open) {
+      menuToggle.setAttribute("aria-expanded", String(open));
+      leftMenu.setAttribute("aria-hidden", String(!open));
+      leftMenu.classList.toggle("is-open", open);
+      drawerBackdrop.classList.toggle("is-open", open);
+    }
+
+    /* =======================================================
+      18-03. 阅读进度与固定菜单 / Progress And Fixed Menus
+      -----------------------------------------------------
+      根据滚动位置更新顶部进度条，并在进入正文后显示底部章节菜单。
+      Updates the reading progress bar and reveals the bottom chapter
+      menu after the reader enters the story body.
+    ======================================================== */
+    function updateScrollState() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
+      const active = window.scrollY > 180;
+      progressBar.style.width = `${Math.min(progress, 100)}%`;
+      topbar.classList.toggle("is-compact", window.scrollY > 16);
+      chapterMenu.classList.toggle("is-visible", active);
+      chapterSwitch.classList.toggle("is-visible", active);
+    }
+
+    /* =======================================================
+      18-04. 分享功能 / Share → Copy Link
+    ======================================================== */
+    var toast = document.createElement("div");
+    toast.style.cssText = "position:fixed;z-index:999;bottom:80px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;background:rgba(7,19,29,0.9);color:#fff;font-size:14px;pointer-events:none;opacity:0;transition:opacity 0.3s ease;white-space:nowrap;";
+    toast.textContent = "链接已复制";
+    document.body.appendChild(toast);
+
+    async function copyPageLink() {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(window.location.href);
+        } else {
+          var ta = document.createElement("textarea");
+          ta.value = window.location.href;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        toast.style.opacity = "1";
+        setTimeout(function () { toast.style.opacity = "0"; }, 1800);
+      } catch (e) {}
+    }
+
+    /* =======================================================
+      18-05. 事件绑定 / Event Listeners
+    ======================================================== */
+    menuToggle.addEventListener("click", () => {
+      const open = menuToggle.getAttribute("aria-expanded") !== "true";
+      setMenu(open);
+    });
+
+    drawerBackdrop.addEventListener("click", () => setMenu(false));
+    drawerLinks.forEach((link) => link.addEventListener("click", () => setMenu(false)));
+
+    shareButton.addEventListener("click", copyPageLink);
+
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        setMenu(false);
+      }
+    });
+
+    updateScrollState();
+  </script>
+</body>
+
+</html>
