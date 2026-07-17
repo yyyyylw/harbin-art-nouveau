@@ -11,3 +11,12 @@ keystore.json
 wallet.json
 *-wallet.json
 btc-mainnet.json
+
+.DS_Store
+*.psd
+*.ai
+*.xcf
+debug-route.png
+test_out.jpg
+.claude/
+
