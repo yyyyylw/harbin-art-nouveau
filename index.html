@@ -1468,6 +1468,185 @@
         animation-duration: 0.001ms !important;
       }
     }
+
+    /* =========================================================
+      02-10. 图表全屏查看 / Chart Fullscreen
+      -------------------------------------------------------
+      手机端在图表右上角显示全屏按钮，点击后弹出横屏全屏查看。
+      Mobile fullscreen button on chart top-right corner,
+      opens landscape-oriented fullscreen overlay.
+    ======================================================== */
+    .fs-container {
+      position: relative;
+    }
+
+    .chart-fs-btn {
+      position: absolute;
+      z-index: 15;
+      top: 8px;
+      right: 8px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 6px;
+      background: rgba(7, 19, 29, 0.62);
+      color: #fff;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.22s ease, background 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chart-fs-btn:hover {
+      background: rgba(7, 19, 29, 0.84);
+    }
+
+    .chart-fs-btn:active {
+      background: rgba(7, 19, 29, 0.94);
+    }
+
+    .chart-fs-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      pointer-events: none;
+    }
+
+    /* 手机端始终显示按钮，桌面端 hover 时显示 */
+    @media (max-width: 900px) {
+      .chart-fs-btn {
+        opacity: 0.82;
+        width: 32px;
+        height: 32px;
+        top: 6px;
+        right: 6px;
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .fs-container:hover .chart-fs-btn,
+      .viz-panel:hover .chart-fs-btn,
+      .inline-graphic:hover .chart-fs-btn,
+      figure:hover .chart-fs-btn {
+        opacity: 0.82;
+      }
+    }
+
+    /* 全屏遮罩 */
+    .chart-fs-overlay {
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .chart-fs-overlay.is-open {
+      display: flex;
+    }
+
+    .chart-fs-overlay .fs-close {
+      position: fixed;
+      z-index: 10001;
+      top: 12px;
+      right: 12px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 50%;
+      background: rgba(7, 19, 29, 0.62);
+      color: #fff;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chart-fs-overlay .fs-close:hover {
+      background: rgba(7, 19, 29, 0.84);
+    }
+
+    .chart-fs-overlay .fs-hint {
+      position: fixed;
+      z-index: 10000;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .chart-fs-overlay .fs-hint.is-visible {
+      opacity: 1;
+    }
+
+    .chart-fs-overlay .fs-stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 手机端：内容旋转 90° 实现横屏观看 */
+    @media (max-width: 900px) {
+      .chart-fs-overlay .fs-stage.is-landscape {
+        width: 100vh;
+        height: 100vw;
+        transform: rotate(90deg);
+        transform-origin: center center;
+      }
+
+      .chart-fs-overlay .fs-stage.is-landscape > * {
+        max-width: 100vh;
+        max-height: 100vw;
+      }
+
+      .chart-fs-overlay .fs-stage.is-landscape img {
+        max-width: 100vh;
+        max-height: 100vw;
+        object-fit: contain;
+      }
+    }
+
+    /* 确保全屏下的内容自适应 */
+    .chart-fs-overlay .fs-stage img,
+    .chart-fs-overlay .fs-stage iframe,
+    .chart-fs-overlay .fs-stage canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .chart-fs-overlay .fs-stage > * {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
   </style>
 </head>
 
@@ -1618,7 +1797,10 @@
         </p>
       </div>
 
-      <div class="viz-panel">
+      <div class="viz-panel fs-container">
+        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
         <div class="flourish-panel">
           <div class="flourish-embed flourish-map" data-src="visualisation/29593517">
             <script src="https://public.flourish.studio/resources/embed.js"></script>
@@ -1658,7 +1840,10 @@
         </p>
       </div>
 
-      <div class="viz-panel">
+      <div class="viz-panel fs-container">
+        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
         <div class="feature-map-scroll" aria-label="新艺术建筑正立面图解">
           <div class="feature-map" id="featureMap">
             <img class="feature-map__image" src="新艺术建筑风格图解/正立面图222.png" width="5322" height="3241" alt="哈尔滨新艺术建筑正立面细部图解">
@@ -1742,7 +1927,10 @@
         </p>
       </div>
 
-      <div class="viz-panel">
+      <div class="viz-panel fs-container">
+        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
         <div class="flourish-panel">
           <div class="flourish-embed flourish-sankey" data-src="visualisation/29601001">
             <script src="https://public.flourish.studio/resources/embed.js"></script>
@@ -1868,6 +2056,18 @@
       </div>
     </div>
   </footer>
+
+  <!-- =========================================================
+    06-B. 全屏查看遮罩 / Fullscreen Overlay
+    ---------------------------------------------------------
+    点击图表右上角全屏按钮后弹出的横屏全屏查看层。
+    Landscape fullscreen overlay triggered by chart corner button.
+  ========================================================== -->
+  <div class="chart-fs-overlay" id="fsOverlay" aria-hidden="true">
+    <button class="fs-close" id="fsClose" type="button" aria-label="退出全屏">&times;</button>
+    <span class="fs-hint" id="fsHint">旋转手机以获得最佳观看体验</span>
+    <div class="fs-stage" id="fsStage"></div>
+  </div>
 
   <!-- =========================================================
     07. 页面脚本 / Page Scripts
@@ -2806,6 +3006,164 @@
 
       positionCards();
       window.addEventListener("resize", positionCards);
+    })();
+  </script>
+
+  <!-- =========================================================
+    09. 全屏查看图表 / Chart Fullscreen Toggle
+    ---------------------------------------------------------
+    点击图表右上角全屏按钮 → 克隆内容到遮罩层 → 横屏查看。
+    Click fullscreen button → clone chart into overlay → landscape view.
+  ========================================================== -->
+  <script>
+    (function () {
+      var overlay = document.getElementById("fsOverlay");
+      var stage = document.getElementById("fsStage");
+      var closeBtn = document.getElementById("fsClose");
+      var hint = document.getElementById("fsHint");
+      var isOpen = false;
+
+      function openFS(container) {
+        if (isOpen) return;
+
+        // 克隆容器内容，排除全屏按钮自身
+        var clone = container.cloneNode(true);
+        var fsBtns = clone.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < fsBtns.length; i++) {
+          fsBtns[i].remove();
+        }
+
+        // 重置克隆元素的样式限制
+        clone.style.maxHeight = "none";
+        clone.style.overflow = "visible";
+        clone.style.position = "static";
+        clone.style.width = "100%";
+        clone.style.height = "100%";
+
+        // 处理 iframe：确保能重新加载
+        var iframes = clone.querySelectorAll("iframe");
+        for (var j = 0; j < iframes.length; j++) {
+          var src = iframes[j].getAttribute("src");
+          if (src) {
+            iframes[j].setAttribute("src", src);
+          }
+        }
+
+        stage.innerHTML = "";
+        stage.appendChild(clone);
+
+        // 手机端启用横屏旋转
+        var isMobile = window.innerWidth < 900;
+        if (isMobile) {
+          stage.classList.add("is-landscape");
+          hint.classList.add("is-visible");
+          // 3 秒后自动隐藏提示
+          clearTimeout(window.__fsHintTimer);
+          window.__fsHintTimer = setTimeout(function () {
+            hint.classList.remove("is-visible");
+          }, 3500);
+        } else {
+          stage.classList.remove("is-landscape");
+          hint.classList.remove("is-visible");
+        }
+
+        overlay.classList.add("is-open");
+        overlay.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        isOpen = true;
+
+        // 尝试锁定横屏（需要 Fullscreen API）
+        tryFullscreenLock();
+      }
+
+      function closeFS() {
+        if (!isOpen) return;
+        overlay.classList.remove("is-open");
+        overlay.setAttribute("aria-hidden", "true");
+        stage.innerHTML = "";
+        stage.classList.remove("is-landscape");
+        hint.classList.remove("is-visible");
+        document.body.style.overflow = "";
+        isOpen = false;
+
+        // 退出浏览器全屏
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          try {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+              document.webkitExitFullscreen();
+            }
+          } catch (e) { /* ignore */ }
+        }
+      }
+
+      function tryFullscreenLock() {
+        // 尝试进入浏览器全屏 + 锁定横屏
+        var el = overlay;
+        try {
+          if (el.requestFullscreen) {
+            el.requestFullscreen().then(function () {
+              tryFSOrientation();
+            }).catch(function () {});
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+            tryFSOrientation();
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      function tryFSOrientation() {
+        try {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(function () {});
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      // 绑定所有全屏按钮
+      function bindFSButtons() {
+        var buttons = document.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].addEventListener("click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var container = this.closest(".fs-container");
+            if (container) {
+              openFS(container);
+            }
+          });
+        }
+      }
+
+      bindFSButtons();
+
+      // 关闭按钮
+      closeBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        closeFS();
+      });
+
+      // Escape 关闭
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isOpen) {
+          closeFS();
+        }
+      });
+
+      // 点击遮罩背景关闭
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) {
+          closeFS();
+        }
+      });
+
+      // 屏幕旋转时调整
+      window.addEventListener("orientationchange", function () {
+        if (isOpen) {
+          closeFS();
+        }
+      });
     })();
   </script>
 </body>

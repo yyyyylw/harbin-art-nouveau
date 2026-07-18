@@ -1247,6 +1247,62 @@
         animation-iteration-count: 1 !important;
       }
     }
+
+    /* =========================================================
+      03-14. 图表全屏查看 / Chart Fullscreen
+    ======================================================== */
+    .fs-container { position: relative; }
+    .chart-fs-btn {
+      position: absolute; z-index: 15; top: 8px; right: 8px;
+      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      padding: 0; border: 1px solid rgba(255,255,255,0.30); border-radius: 6px;
+      background: rgba(7,19,29,0.62); color: #fff; cursor: pointer;
+      opacity: 0; transition: opacity 0.22s ease, background 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .chart-fs-btn:hover { background: rgba(7,19,29,0.84); }
+    .chart-fs-btn:active { background: rgba(7,19,29,0.94); }
+    .chart-fs-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; pointer-events: none; }
+    @media (max-width: 900px) { .chart-fs-btn { opacity: 0.82; width: 32px; height: 32px; top: 6px; right: 6px; } }
+    @media (hover: hover) and (pointer: fine) {
+      .fs-container:hover .chart-fs-btn, .inline-graphic:hover .chart-fs-btn, figure:hover .chart-fs-btn { opacity: 0.82; }
+    }
+    .chart-fs-overlay {
+      position: fixed; z-index: 9999; inset: 0; display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      background: #000; -webkit-overflow-scrolling: touch;
+    }
+    .chart-fs-overlay.is-open { display: flex; }
+    .chart-fs-overlay .fs-close {
+      position: fixed; z-index: 10001; top: 12px; right: 12px;
+      width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+      padding: 0; border: 1px solid rgba(255,255,255,0.30); border-radius: 50%;
+      background: rgba(7,19,29,0.62); color: #fff; font-size: 22px; line-height: 1;
+      cursor: pointer; transition: background 0.22s ease; -webkit-tap-highlight-color: transparent;
+    }
+    .chart-fs-overlay .fs-close:hover { background: rgba(7,19,29,0.84); }
+    .chart-fs-overlay .fs-hint {
+      position: fixed; z-index: 10000; top: 14px; left: 50%; transform: translateX(-50%);
+      padding: 6px 16px; border-radius: 20px; background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.80); font-size: 13px; white-space: nowrap;
+      pointer-events: none; opacity: 0; transition: opacity 0.4s ease;
+    }
+    .chart-fs-overlay .fs-hint.is-visible { opacity: 1; }
+    .chart-fs-overlay .fs-stage {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      overflow: auto; -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 900px) {
+      .chart-fs-overlay .fs-stage.is-landscape {
+        width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: center center;
+      }
+      .chart-fs-overlay .fs-stage.is-landscape > * { max-width: 100vh; max-height: 100vw; }
+      .chart-fs-overlay .fs-stage.is-landscape img { max-width: 100vh; max-height: 100vw; object-fit: contain; }
+    }
+    .chart-fs-overlay .fs-stage img, .chart-fs-overlay .fs-stage iframe, .chart-fs-overlay .fs-stage canvas {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+    }
+    .chart-fs-overlay .fs-stage > * { width: 100%; height: 100%; overflow: auto; }
   </style>
 </head>
 
@@ -1351,13 +1407,19 @@
       <section class="full-content visual-pair" aria-label="双图视觉模块 / Paired visual module">
         <ul class="wrapper">
           <li class="side">
-            <figure class="media-card">
+            <figure class="media-card fs-container">
+              <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+                <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+              </button>
               <img src="assets/chapter-2-moscow-shopping-mall/moscow-dome.jpg" alt="原莫斯科商场屋顶暗红色穹窿与金属构件" loading="lazy" decoding="async">
               <figcaption>暗红色穹窿、尖顶和金属栏杆共同勾勒出建筑醒目的屋顶轮廓。</figcaption>
             </figure>
           </li>
           <li class="side">
-            <figure class="media-card">
+            <figure class="media-card fs-container">
+              <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+                <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+              </button>
               <img src="assets/chapter-2-moscow-shopping-mall/moscow-stained-glass.jpg" alt="黑龙江省博物馆楼梯间彩色玻璃与铁艺栏杆" loading="lazy" decoding="async">
               <figcaption>楼梯间的彩色玻璃与铁艺栏杆，把曲线语言从建筑外部延伸到室内。</figcaption>
             </figure>
@@ -1381,7 +1443,10 @@
 
       <section class="full-content single-visual" aria-label="原莫斯科商场建筑模型">
         <div class="wrapper">
-          <figure>
+          <figure class="fs-container">
+            <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+              <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </button>
             <img src="assets/chapter-2-moscow-shopping-mall/moscow-model.jpg" alt="黑龙江省博物馆展陈中的原莫斯科商场建筑模型" loading="lazy" decoding="async">
             <figcaption class="caption">
               展陈中的建筑模型呈现了原莫斯科商场的转角体量、屋顶平台和连续窗列。
@@ -1457,6 +1522,15 @@
       </div>
     </div>
   </footer>
+
+  <!-- =========================================================
+    17-B. 全屏查看遮罩 / Fullscreen Overlay
+  ========================================================== -->
+  <div class="chart-fs-overlay" id="fsOverlay" aria-hidden="true">
+    <button class="fs-close" id="fsClose" type="button" aria-label="退出全屏">&times;</button>
+    <span class="fs-hint" id="fsHint">旋转手机以获得最佳观看体验</span>
+    <div class="fs-stage" id="fsStage"></div>
+  </div>
 
   <!-- =========================================================
     18. 页面交互脚本 / Interaction Scripts
@@ -1562,6 +1636,52 @@
     });
 
     updateScrollState();
+  </script>
+
+  <script>
+    (function () {
+      var overlay = document.getElementById("fsOverlay");
+      var stage = document.getElementById("fsStage");
+      var closeBtn = document.getElementById("fsClose");
+      var hint = document.getElementById("fsHint");
+      var isOpen = false;
+      function openFS(container) {
+        if (isOpen) return;
+        var clone = container.cloneNode(true);
+        var fsBtns = clone.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < fsBtns.length; i++) { fsBtns[i].remove(); }
+        clone.style.maxHeight = "none"; clone.style.overflow = "visible";
+        clone.style.position = "static"; clone.style.width = "100%"; clone.style.height = "100%";
+        stage.innerHTML = ""; stage.appendChild(clone);
+        var isMobile = window.innerWidth < 900;
+        if (isMobile) {
+          stage.classList.add("is-landscape"); hint.classList.add("is-visible");
+          clearTimeout(window.__fsHintTimer);
+          window.__fsHintTimer = setTimeout(function () { hint.classList.remove("is-visible"); }, 3500);
+        }
+        overlay.classList.add("is-open"); overlay.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden"; isOpen = true;
+        try { overlay.requestFullscreen && overlay.requestFullscreen().catch(function () {}); } catch (e) {}
+      }
+      function closeFS() {
+        if (!isOpen) return;
+        overlay.classList.remove("is-open"); overlay.setAttribute("aria-hidden", "true");
+        stage.innerHTML = ""; stage.classList.remove("is-landscape"); hint.classList.remove("is-visible");
+        document.body.style.overflow = ""; isOpen = false;
+        try { document.exitFullscreen && document.exitFullscreen().catch(function () {}); } catch (e) {}
+      }
+      document.querySelectorAll(".chart-fs-btn").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation(); e.preventDefault();
+          var container = this.closest(".fs-container");
+          if (container) { openFS(container); }
+        });
+      });
+      closeBtn.addEventListener("click", function (e) { e.stopPropagation(); closeFS(); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && isOpen) { closeFS(); } });
+      overlay.addEventListener("click", function (e) { if (e.target === overlay) { closeFS(); } });
+      window.addEventListener("orientationchange", function () { if (isOpen) { closeFS(); } });
+    })();
   </script>
 </body>
 

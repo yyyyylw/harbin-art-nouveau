@@ -1248,6 +1248,178 @@
         animation-iteration-count: 1 !important;
       }
     }
+
+    /* =========================================================
+      03-14. 图表全屏查看 / Chart Fullscreen
+      -------------------------------------------------------
+      手机端在图表右上角显示全屏按钮，点击后弹出横屏全屏查看。
+    ======================================================== */
+    .fs-container {
+      position: relative;
+    }
+
+    .chart-fs-btn {
+      position: absolute;
+      z-index: 15;
+      top: 8px;
+      right: 8px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 6px;
+      background: rgba(7, 19, 29, 0.62);
+      color: #fff;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.22s ease, background 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chart-fs-btn:hover {
+      background: rgba(7, 19, 29, 0.84);
+    }
+
+    .chart-fs-btn:active {
+      background: rgba(7, 19, 29, 0.94);
+    }
+
+    .chart-fs-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      pointer-events: none;
+    }
+
+    @media (max-width: 900px) {
+      .chart-fs-btn {
+        opacity: 0.82;
+        width: 32px;
+        height: 32px;
+        top: 6px;
+        right: 6px;
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .fs-container:hover .chart-fs-btn,
+      .inline-graphic:hover .chart-fs-btn,
+      figure:hover .chart-fs-btn {
+        opacity: 0.82;
+      }
+    }
+
+    .chart-fs-overlay {
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .chart-fs-overlay.is-open {
+      display: flex;
+    }
+
+    .chart-fs-overlay .fs-close {
+      position: fixed;
+      z-index: 10001;
+      top: 12px;
+      right: 12px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 50%;
+      background: rgba(7, 19, 29, 0.62);
+      color: #fff;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chart-fs-overlay .fs-close:hover {
+      background: rgba(7, 19, 29, 0.84);
+    }
+
+    .chart-fs-overlay .fs-hint {
+      position: fixed;
+      z-index: 10000;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .chart-fs-overlay .fs-hint.is-visible {
+      opacity: 1;
+    }
+
+    .chart-fs-overlay .fs-stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @media (max-width: 900px) {
+      .chart-fs-overlay .fs-stage.is-landscape {
+        width: 100vh;
+        height: 100vw;
+        transform: rotate(90deg);
+        transform-origin: center center;
+      }
+
+      .chart-fs-overlay .fs-stage.is-landscape > * {
+        max-width: 100vh;
+        max-height: 100vw;
+      }
+
+      .chart-fs-overlay .fs-stage.is-landscape img {
+        max-width: 100vh;
+        max-height: 100vw;
+        object-fit: contain;
+      }
+    }
+
+    .chart-fs-overlay .fs-stage img,
+    .chart-fs-overlay .fs-stage iframe,
+    .chart-fs-overlay .fs-stage canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .chart-fs-overlay .fs-stage > * {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
   </style>
 </head>
 
@@ -1344,7 +1516,10 @@
         <p>
           20世纪初的哈尔滨，是一座因铁路迅速生长起来的国际城市。中央大街一带商铺、旅馆、影院、银行林立，俄侨、犹太商人、各国侨民和本地居民在这里交汇。马迭尔宾馆曾是当时哈尔滨最豪华的旅馆之一，也长期承担着城市会客厅的角色。住店、宴饮、社交、观光，很多人的哈尔滨记忆，都曾从这栋楼里进出。时代几经转换，马迭尔的身份也不断变化。1946年后，它曾改为中共中央东北局招待处；1987年恢复“马迭尔”原名。2013年，马迭尔宾馆被列为全国重点文物保护单位。对哈尔滨来说，它早已不是一家普通酒店，而是一段城市历史的实体切片。
         </p>
-        <figure class="inline-graphic">
+        <figure class="inline-graphic fs-container">
+          <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+            <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
           <img src="assets/chapter-1-modern-hotel/rebuild.jpg" alt="修缮中的马迭尔宾馆" loading="lazy" decoding="async">
           <figcaption class="caption">修缮中的马迭尔宾馆</figcaption>
         </figure>
@@ -1432,6 +1607,17 @@
       </div>
     </div>
   </footer>
+
+  <!-- =========================================================
+    17-B. 全屏查看遮罩 / Fullscreen Overlay
+    ---------------------------------------------------------
+    点击图表右上角全屏按钮后弹出的横屏全屏查看层。
+  ========================================================== -->
+  <div class="chart-fs-overlay" id="fsOverlay" aria-hidden="true">
+    <button class="fs-close" id="fsClose" type="button" aria-label="退出全屏">&times;</button>
+    <span class="fs-hint" id="fsHint">旋转手机以获得最佳观看体验</span>
+    <div class="fs-stage" id="fsStage"></div>
+  </div>
 
   <!-- =========================================================
     18. 页面交互脚本 / Interaction Scripts
@@ -1537,6 +1723,108 @@
     });
 
     updateScrollState();
+  </script>
+
+  <!-- =========================================================
+    19. 全屏查看图表 / Chart Fullscreen Toggle
+  ========================================================== -->
+  <script>
+    (function () {
+      var overlay = document.getElementById("fsOverlay");
+      var stage = document.getElementById("fsStage");
+      var closeBtn = document.getElementById("fsClose");
+      var hint = document.getElementById("fsHint");
+      var isOpen = false;
+
+      function openFS(container) {
+        if (isOpen) return;
+        var clone = container.cloneNode(true);
+        var fsBtns = clone.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < fsBtns.length; i++) { fsBtns[i].remove(); }
+        clone.style.maxHeight = "none";
+        clone.style.overflow = "visible";
+        clone.style.position = "static";
+        clone.style.width = "100%";
+        clone.style.height = "100%";
+        var iframes = clone.querySelectorAll("iframe");
+        for (var j = 0; j < iframes.length; j++) {
+          var src = iframes[j].getAttribute("src");
+          if (src) { iframes[j].setAttribute("src", src); }
+        }
+        stage.innerHTML = "";
+        stage.appendChild(clone);
+        var isMobile = window.innerWidth < 900;
+        if (isMobile) {
+          stage.classList.add("is-landscape");
+          hint.classList.add("is-visible");
+          clearTimeout(window.__fsHintTimer);
+          window.__fsHintTimer = setTimeout(function () { hint.classList.remove("is-visible"); }, 3500);
+        } else {
+          stage.classList.remove("is-landscape");
+          hint.classList.remove("is-visible");
+        }
+        overlay.classList.add("is-open");
+        overlay.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        isOpen = true;
+        tryFullscreenLock();
+      }
+
+      function closeFS() {
+        if (!isOpen) return;
+        overlay.classList.remove("is-open");
+        overlay.setAttribute("aria-hidden", "true");
+        stage.innerHTML = "";
+        stage.classList.remove("is-landscape");
+        hint.classList.remove("is-visible");
+        document.body.style.overflow = "";
+        isOpen = false;
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          try {
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+          } catch (e) {}
+        }
+      }
+
+      function tryFullscreenLock() {
+        var el = overlay;
+        try {
+          if (el.requestFullscreen) {
+            el.requestFullscreen().then(function () {
+              try { screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape").catch(function () {}); } catch (e) {}
+            }).catch(function () {});
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+            try { screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape").catch(function () {}); } catch (e) {}
+          }
+        } catch (e) {}
+      }
+
+      function bindFSButtons() {
+        var buttons = document.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].addEventListener("click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var container = this.closest(".fs-container");
+            if (container) { openFS(container); }
+          });
+        }
+      }
+
+      bindFSButtons();
+      closeBtn.addEventListener("click", function (e) { e.stopPropagation(); closeFS(); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isOpen) { closeFS(); }
+      });
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) { closeFS(); }
+      });
+      window.addEventListener("orientationchange", function () {
+        if (isOpen) { closeFS(); }
+      });
+    })();
   </script>
 </body>
 
