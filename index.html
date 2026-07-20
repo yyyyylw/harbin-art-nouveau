@@ -2575,10 +2575,17 @@
       var images = { mapFinal: null, baseMap: null };
       var route = null;
       var offCvs = null, offCtx = null, lastProgress = -1;
+      // 缓存初始视口高度，避免手机端滚动时地址栏显隐导致进度计算跳变
+      var stableVh = window.innerHeight;
 
       loadAll();
 
-      window.addEventListener("resize", function () { resize(); requestPaint(); });
+      // 手机端 resize 常由地址栏显隐触发，仅更新画布尺寸，不改变 stableVh
+      // 以保持滚动进度计算稳定
+      window.addEventListener("resize", function () {
+        resize();
+        requestPaint();
+      });
       window.addEventListener("scroll", function () {
         state.progress = getProgress();
         window.__revealProgress = state.progress;
@@ -2661,7 +2668,8 @@
       /* ---- 滚动进度（两段式：前80%缓慢滚动，后20%页面"停住"小人走完） ---- */
       function getProgress() {
         var top = revealScroll.getBoundingClientRect().top + window.scrollY;
-        var range = revealScroll.offsetHeight - window.innerHeight;
+        // 使用稳定视口高度，避免手机端地址栏显隐导致进度跳变
+        var range = revealScroll.offsetHeight - stableVh;
         if (range <= 0) return 1;
         var raw = clamp((window.scrollY - top) / range, 0, 1);
         // 前 80% 滚动 → 小人走 0→85%；后 20% 滚动 → 小人走 85→100%
@@ -3012,8 +3020,9 @@
   <!-- =========================================================
     09. 全屏查看图表 / Chart Fullscreen Toggle
     ---------------------------------------------------------
-    点击图表右上角全屏按钮 → 克隆内容到遮罩层 → 横屏查看。
-    Click fullscreen button → clone chart into overlay → landscape view.
+    点击图表右上角全屏按钮。
+    - 普通图表/iframe：克隆内容到遮罩层 → 横屏查看。
+    - 特征图（含交互热区）：移动原始 DOM 到遮罩层，保留事件监听。
   ========================================================== -->
   <script>
     (function () {
@@ -3023,41 +3032,29 @@
       var hint = document.getElementById("fsHint");
       var isOpen = false;
 
+      // 移动模式：保存原始父节点，以便关闭时还原
+      var movedEl = null;
+      var movedParent = null;
+      var movedNextSibling = null;
+
+      function isFeatureDiagram(container) {
+        return !!(container.closest("#feature-diagram"));
+      }
+
       function openFS(container) {
         if (isOpen) return;
 
-        // 克隆容器内容，排除全屏按钮自身
-        var clone = container.cloneNode(true);
-        var fsBtns = clone.querySelectorAll(".chart-fs-btn");
-        for (var i = 0; i < fsBtns.length; i++) {
-          fsBtns[i].remove();
+        if (isFeatureDiagram(container)) {
+          openFeatureFS(container);
+        } else {
+          openCloneFS(container);
         }
-
-        // 重置克隆元素的样式限制
-        clone.style.maxHeight = "none";
-        clone.style.overflow = "visible";
-        clone.style.position = "static";
-        clone.style.width = "100%";
-        clone.style.height = "100%";
-
-        // 处理 iframe：确保能重新加载
-        var iframes = clone.querySelectorAll("iframe");
-        for (var j = 0; j < iframes.length; j++) {
-          var src = iframes[j].getAttribute("src");
-          if (src) {
-            iframes[j].setAttribute("src", src);
-          }
-        }
-
-        stage.innerHTML = "";
-        stage.appendChild(clone);
 
         // 手机端启用横屏旋转
         var isMobile = window.innerWidth < 900;
         if (isMobile) {
           stage.classList.add("is-landscape");
           hint.classList.add("is-visible");
-          // 3 秒后自动隐藏提示
           clearTimeout(window.__fsHintTimer);
           window.__fsHintTimer = setTimeout(function () {
             hint.classList.remove("is-visible");
@@ -3072,34 +3069,108 @@
         document.body.style.overflow = "hidden";
         isOpen = true;
 
-        // 尝试锁定横屏（需要 Fullscreen API）
         tryFullscreenLock();
+      }
+
+      function openCloneFS(container) {
+        var clone = container.cloneNode(true);
+        var fsBtns = clone.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < fsBtns.length; i++) { fsBtns[i].remove(); }
+        clone.style.maxHeight = "none";
+        clone.style.overflow = "visible";
+        clone.style.position = "static";
+        clone.style.width = "100%";
+        clone.style.height = "100%";
+        var iframes = clone.querySelectorAll("iframe");
+        for (var j = 0; j < iframes.length; j++) {
+          var src = iframes[j].getAttribute("src");
+          if (src) { iframes[j].setAttribute("src", src); }
+        }
+        stage.innerHTML = "";
+        stage.appendChild(clone);
+      }
+
+      function openFeatureFS(container) {
+        // 移动原始 .feature-map-scroll 到遮罩层，保留热区事件监听
+        var mapScroll = container.querySelector(".feature-map-scroll");
+        if (!mapScroll) return;
+
+        movedParent = mapScroll.parentNode;
+        movedNextSibling = mapScroll.nextSibling;
+        movedEl = mapScroll;
+
+        // 重置尺寸限制，让特征图撑满遮罩
+        mapScroll.style.maxHeight = "none";
+        mapScroll.style.overflow = "visible";
+        mapScroll.style.width = "100%";
+        mapScroll.style.height = "100%";
+
+        stage.innerHTML = "";
+        stage.appendChild(mapScroll);
+
+        // 提高 backdrop 和 detail card 的 z-index，确保在遮罩之上
+        var backdrop = document.getElementById("featureBackdrop");
+        var detail = document.getElementById("featureDetail");
+        if (backdrop) {
+          backdrop.setAttribute("data-fs-z", backdrop.style.zIndex || "");
+          backdrop.style.zIndex = "10001";
+        }
+        if (detail) {
+          detail.setAttribute("data-fs-z", detail.style.zIndex || "");
+          detail.style.zIndex = "10002";
+        }
       }
 
       function closeFS() {
         if (!isOpen) return;
+
+        // 如果是移动模式，还原 DOM
+        if (movedEl && movedParent) {
+          if (movedNextSibling) {
+            movedParent.insertBefore(movedEl, movedNextSibling);
+          } else {
+            movedParent.appendChild(movedEl);
+          }
+          // 还原样式
+          movedEl.style.maxHeight = "";
+          movedEl.style.overflow = "";
+          movedEl.style.width = "";
+          movedEl.style.height = "";
+          movedEl = null;
+          movedParent = null;
+          movedNextSibling = null;
+
+          // 还原 backdrop 和 detail card 的 z-index
+          var backdrop = document.getElementById("featureBackdrop");
+          var detail = document.getElementById("featureDetail");
+          if (backdrop) {
+            backdrop.style.zIndex = backdrop.getAttribute("data-fs-z") || "";
+            backdrop.removeAttribute("data-fs-z");
+          }
+          if (detail) {
+            detail.style.zIndex = detail.getAttribute("data-fs-z") || "";
+            detail.removeAttribute("data-fs-z");
+          }
+        } else {
+          stage.innerHTML = "";
+        }
+
         overlay.classList.remove("is-open");
         overlay.setAttribute("aria-hidden", "true");
-        stage.innerHTML = "";
         stage.classList.remove("is-landscape");
         hint.classList.remove("is-visible");
         document.body.style.overflow = "";
         isOpen = false;
 
-        // 退出浏览器全屏
         if (document.fullscreenElement || document.webkitFullscreenElement) {
           try {
-            if (document.exitFullscreen) {
-              document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-              document.webkitExitFullscreen();
-            }
-          } catch (e) { /* ignore */ }
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+          } catch (e) {}
         }
       }
 
       function tryFullscreenLock() {
-        // 尝试进入浏览器全屏 + 锁定横屏
         var el = overlay;
         try {
           if (el.requestFullscreen) {
@@ -3110,7 +3181,7 @@
             el.webkitRequestFullscreen();
             tryFSOrientation();
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) {}
       }
 
       function tryFSOrientation() {
@@ -3118,7 +3189,7 @@
           if (screen.orientation && screen.orientation.lock) {
             screen.orientation.lock("landscape").catch(function () {});
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) {}
       }
 
       // 绑定所有全屏按钮
@@ -3129,40 +3200,21 @@
             e.stopPropagation();
             e.preventDefault();
             var container = this.closest(".fs-container");
-            if (container) {
-              openFS(container);
-            }
+            if (container) { openFS(container); }
           });
         }
       }
 
       bindFSButtons();
-
-      // 关闭按钮
-      closeBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        closeFS();
-      });
-
-      // Escape 关闭
+      closeBtn.addEventListener("click", function (e) { e.stopPropagation(); closeFS(); });
       document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && isOpen) {
-          closeFS();
-        }
+        if (e.key === "Escape" && isOpen) { closeFS(); }
       });
-
-      // 点击遮罩背景关闭
       overlay.addEventListener("click", function (e) {
-        if (e.target === overlay) {
-          closeFS();
-        }
+        if (e.target === overlay) { closeFS(); }
       });
-
-      // 屏幕旋转时调整
       window.addEventListener("orientationchange", function () {
-        if (isOpen) {
-          closeFS();
-        }
+        if (isOpen) { closeFS(); }
       });
     })();
   </script>
