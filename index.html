@@ -914,6 +914,42 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
     }
 
+    /* 特征图全屏模式：原地扩展，不动 DOM，保留所有交互 */
+    #feature-diagram.is-fs-active {
+      position: fixed !important;
+      z-index: 10000 !important;
+      inset: 0 !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      padding: 12px !important;
+      background: #000 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+
+    #feature-diagram.is-fs-active .viz-intro {
+      display: none;
+    }
+
+    #feature-diagram.is-fs-active .viz-panel {
+      flex: 1 1 auto;
+      width: 100%;
+      max-width: 100%;
+      max-height: none;
+      overflow: auto;
+    }
+
+    #feature-diagram.is-fs-active .feature-map-scroll {
+      width: 100%;
+      max-height: none;
+      overflow: auto;
+      border-radius: 0;
+      border-color: transparent;
+    }
+
     .feature-map {
       position: relative;
       width: 100%;
@@ -1186,8 +1222,14 @@
 
     #revealCanvas {
       display: block;
-      touch-action: none;
       cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='13' cy='13' r='9' fill='none' stroke='white' stroke-width='2.5'/%3E%3Cline x1='20' y1='20' x2='28' y2='28' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") 16 16, crosshair;
+    }
+
+    /* 手机端允许垂直滚动以驱动散点图动画 */
+    @media (max-width: 720px) {
+      #revealCanvas {
+        touch-action: pan-y;
+      }
     }
 
     #magnifier {
@@ -3022,7 +3064,7 @@
     ---------------------------------------------------------
     点击图表右上角全屏按钮。
     - 普通图表/iframe：克隆内容到遮罩层 → 横屏查看。
-    - 特征图（含交互热区）：移动原始 DOM 到遮罩层，保留事件监听。
+    - 特征图（含交互热区）：原地 CSS 全屏，不动 DOM，保留所有交互。
   ========================================================== -->
   <script>
     (function () {
@@ -3031,11 +3073,7 @@
       var closeBtn = document.getElementById("fsClose");
       var hint = document.getElementById("fsHint");
       var isOpen = false;
-
-      // 移动模式：保存原始父节点，以便关闭时还原
-      var movedEl = null;
-      var movedParent = null;
-      var movedNextSibling = null;
+      var activeMode = null; // "clone" | "feature"
 
       function isFeatureDiagram(container) {
         return !!(container.closest("#feature-diagram"));
@@ -3050,20 +3088,6 @@
           openCloneFS(container);
         }
 
-        // 手机端启用横屏旋转
-        var isMobile = window.innerWidth < 900;
-        if (isMobile) {
-          stage.classList.add("is-landscape");
-          hint.classList.add("is-visible");
-          clearTimeout(window.__fsHintTimer);
-          window.__fsHintTimer = setTimeout(function () {
-            hint.classList.remove("is-visible");
-          }, 3500);
-        } else {
-          stage.classList.remove("is-landscape");
-          hint.classList.remove("is-visible");
-        }
-
         overlay.classList.add("is-open");
         overlay.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
@@ -3073,6 +3097,7 @@
       }
 
       function openCloneFS(container) {
+        activeMode = "clone";
         var clone = container.cloneNode(true);
         var fsBtns = clone.querySelectorAll(".chart-fs-btn");
         for (var i = 0; i < fsBtns.length; i++) { fsBtns[i].remove(); }
@@ -3088,25 +3113,25 @@
         }
         stage.innerHTML = "";
         stage.appendChild(clone);
+
+        // 手机端启用横屏旋转
+        var isMobile = window.innerWidth < 900;
+        if (isMobile) {
+          stage.classList.add("is-landscape");
+          hint.textContent = "旋转手机以获得最佳观看体验";
+          hint.classList.add("is-visible");
+          clearTimeout(window.__fsHintTimer);
+          window.__fsHintTimer = setTimeout(function () {
+            hint.classList.remove("is-visible");
+          }, 3500);
+        }
       }
 
       function openFeatureFS(container) {
-        // 移动原始 .feature-map-scroll 到遮罩层，保留热区事件监听
-        var mapScroll = container.querySelector(".feature-map-scroll");
-        if (!mapScroll) return;
-
-        movedParent = mapScroll.parentNode;
-        movedNextSibling = mapScroll.nextSibling;
-        movedEl = mapScroll;
-
-        // 重置尺寸限制，让特征图撑满遮罩
-        mapScroll.style.maxHeight = "none";
-        mapScroll.style.overflow = "visible";
-        mapScroll.style.width = "100%";
-        mapScroll.style.height = "100%";
-
-        stage.innerHTML = "";
-        stage.appendChild(mapScroll);
+        activeMode = "feature";
+        // 原地全屏：不移 DOM，只加 CSS class，保留所有热区事件
+        var section = document.getElementById("feature-diagram");
+        if (section) { section.classList.add("is-fs-active"); }
 
         // 提高 backdrop 和 detail card 的 z-index，确保在遮罩之上
         var backdrop = document.getElementById("featureBackdrop");
@@ -3119,28 +3144,23 @@
           detail.setAttribute("data-fs-z", detail.style.zIndex || "");
           detail.style.zIndex = "10002";
         }
+
+        // 特征图不旋转，只显示关闭提示
+        hint.textContent = "点击 × 退出全屏";
+        hint.classList.add("is-visible");
+        clearTimeout(window.__fsHintTimer);
+        window.__fsHintTimer = setTimeout(function () {
+          hint.classList.remove("is-visible");
+        }, 3000);
       }
 
       function closeFS() {
         if (!isOpen) return;
 
-        // 如果是移动模式，还原 DOM
-        if (movedEl && movedParent) {
-          if (movedNextSibling) {
-            movedParent.insertBefore(movedEl, movedNextSibling);
-          } else {
-            movedParent.appendChild(movedEl);
-          }
-          // 还原样式
-          movedEl.style.maxHeight = "";
-          movedEl.style.overflow = "";
-          movedEl.style.width = "";
-          movedEl.style.height = "";
-          movedEl = null;
-          movedParent = null;
-          movedNextSibling = null;
+        if (activeMode === "feature") {
+          var section = document.getElementById("feature-diagram");
+          if (section) { section.classList.remove("is-fs-active"); }
 
-          // 还原 backdrop 和 detail card 的 z-index
           var backdrop = document.getElementById("featureBackdrop");
           var detail = document.getElementById("featureDetail");
           if (backdrop) {
@@ -3153,14 +3173,16 @@
           }
         } else {
           stage.innerHTML = "";
+          stage.classList.remove("is-landscape");
         }
 
         overlay.classList.remove("is-open");
         overlay.setAttribute("aria-hidden", "true");
-        stage.classList.remove("is-landscape");
         hint.classList.remove("is-visible");
+        hint.textContent = "旋转手机以获得最佳观看体验";
         document.body.style.overflow = "";
         isOpen = false;
+        activeMode = null;
 
         if (document.fullscreenElement || document.webkitFullscreenElement) {
           try {
