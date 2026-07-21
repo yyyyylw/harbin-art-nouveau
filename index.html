@@ -386,7 +386,7 @@
       mix-blend-mode: multiply;
     }
 
-    /* ---- 主图：全幅背景 ---- */
+    /* ---- 主图：全幅全景背景，尽量展示完整画面 ---- */
     .cover-hero {
       position: absolute;
       inset: 0;
@@ -397,61 +397,19 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: 50% 40%;
-      filter: saturate(1.05) contrast(1.35) brightness(0.78);
+      object-position: 50% 50%;
+      filter: saturate(1.08) contrast(1.30) brightness(0.82);
     }
 
-    /* ---- 右上角：建筑细部竖图 ---- */
-    .cover-accent--detail {
-      position: absolute;
-      z-index: 3;
-      top: clamp(80px, 12vh, 140px);
-      right: clamp(16px, 5vw, 60px);
-      width: clamp(120px, 18vw, 220px);
-      aspect-ratio: 9 / 16;
-      border: 2px solid rgba(255, 255, 255, 0.45);
-      border-radius: 6px;
-      box-shadow: 0 12px 38px rgba(0, 0, 0, 0.48);
-      overflow: hidden;
-    }
-
-    .cover-accent--detail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: 50% 30%;
-      filter: saturate(1.0) contrast(1.12) brightness(0.92);
-    }
-
-    /* ---- 底部横条：街景宽幅 ---- */
-    .cover-accent--strip {
-      position: absolute;
-      z-index: 3;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: clamp(90px, 16vh, 200px);
-      border-top: 2px solid rgba(255, 255, 255, 0.40);
-      overflow: hidden;
-    }
-
-    .cover-accent--strip img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: 50% 55%;
-      filter: saturate(0.95) contrast(1.18) brightness(0.82);
-    }
-
-    /* ---- 全局暗角 + 渐变 ---- */
+    /* ---- 暗角 + 渐变 ---- */
     .intro-gradient {
       position: absolute;
       inset: 0;
       z-index: 2;
       pointer-events: none;
       background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0.05) 28%, rgba(0, 0, 0, 0.82) 100%),
-        radial-gradient(ellipse at 50% 44%, rgba(230, 215, 180, 0.06), transparent 52%);
+        linear-gradient(180deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.04) 32%, rgba(0, 0, 0, 0.80) 100%),
+        radial-gradient(ellipse at 50% 42%, rgba(220, 205, 175, 0.06), transparent 50%);
     }
 
     .intro-box {
@@ -1853,17 +1811,8 @@
     ======================================================== -->
     <section class="intro" aria-labelledby="page-title">
       <div class="cover" id="cover">
-        <!-- 主图：全幅建筑立面 -->
         <div class="cover-hero">
-          <img src="assets/poster/DSCF6629.JPG" alt="哈尔滨新艺术建筑">
-        </div>
-        <!-- 右上角：建筑细部竖图 -->
-        <div class="cover-accent cover-accent--detail">
-          <img src="assets/poster/下载.jpg" alt="建筑细部特写">
-        </div>
-        <!-- 底部横条：街景宽幅 -->
-        <div class="cover-accent cover-accent--strip">
-          <img src="assets/poster/cover.jpg" alt="哈尔滨街景">
+          <img src="assets/cover.jpg" alt="冬季的哈尔滨历史建筑街景">
         </div>
         <div class="intro-gradient"></div>
       </div>
