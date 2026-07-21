@@ -930,7 +930,8 @@
       inset: 0 !important;
       height: 100vh !important;
       height: 100dvh !important;
-      padding: 12px !important;
+      padding: 8px !important;
+      padding-top: 44px !important;
       background: #000 !important;
       display: flex !important;
       flex-direction: column !important;
@@ -939,7 +940,8 @@
       overflow: hidden !important;
     }
 
-    #feature-diagram.is-fs-active .viz-intro {
+    #feature-diagram.is-fs-active .viz-intro,
+    #feature-diagram.is-fs-active .viz-next {
       display: none;
     }
 
@@ -949,14 +951,17 @@
       max-width: 100%;
       max-height: none;
       overflow: auto;
+      min-height: 0;
     }
 
     #feature-diagram.is-fs-active .feature-map-scroll {
       width: 100%;
+      min-height: 100%;
       max-height: none;
       overflow: auto;
       border-radius: 0;
       border-color: transparent;
+      box-shadow: none;
     }
 
     .feature-map {
@@ -1957,7 +1962,7 @@
           经过近三十年的修建，哈尔滨市区内散布着五十处左右的比较典型的新艺术建筑，这些建筑散布在南岗、道里、道外等老城区，沿着中东铁路主线两侧展开，至今仍向我们展示着哈尔滨的城市肌理。
         </p>
         <p>
-          在图片上移动放大镜，自由探索它们的具体位置；也可以向下滚动鼠标滚轮或滑动屏幕，跟随途中小人的路线，寻找哈尔滨的新艺术建筑。令人惋惜的是，图上用白点标记的建筑均已被毁坏或拆除重建，其中的尚志小学、中东铁路管理局局长官邸等的具体位置已无从考究。
+          在图片上移动放大镜，自由探索它们的具体位置；也可以向下滚动鼠标滚轮或滑动屏幕，跟随途中小人的路线，寻找哈尔滨的新艺术建筑，同时还能欣赏两侧的哈尔滨新艺术建筑的老照片。令人惋惜的是，图上用白点标记的建筑均已被毁坏或拆除重建，其中的尚志小学、中东铁路管理局局长官邸等的具体位置已无从考究。
         </p>
       </div>
 
@@ -3158,6 +3163,11 @@
 
       function openFeatureFS(container) {
         activeMode = "feature";
+        // 遮罩透明：特征图自身提供黑底，遮罩仅承载关闭按钮
+        overlay.style.background = "transparent";
+        // 手机端取消旋转（保留热区交互）
+        stage.classList.remove("is-landscape");
+
         // 原地全屏：不移 DOM，只加 CSS class，保留所有热区事件
         var section = document.getElementById("feature-diagram");
         if (section) { section.classList.add("is-fs-active"); }
@@ -3207,6 +3217,7 @@
 
         overlay.classList.remove("is-open");
         overlay.setAttribute("aria-hidden", "true");
+        overlay.style.background = "";
         hint.classList.remove("is-visible");
         hint.textContent = "旋转手机以获得最佳观看体验";
         document.body.style.overflow = "";
