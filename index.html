@@ -952,51 +952,75 @@
       line-height: 1.55;
     }
 
-    /* 上下布局：建筑在上 → 卡片行在下方环绕 */
+    /* 三面环绕：左列 | 中央(建筑+下列) | 右列 */
     .feature-gallery__layout {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: min(1100px, calc(100% - 20px));
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+      width: min(1200px, calc(100% - 20px));
       margin: 0 auto;
     }
 
-    /* ---- 卡片环绕行 ---- */
-    .feature-cards-wrap {
+    /* ---- 中央区域 ---- */
+    .feature-center {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 6px;
-      padding: 12px 0 0;
-      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* ---- 单张卡片：小尺寸 + 果冻弹跳效果 ---- */
+    /* ---- 左右列：纵向堆叠 ---- */
+    .feature-cards--left,
+    .feature-cards--right {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-top: 6px;
+    }
+
+    .feature-cards--left { align-items: flex-end; }
+    .feature-cards--right { align-items: flex-start; }
+
+    /* ---- 下列：横向排列 ---- */
+    .feature-cards--bottom {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* ---- 单张卡片：小尺寸 + 果冻弹跳 ---- */
     .feature-card {
       position: relative;
-      width: 100px;
-      flex: 0 0 100px;
+      width: 95px;
       padding: 5px;
       border-radius: 5px;
       background: rgba(20, 25, 22, 0.78);
       border: 1px solid rgba(255, 255, 255, 0.12);
       cursor: pointer;
-      transition: flex 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
                   box-shadow 0.35s ease,
                   background 0.35s ease,
                   border-color 0.35s ease;
       z-index: 1;
     }
 
+    .feature-cards--left .feature-card,
+    .feature-cards--right .feature-card {
+      width: 100px;
+    }
+
+    .feature-cards--bottom .feature-card {
+      width: 110px;
+    }
+
     .feature-card:hover {
-      flex: 0 0 170px;
-      width: 170px;
-      transform: scale(1.06);
+      transform: scale(2.0);
       background: rgba(30, 35, 32, 0.96);
-      border-color: rgba(233, 104, 25, 0.6);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), 0 0 0 4px rgba(233, 104, 25, 0.18);
+      border-color: rgba(233, 104, 25, 0.7);
+      box-shadow: 0 20px 56px rgba(0, 0, 0, 0.60), 0 0 0 6px rgba(233, 104, 25, 0.25);
       z-index: 10;
     }
 
@@ -1136,26 +1160,42 @@
       stroke-dasharray: none;
     }
 
-    /* ---- 响应式：手机端卡片更小，隐藏连线和标记 ---- */
+    /* ---- 响应式：手机端上下堆叠 ---- */
     @media (max-width: 900px) {
-      .feature-card {
-        width: 80px;
-        flex: 0 0 80px;
-        padding: 4px;
+      .feature-gallery__layout {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .feature-center {
+        order: -1;
+        grid-column: 1 / -1;
+      }
+
+      .feature-cards--left,
+      .feature-cards--right {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding-top: 0;
+      }
+
+      .feature-cards--left { justify-content: flex-end; }
+      .feature-cards--right { justify-content: flex-start; }
+
+      .feature-cards--left .feature-card,
+      .feature-cards--right .feature-card,
+      .feature-cards--bottom .feature-card {
+        width: 70px;
+        padding: 3px;
       }
 
       .feature-card:hover {
-        flex: 0 0 130px;
-        width: 130px;
+        transform: scale(1.5);
       }
 
-      .feature-card__title {
-        font-size: 9px;
-      }
-
-      .feature-card:hover .feature-card__title {
-        font-size: 11px;
-      }
+      .feature-card__title { font-size: 8px; }
+      .feature-card:hover .feature-card__title { font-size: 10px; }
 
       .feature-marker,
       .feature-marker__num,
@@ -1926,19 +1966,25 @@
       </div>
 
       <div class="feature-gallery__layout" id="featureLayout">
-        <!-- 上方：建筑立面 + 标记圆点 + SVG 连线 -->
-        <div class="feature-building" id="featureBuilding">
-          <img
-            class="feature-building__img" id="featureImg"
-            src="新艺术建筑风格图解/正立面图222.png"
-            width="5322" height="3241"
-            alt="哈尔滨新艺术建筑正立面细部图解"
-          >
-          <svg class="feature-lines" id="featureLines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+        <!-- 左列卡片 1-4 -->
+        <div class="feature-cards feature-cards--left" id="featureCardsLeft"></div>
+
+        <!-- 中央：建筑立面 + 下方卡片 5-8 -->
+        <div class="feature-center">
+          <div class="feature-building" id="featureBuilding">
+            <img
+              class="feature-building__img" id="featureImg"
+              src="新艺术建筑风格图解/正立面图222.png"
+              width="5322" height="3241"
+              alt="哈尔滨新艺术建筑正立面细部图解"
+            >
+            <svg class="feature-lines" id="featureLines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="feature-cards feature-cards--bottom" id="featureCardsBottom"></div>
         </div>
 
-        <!-- 下方：12 张卡片环绕排列 -->
-        <div class="feature-cards-wrap" id="featureCardsWrap"></div>
+        <!-- 右列卡片 9-12 -->
+        <div class="feature-cards feature-cards--right" id="featureCardsRight"></div>
       </div>
     </section>
 
@@ -2385,14 +2431,16 @@
         { id: "12", title: "优雅精致的室内楼梯", area: { x: 54.30, y: 76.74 }, img: "11-优雅精致的室内楼梯.JPG" }
       ];
 
-      var cardsWrap = document.getElementById("featureCardsWrap");
+      var leftEl = document.getElementById("featureCardsLeft");
+      var bottomEl = document.getElementById("featureCardsBottom");
+      var rightEl = document.getElementById("featureCardsRight");
       var buildingEl = document.getElementById("featureBuilding");
       var linesSvg = document.getElementById("featureLines");
 
-      if (!cardsWrap || !buildingEl) return;
+      if (!leftEl || !bottomEl || !rightEl || !buildingEl) return;
 
-      // 渲染所有 12 张卡片到单行 flex-wrap 容器
-      features.forEach(function (f) {
+      // 分组：1-4 左，5-8 下，9-12 右
+      function renderCard(f, container) {
         var card = document.createElement("div");
         card.className = "feature-card";
         card.setAttribute("data-feature", f.id);
@@ -2414,7 +2462,14 @@
         card.appendChild(num);
         card.appendChild(img);
         card.appendChild(title);
-        cardsWrap.appendChild(card);
+        container.appendChild(card);
+      }
+
+      features.forEach(function (f) {
+        var id = parseInt(f.id);
+        if (id <= 4) { renderCard(f, leftEl); }
+        else if (id <= 8) { renderCard(f, bottomEl); }
+        else { renderCard(f, rightEl); }
       });
 
       // 渲染建筑图上的标记圆点（大号，带编号）
@@ -2434,34 +2489,41 @@
         buildingEl.appendChild(label);
       });
 
-      // 绘制 SVG 连线（从卡片顶部中央 → 建筑标记位置）
+      // 绘制 SVG 连线：左列从右边缘 → 标记，右列从左边缘 → 标记，下列从顶边缘 → 标记
       function drawLines() {
         if (!linesSvg) return;
         var buildingRect = buildingEl.getBoundingClientRect();
         if (buildingRect.width === 0) return;
 
-        // 更新 SVG viewBox 为像素坐标
         linesSvg.setAttribute("viewBox", "0 0 " + buildingRect.width + " " + buildingRect.height);
 
         var html = "";
         features.forEach(function (f) {
-          // 标记在建筑图上的像素位置
           var mx = (f.area.x / 100) * buildingRect.width;
           var my = (f.area.y / 100) * buildingRect.height;
 
-          // 找到对应卡片
           var card = document.querySelector('.feature-card[data-feature="' + f.id + '"]');
           if (!card) return;
 
           var cardRect = card.getBoundingClientRect();
+          var id = parseInt(f.id);
+          var x1, y1;
 
-          // 从卡片顶部中央 → 建筑标记位置
-          var x1 = cardRect.left + cardRect.width / 2 - buildingRect.left;
-          var y1 = cardRect.top - buildingRect.top;
-          var x2 = mx;
-          var y2 = my;
+          if (id <= 4) {
+            // 左列：从卡片右边缘中央 → 标记
+            x1 = cardRect.right - buildingRect.left;
+            y1 = cardRect.top + cardRect.height / 2 - buildingRect.top;
+          } else if (id <= 8) {
+            // 下列：从卡片顶边缘中央 → 标记
+            x1 = cardRect.left + cardRect.width / 2 - buildingRect.left;
+            y1 = cardRect.top - buildingRect.top;
+          } else {
+            // 右列：从卡片左边缘中央 → 标记
+            x1 = cardRect.left - buildingRect.left;
+            y1 = cardRect.top + cardRect.height / 2 - buildingRect.top;
+          }
 
-          html += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" data-feature="' + f.id + '" />';
+          html += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + mx + '" y2="' + my + '" data-feature="' + f.id + '" />';
         });
 
         linesSvg.innerHTML = html;
