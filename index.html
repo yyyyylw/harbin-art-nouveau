@@ -396,9 +396,28 @@
     .cover-hero img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       object-position: 50% 50%;
       filter: saturate(1.08) contrast(1.30) brightness(0.82);
+    }
+
+    /* ---- 左下角图片说明 ---- */
+    .cover-caption {
+      position: absolute;
+      z-index: 4;
+      bottom: 28px;
+      left: 28px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 12px;
+      font-weight: 500;
+      font-style: italic;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .cover-caption.is-hidden {
+      opacity: 0;
     }
 
     /* ---- 暗角 + 渐变 ---- */
@@ -1815,6 +1834,7 @@
           <img src="assets/cover.jpg" alt="冬季的哈尔滨历史建筑街景">
         </div>
         <div class="intro-gradient"></div>
+        <p class="cover-caption" id="coverCaption">图中为哈尔滨新艺术建筑代表建筑：马迭尔宾馆</p>
       </div>
 
       <div class="intro-box">
@@ -2218,6 +2238,7 @@
       After scrolling 80px, the header becomes solid for readability.
     ======================================================= */
     var coverEl = document.getElementById("cover");
+    var coverCaption = document.getElementById("coverCaption");
 
     function updateHeader() {
       siteHeader.classList.toggle("is-solid", window.scrollY > 80);
@@ -2225,6 +2246,10 @@
       if (coverEl) {
         var p = Math.min(window.scrollY / (window.innerHeight * 3), 1);
         coverEl.style.opacity = String(Math.max(0.12, 1 - p * 0.88));
+      }
+      // 封面说明文字：滚动即消失
+      if (coverCaption) {
+        coverCaption.classList.toggle("is-hidden", window.scrollY > 20);
       }
     }
 
