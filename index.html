@@ -48,8 +48,9 @@
       --radius: 8px;
       --content-width: 1120px;
       --article-width: 620px;
-      --serif: Georgia, "Times New Roman", "Noto Serif SC", "Songti SC", serif;
-      --sans: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      --serif: "Times New Roman", "Noto Serif SC", "Songti SC", "SimSun", "STSong", serif;
+      --sans: "PingFang SC", "Microsoft YaHei", "SimHei", "Heiti SC", "Noto Sans SC", sans-serif;
+      --font-size-base: 17px;
     }
 
     /* =========================================================
@@ -82,7 +83,9 @@
           #f6f6f4 100%
         );
       font-family: var(--sans);
-      line-height: 1.65;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      line-height: 1.7;
       text-rendering: optimizeLegibility;
     }
 
@@ -175,16 +178,17 @@
     .brand-title {
       display: block;
       font-family: var(--serif);
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 19px;
+      font-weight: 800;
       line-height: 1.1;
     }
 
     .brand-subtitle {
       display: block;
       margin-top: 2px;
-      color: rgba(255, 255, 255, 0.74);
-      font-size: 12px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      font-weight: 600;
       line-height: 1.2;
     }
 
@@ -644,10 +648,10 @@
 
     .new-intro p {
       margin: 24px 0;
-      color: rgba(255, 255, 255, 0.86);
-      font-size: 16px;
-      font-weight: 300;
-      line-height: 1.56;
+      color: rgba(255, 255, 255, 0.90);
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.65;
     }
 
     .new-intro p + p {
@@ -659,7 +663,8 @@
       padding-top: 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.18);
       color: rgba(255, 255, 255, 0.62);
-      font-size: 13px;
+      font-size: 14px;
+      font-weight: 600;
       line-height: 1.75;
     }
 
@@ -735,10 +740,10 @@
 
     .viz-intro p {
       margin: 8px 0;
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 14px;
-      font-weight: 300;
-      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.55;
     }
 
     .viz-intro p + p {
@@ -1162,14 +1167,15 @@
     .heading h3 {
       margin: 0;
       font-family: var(--serif);
-      font-size: clamp(28px, 4.5vw, 52px);
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
       line-height: 1.15;
     }
 
     .heading h5 {
       margin: 14px 0 0;
-      color: rgba(255, 255, 255, 0.62);
-      font-size: 14px;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 15px;
       font-weight: 700;
     }
 
@@ -1199,8 +1205,22 @@
       overflow: visible;
     }
 
+    /* 桑基图：桌面端深色文字，手机端白色文字（背景渐变更亮） */
     #sankey-diagram .viz-intro p {
       color: rgba(15, 24, 32, 0.88);
+    }
+
+    @media (max-width: 720px) {
+      #sankey-diagram .viz-intro p {
+        color: rgba(255, 255, 255, 0.90);
+      }
+    }
+
+    /* 桑基图不限高，避免桌面端显示不全 */
+    #sankey-diagram {
+      height: auto;
+      min-height: 100svh;
+      overflow: visible;
     }
 
     #sankey-diagram .viz-panel {
@@ -1378,6 +1398,8 @@
       color: rgba(22, 33, 42, 0.72);
       background: transparent;
       text-align: center;
+      font-size: 15px;
+      font-weight: 600;
     }
 
     .site-footer strong {
