@@ -3098,7 +3098,7 @@
     ---------------------------------------------------------
     点击图表右上角全屏按钮。
     - 普通图表/iframe：克隆内容到遮罩层 → 横屏查看。
-    - 特征图（含交互热区）：原地 CSS 全屏，不动 DOM，保留所有交互。
+    - 特征图（含交互热区）：移动原始 DOM 到遮罩层 + 横屏旋转，保留热区事件。
   ========================================================== -->
   <script>
     (function () {
@@ -3108,6 +3108,9 @@
       var hint = document.getElementById("fsHint");
       var isOpen = false;
       var activeMode = null; // "clone" | "feature"
+      var movedEl = null;
+      var movedParent = null;
+      var movedNext = null;
 
       function isFeatureDiagram(container) {
         return !!(container.closest("#feature-diagram"));
@@ -3132,6 +3135,7 @@
 
       function openCloneFS(container) {
         activeMode = "clone";
+        overlay.style.background = "";
         var clone = container.cloneNode(true);
         var fsBtns = clone.querySelectorAll(".chart-fs-btn");
         for (var i = 0; i < fsBtns.length; i++) { fsBtns[i].remove(); }
@@ -3148,7 +3152,10 @@
         stage.innerHTML = "";
         stage.appendChild(clone);
 
-        // 手机端启用横屏旋转
+        applyMobileRotation();
+      }
+
+      function applyMobileRotation() {
         var isMobile = window.innerWidth < 900;
         if (isMobile) {
           stage.classList.add("is-landscape");
@@ -3163,16 +3170,28 @@
 
       function openFeatureFS(container) {
         activeMode = "feature";
-        // 遮罩透明：特征图自身提供黑底，遮罩仅承载关闭按钮
-        overlay.style.background = "transparent";
-        // 手机端取消旋转（保留热区交互）
-        stage.classList.remove("is-landscape");
+        // 深灰背景填补旋转后边角
+        overlay.style.background = "#111";
 
-        // 原地全屏：不移 DOM，只加 CSS class，保留所有热区事件
-        var section = document.getElementById("feature-diagram");
-        if (section) { section.classList.add("is-fs-active"); }
+        // 移动原始 .feature-map-scroll 到遮罩层，保留热区事件
+        var mapScroll = container.querySelector(".feature-map-scroll");
+        if (!mapScroll) return;
+        movedParent = mapScroll.parentNode;
+        movedNext = mapScroll.nextSibling;
+        movedEl = mapScroll;
 
-        // 提高 backdrop 和 detail card 的 z-index，确保在遮罩之上
+        mapScroll.style.maxHeight = "none";
+        mapScroll.style.overflow = "auto";
+        mapScroll.style.width = "100%";
+        mapScroll.style.height = "100%";
+        mapScroll.style.boxShadow = "none";
+        mapScroll.style.borderRadius = "0";
+        mapScroll.style.borderColor = "transparent";
+
+        stage.innerHTML = "";
+        stage.appendChild(mapScroll);
+
+        // 提高 backdrop 和 detail card 的 z-index
         var backdrop = document.getElementById("featureBackdrop");
         var detail = document.getElementById("featureDetail");
         if (backdrop) {
@@ -3184,22 +3203,32 @@
           detail.style.zIndex = "10002";
         }
 
-        // 特征图不旋转，只显示关闭提示
-        hint.textContent = "点击 × 退出全屏";
-        hint.classList.add("is-visible");
-        clearTimeout(window.__fsHintTimer);
-        window.__fsHintTimer = setTimeout(function () {
-          hint.classList.remove("is-visible");
-        }, 3000);
+        applyMobileRotation();
       }
 
       function closeFS() {
         if (!isOpen) return;
 
         if (activeMode === "feature") {
-          var section = document.getElementById("feature-diagram");
-          if (section) { section.classList.remove("is-fs-active"); }
-
+          // 还原原始 DOM
+          if (movedEl && movedParent) {
+            if (movedNext) {
+              movedParent.insertBefore(movedEl, movedNext);
+            } else {
+              movedParent.appendChild(movedEl);
+            }
+            movedEl.style.maxHeight = "";
+            movedEl.style.overflow = "";
+            movedEl.style.width = "";
+            movedEl.style.height = "";
+            movedEl.style.boxShadow = "";
+            movedEl.style.borderRadius = "";
+            movedEl.style.borderColor = "";
+            movedEl = null;
+            movedParent = null;
+            movedNext = null;
+          }
+          // 还原 z-index
           var backdrop = document.getElementById("featureBackdrop");
           var detail = document.getElementById("featureDetail");
           if (backdrop) {
@@ -3212,12 +3241,12 @@
           }
         } else {
           stage.innerHTML = "";
-          stage.classList.remove("is-landscape");
         }
 
         overlay.classList.remove("is-open");
         overlay.setAttribute("aria-hidden", "true");
         overlay.style.background = "";
+        stage.classList.remove("is-landscape");
         hint.classList.remove("is-visible");
         hint.textContent = "旋转手机以获得最佳观看体验";
         document.body.style.overflow = "";
