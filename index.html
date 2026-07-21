@@ -959,12 +959,19 @@
     .feature-cards--left { align-items: flex-end; }
     .feature-cards--right { align-items: flex-start; }
 
-    /* ---- 下列：横向排列 ---- */
+    /* ---- 下列：两两分组，中间下滑按钮 ---- */
+    .feature-bottom-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+    }
+
     .feature-cards--bottom {
       display: flex;
       flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
       gap: 6px;
     }
 
@@ -1137,7 +1144,7 @@
       stroke-dasharray: none;
     }
 
-    /* ---- 响应式：手机端上下堆叠 ---- */
+    /* ---- 响应式：手机端 ---- */
     @media (max-width: 900px) {
       .feature-gallery__layout {
         grid-template-columns: 1fr 1fr;
@@ -1159,6 +1166,14 @@
 
       .feature-cards--left { justify-content: flex-end; }
       .feature-cards--right { justify-content: flex-start; }
+
+      .feature-bottom-row {
+        gap: 6px;
+      }
+
+      .feature-bottom-row .viz-next {
+        display: none;
+      }
 
       .feature-cards--left .feature-card,
       .feature-cards--right .feature-card,
@@ -1949,7 +1964,17 @@
             >
             <svg class="feature-lines" id="featureLines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
           </div>
-          <div class="feature-cards feature-cards--bottom" id="featureCardsBottom"></div>
+          <div class="feature-bottom-row">
+            <div class="feature-cards feature-cards--bottom" id="featureCardsBottomL"></div>
+            <a class="viz-next" id="viz-next-feature" href="#dot-explore-map" aria-label="向下滑动">
+              <svg class="progress-ring" viewBox="0 0 54 54">
+                <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
+                <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
+              </svg>
+              <span class="progress-text">0%</span>
+            </a>
+            <div class="feature-cards feature-cards--bottom" id="featureCardsBottomR"></div>
+          </div>
         </div>
 
         <!-- 右列卡片 9-12 -->
@@ -2362,6 +2387,15 @@
         expectedCount: 1
       });
 
+      // 特征卡片底部：3s 兜底 / Feature cards bottom ring
+      createProgressLoader({
+        ringSelector: "#viz-next-feature",
+        iframeSelector: ".dot-nonexistent iframe",
+        trackedKey: "featureVizTracked",
+        loadedKey: "featureVizLoaded",
+        expectedCount: 1
+      });
+
       // 散点地图底部：追踪桑基图 / Dot-map bottom ring tracks Sankey
       createProgressLoader({
         ringSelector: "#viz-next-dotmap",
@@ -2406,12 +2440,13 @@
       ];
 
       var leftEl = document.getElementById("featureCardsLeft");
-      var bottomEl = document.getElementById("featureCardsBottom");
+      var bottomL = document.getElementById("featureCardsBottomL");
+      var bottomR = document.getElementById("featureCardsBottomR");
       var rightEl = document.getElementById("featureCardsRight");
       var buildingEl = document.getElementById("featureBuilding");
       var linesSvg = document.getElementById("featureLines");
 
-      if (!leftEl || !bottomEl || !rightEl || !buildingEl) return;
+      if (!leftEl || !bottomL || !bottomR || !rightEl || !buildingEl) return;
 
       // 分组：1-4 左，5-8 下，9-12 右
       function renderCard(f, container) {
@@ -2442,7 +2477,8 @@
       features.forEach(function (f) {
         var id = parseInt(f.id);
         if (id <= 4) { renderCard(f, leftEl); }
-        else if (id <= 8) { renderCard(f, bottomEl); }
+        else if (id <= 6) { renderCard(f, bottomL); }
+        else if (id <= 8) { renderCard(f, bottomR); }
         else { renderCard(f, rightEl); }
       });
 
@@ -2484,11 +2520,9 @@
           var x1, y1;
 
           if (id <= 4) {
-            // 左列：从卡片右边缘中央 → 标记
             x1 = cardRect.right - buildingRect.left;
             y1 = cardRect.top + cardRect.height / 2 - buildingRect.top;
           } else if (id <= 8) {
-            // 下列：从卡片顶边缘中央 → 标记
             x1 = cardRect.left + cardRect.width / 2 - buildingRect.left;
             y1 = cardRect.top - buildingRect.top;
           } else {
