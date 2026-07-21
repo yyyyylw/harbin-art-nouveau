@@ -927,248 +927,216 @@
     }
 
     /* =========================================================
-      02-06-B. 特征图：新艺术建筑立面图解 / Feature Facade Diagram
+      02-06-B. 建筑特征卡片画廊 / Feature Card Gallery
       -------------------------------------------------------
-      可横向滚动的建筑立面图，点击热区弹出细节卡片。
-      Horizontally scrollable facade diagram with hotspot
-      buttons that open detail cards.
+      12 张卡片左右环绕建筑立面图，SVG 直线连接对应位置。
+      Cards surround the facade, lines connect to markers.
     ======================================================== */
-    .feature-map-scroll {
-      width: min(980px, calc(100% - 40px));
+    .feature-gallery {
+      padding: 60px 20px 80px;
+      color: var(--white);
+      background: transparent;
+    }
+
+    .feature-gallery__intro {
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto 32px;
+      text-align: left;
+    }
+
+    .feature-gallery__intro p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    /* 三栏布局：左卡片 | 中间建筑 | 右卡片 */
+    .feature-gallery__layout {
+      display: grid;
+      grid-template-columns: 200px 1fr 200px;
+      gap: 0;
+      align-items: start;
+      width: min(1320px, calc(100% - 20px));
       margin: 0 auto;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: var(--radius);
-      background: #f3f5f2;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
     }
 
-    /* 特征图全屏模式：原地扩展，不动 DOM，保留所有交互 */
-    #feature-diagram.is-fs-active {
-      position: fixed !important;
-      z-index: 10000 !important;
-      inset: 0 !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      padding: 8px !important;
-      padding-top: 44px !important;
-      background: #000 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      overflow: hidden !important;
+    /* ---- 卡片列 ---- */
+    .feature-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding-top: 10px;
     }
 
-    #feature-diagram.is-fs-active .viz-intro,
-    #feature-diagram.is-fs-active .viz-next {
-      display: none;
+    .feature-cards--left {
+      align-items: flex-end;
     }
 
-    #feature-diagram.is-fs-active .viz-panel {
-      flex: 1 1 auto;
+    .feature-cards--right {
+      align-items: flex-start;
+    }
+
+    /* ---- 单张卡片 ---- */
+    .feature-card {
+      position: relative;
+      width: 160px;
+      padding: 8px;
+      border-radius: 6px;
+      background: rgba(20, 25, 22, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      cursor: default;
+      transition: transform 0.28s ease, width 0.28s ease, background 0.28s ease,
+                  box-shadow 0.28s ease, z-index 0s;
+      z-index: 1;
+      margin: 2px 0;
+    }
+
+    .feature-card:hover {
+      transform: scale(1.25);
+      width: 220px;
+      background: rgba(30, 35, 32, 0.95);
+      border-color: rgba(255, 255, 255, 0.30);
+      box-shadow: 0 12px 38px rgba(0, 0, 0, 0.45);
+      z-index: 10;
+    }
+
+    .feature-card__num {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      border-radius: 50%;
+      background: rgba(233, 104, 25, 0.75);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .feature-card__thumb {
       width: 100%;
-      max-width: 100%;
-      max-height: none;
-      overflow: auto;
-      min-height: 0;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 3px;
+      display: block;
     }
 
-    #feature-diagram.is-fs-active .feature-map-scroll {
-      width: 100%;
-      min-height: 100%;
-      max-height: none;
-      overflow: auto;
-      border-radius: 0;
-      border-color: transparent;
-      box-shadow: none;
+    .feature-card__title {
+      margin: 5px 0 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
     }
 
-    .feature-map {
+    .feature-card:hover .feature-card__title {
+      font-size: 13px;
+    }
+
+    /* ---- 中央建筑立面 ---- */
+    .feature-building {
       position: relative;
       width: 100%;
       line-height: 0;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 4px;
+      overflow: hidden;
+      background: #f3f5f2;
     }
 
-    .feature-map__image {
+    .feature-building__img {
       display: block;
       width: 100%;
       height: auto;
       user-select: none;
     }
 
-    .feature-hotspot {
+    /* 标记圆点 */
+    .feature-marker {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      margin: -5px 0 0 -5px;
+      left: calc(var(--x) * 1%);
+      top: calc(var(--y) * 1%);
+      border-radius: 50%;
+      background: #e96819;
+      border: 2px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 0 0 3px rgba(233, 104, 25, 0.22);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* 标记编号 */
+    .feature-marker__num {
       position: absolute;
       left: calc(var(--x) * 1%);
       top: calc(var(--y) * 1%);
-      width: calc(var(--w) * 1%);
-      height: calc(var(--h) * 1%);
-      border: 0;
-      padding: 0;
-      background: transparent;
-      cursor: pointer;
-      border-radius: 3px;
+      transform: translate(-50%, calc(-100% - 6px));
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      background: #e96819;
+      padding: 1px 5px;
+      border-radius: 10px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 2;
     }
 
-    .feature-hotspot::after {
-      content: "";
+    /* SVG 连线层 */
+    .feature-lines {
       position: absolute;
       inset: 0;
-      border: 2px solid transparent;
-      border-radius: 3px;
-      transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
-    }
-
-    .feature-hotspot:hover::after,
-    .feature-hotspot:focus-visible::after,
-    .feature-hotspot.is-active::after {
-      background: rgba(233, 104, 25, 0.16);
-      border-color: rgba(233, 104, 25, 0.8);
-      box-shadow: 0 0 0 4px rgba(29, 98, 93, 0.16);
-    }
-
-    .feature-hotspot:focus-visible {
-      outline: none;
-    }
-
-    /* 细节卡片 / detail card */
-    .feature-detail {
-      position: fixed;
-      z-index: 30;
-      display: none;
-      width: min(430px, calc(100vw - 32px));
-      max-height: calc(100vh - 32px);
-      overflow: auto;
-      background: #ffffff;
-      border: 1px solid rgba(29, 98, 93, 0.22);
-      border-radius: 8px;
-      box-shadow: 0 22px 60px rgba(24, 31, 29, 0.32);
-    }
-
-    .feature-detail.is-open {
-      display: block;
-    }
-
-    .feature-detail__top {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 14px 12px;
-      background: rgba(255, 255, 255, 0.96);
-      border-bottom: 1px solid #cfd8d2;
-      backdrop-filter: blur(10px);
-    }
-
-    .feature-detail__number {
-      display: inline-grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border: 1px solid rgba(233, 104, 25, 0.45);
-      border-radius: 50%;
-      color: #e96819;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .feature-detail__title {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.35;
-      font-weight: 680;
-      color: #202725;
-    }
-
-    .feature-detail__close {
-      width: 34px;
-      height: 34px;
-      border: 1px solid #cfd8d2;
-      border-radius: 50%;
-      background: #f7f9f8;
-      color: #202725;
-      font-size: 22px;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    .feature-detail__close:hover,
-    .feature-detail__close:focus-visible {
-      border-color: rgba(29, 98, 93, 0.55);
-      color: #1d625d;
-      outline: none;
-    }
-
-    .feature-detail__body {
-      padding: 14px;
-    }
-
-    .feature-detail__text {
-      margin: 0 0 24px;
-      color: #34403c;
-      font-size: 16px;
-      font-weight: 300;
-      line-height: 1.56;
-    }
-
-    .feature-media-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-    }
-
-    .feature-media-item {
-      display: grid;
-      gap: 7px;
-      margin: 0;
-      min-width: 0;
-    }
-
-    .feature-media-item__frame {
-      width: 100%;
-      aspect-ratio: var(--ratio, 4 / 3);
-      overflow: hidden;
-      background: #f8faf9;
-      border: 1px solid #dce4df;
-      border-radius: 7px;
-    }
-
-    .feature-media-item__image {
-      display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      pointer-events: none;
+      z-index: 1;
     }
 
-    .feature-media-item__caption {
-      color: #66706c;
-      font-size: 12px;
-      line-height: 1.35;
+    .feature-lines line {
+      stroke: rgba(233, 104, 25, 0.40);
+      stroke-width: 1;
+      stroke-dasharray: 4 3;
+      transition: stroke 0.25s, stroke-width 0.25s;
     }
 
-    .feature-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 25;
-      display: none;
-      background: rgba(20, 27, 25, 0.18);
-    }
+    /* ---- 响应式 ---- */
+    @media (max-width: 900px) {
+      .feature-gallery__layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
 
-    .feature-backdrop.is-open {
-      display: block;
-    }
+      .feature-cards {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        padding-top: 0;
+      }
 
-    @media (max-width: 720px) {
-      .feature-detail {
-        left: 12px !important;
-        right: 12px;
-        bottom: 12px;
-        top: auto !important;
-        width: auto;
-        max-height: 78vh;
+      .feature-card {
+        width: 130px;
+        padding: 6px;
+      }
+
+      .feature-card:hover {
+        transform: scale(1.12);
+        width: 160px;
+      }
+
+      .feature-card__title {
+        font-size: 11px;
+      }
+
+      .feature-marker,
+      .feature-marker__num,
+      .feature-lines {
+        display: none;
       }
     }
 
@@ -1921,58 +1889,37 @@
     </section>
 
     <!-- =======================================================
-      05-02-B. 特征图 / Feature Facade Diagram
+      05-02-B. 建筑特征卡片 / Feature Card Gallery
       -------------------------------------------------------
-      全屏滑动页：上方报道简介 + 新艺术建筑立面图解（可点击热区查看细节）。
-      Full-viewport slide: reported intro + interactive facade
-      diagram with clickable hotspots.
+      12 张特征卡片环绕建筑立面图，直线连接对应位置。
+      Cards surround the facade diagram with connector lines.
     ======================================================== -->
-    <section class="viz-slide" id="feature-diagram">
-      <div class="viz-intro">
+    <section class="feature-gallery" id="feature-diagram">
+      <div class="feature-gallery__intro">
         <p>
-          新艺术建筑的特色在于大量运用流畅的曲线和自然元素（如花卉、藤蔓）作为装饰母题，体现在铁艺栏杆、窗框及檐部设计中；强调建筑整体风格的统一，从外观到室内家具均遵循同一设计语言；建筑材料多采用青石、砖木混合结构，工艺精致。这些建筑不仅反映了20世纪初欧洲现代设计思潮在远东的传播，也体现了哈尔滨作为国际商埠的文化交融特征，
-        </p>
-        <p>
-          哈尔滨的建筑还要应对漫长冬季。图中的木檐、坡屋顶和悬挑雨篷都有挡雪、排水等实际用途，弧形窗楣、女儿墙和雕饰则改变立面的节奏。功能和装饰经常落在同一个构件上。
-        </p>
-        <p>
-          立面图标出12处哈尔滨新艺术建筑的典型特征。把鼠标移到标记上，或直接点击，可以对照实景照片查看每处特征的代表性图片。
+          新艺术建筑的特色在于大量运用流畅的曲线和自然元素（花卉、藤蔓）作为装饰母题，体现在铁艺栏杆、窗框及檐部设计中。以下12处细节是哈尔滨新艺术建筑最具代表性的特征语言。
         </p>
       </div>
 
-      <div class="viz-panel fs-container">
-        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
-          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-        </button>
-        <div class="feature-map-scroll" aria-label="新艺术建筑正立面图解">
-          <div class="feature-map" id="featureMap">
-            <img class="feature-map__image" src="新艺术建筑风格图解/正立面图222.png" width="5322" height="3241" alt="哈尔滨新艺术建筑正立面细部图解">
-          </div>
+      <div class="feature-gallery__layout" id="featureLayout">
+        <!-- 左侧卡片 JS 填充 -->
+        <div class="feature-cards feature-cards--left" id="featureCardsLeft"></div>
+
+        <!-- 中央：建筑立面 + 标记圆点 + SVG 连线 -->
+        <div class="feature-building" id="featureBuilding">
+          <img
+            class="feature-building__img" id="featureImg"
+            src="新艺术建筑风格图解/正立面图222.png"
+            width="5322" height="3241"
+            alt="哈尔滨新艺术建筑正立面细部图解"
+          >
+          <svg class="feature-lines" id="featureLines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
         </div>
-      </div>
 
-      <a class="viz-next" id="viz-next-feature" href="#dot-explore-map" aria-label="向下滑动 / Scroll down">
-        <svg class="progress-ring" viewBox="0 0 54 54">
-          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-        </svg>
-        <span class="progress-text">0%</span>
-      </a>
+        <!-- 右侧卡片 JS 填充 -->
+        <div class="feature-cards feature-cards--right" id="featureCardsRight"></div>
+      </div>
     </section>
-
-    <div class="feature-backdrop" id="featureBackdrop"></div>
-
-    <aside class="feature-detail" id="featureDetail" role="dialog" aria-modal="false" aria-labelledby="featureDetailTitle">
-      <div class="feature-detail__top">
-        <span class="feature-detail__number" id="featureDetailNumber"></span>
-        <h2 class="feature-detail__title" id="featureDetailTitle"></h2>
-        <button class="feature-detail__close" type="button" id="featureCloseCard" aria-label="关闭">&times;</button>
-      </div>
-      <div class="feature-detail__body">
-        <p class="feature-detail__text" id="featureDetailText"></p>
-        <div class="feature-media-grid" id="featureMediaGrid"></div>
-      </div>
-    </aside>
 
     <!-- =======================================================
       05-02-C. 散点探索地图 / Dot Exploration Map
@@ -2374,15 +2321,6 @@
         expectedCount: 1
       });
 
-      // 特征图底部：追踪散点地图（无 iframe，3s 兜底） / Feature-diagram bottom ring
-      createProgressLoader({
-        ringSelector: "#viz-next-feature",
-        iframeSelector: ".dot-nonexistent iframe",
-        trackedKey: "featureVizTracked",
-        loadedKey: "featureVizLoaded",
-        expectedCount: 1
-      });
-
       // 散点地图底部：追踪桑基图 / Dot-map bottom ring tracks Sankey
       createProgressLoader({
         ringSelector: "#viz-next-dotmap",
@@ -2403,179 +2341,157 @@
     })();
 
     /* =======================================================
-      08-07. 特征图交互 / Feature Diagram Hotspots
-      -----------------------------------------------------
-      在新艺术建筑立面图上创建可点击热区，弹出细节卡片。
-      Creates clickable hotspots on the facade diagram that
-      open detail cards with images and descriptions.
+      08-07. 建筑特征卡片画廊 / Feature Card Gallery
+      -------------------------------------------------------
+      左右两列卡片环绕中央建筑立面图，SVG 直线连接标记位置。
+      卡片默认小尺寸，hover 时放大。
     ======================================================= */
     (function () {
       var IMG_BASE = "新艺术建筑风格图解/";
 
       var features = [
-        { id: "1", title: "兼具实用与美观的木制屋檐", text: "屋檐不只是遮雨，木构件被做成轻巧的层次，实用里带着温和的手工感。", area: { x: 6.8020, y: 42.9497, w: 5.1109, h: 5.0910 }, images: [{ src: "0-兼具实用与美观的木制屋檐.JPG", caption: "木制屋檐" }] },
-        { id: "2", title: "方额圆角窗 / 椭圆额直角窗", text: "窗洞把直线和圆角揉在一起，规整但不生硬。这样的窗型让立面多了柔和的节奏。", area: { x: 11.5558, y: 51.1879, w: 5.1109, h: 5.0910 }, images: [{ src: "1-方额圆角窗.png", caption: "方额圆角窗" }, { src: "1-椭圆额直角窗.png", caption: "椭圆额直角窗" }] },
-        { id: "3", title: "富有浪漫主义的雕饰", text: "柱头和雕饰带一点植物感，装饰不抢戏，却把入口和转角衬得更浪漫。", area: { x: 9.1695, y: 72.2308, w: 5.1109, h: 5.0910 }, images: [{ src: "2-富有浪漫主义的雕饰.JPG", caption: "浪漫主义雕饰" }] },
-        { id: "4", title: "曲线铁艺装饰", text: "铁艺最适合新艺术的线条：卷曲、伸展，像藤蔓一样把阳台和护栏带活。", area: { x: 31.1725, y: 76.7356, w: 5.1109, h: 5.0910 }, images: [{ src: "3-曲线铁艺装饰.JPG", caption: "曲线铁艺装饰" }, { src: "3-曲线铁艺装饰1.JPG", caption: "铁艺细部" }] },
-        { id: "5", title: "优美大方的女儿墙和金属装饰绣边", text: "女儿墙的轮廓被收得很优雅，再配上细细的金属边，屋顶线就不会显得平。", area: { x: 45.9226, y: 31.5026, w: 5.1109, h: 5.0910 }, images: [{ src: "4-优美大方的女儿墙和金属装饰绣边.JPG", caption: "女儿墙与金属绣边" }] },
-        { id: "6", title: "门和曲线的结合", text: "门洞边缘顺着曲线过渡，开口像被轻轻推开。硬朗的入口因此多了一点亲近感。", area: { x: 45.0582, y: 68.8368, w: 5.1109, h: 5.0910 }, images: [{ src: "5-门和曲线的结合.png", caption: "门与曲线" }] },
-        { id: "7", title: "屋顶的金属线条装饰", text: "屋顶上的金属线条很细，却能把天际线拉得更精神。它让屋面从远处看也有辨识度。", area: { x: 59.0567, y: 36.0383, w: 5.1109, h: 5.0910 }, images: [{ src: "6-屋顶的金属线条装饰.JPG", caption: "屋顶金属线条" }] },
-        { id: "8", title: "优雅的窗楣", text: "窗楣用弧线压住窗头，既有重量感，也不显笨重。重复出现时，整排窗会更有韵律。", area: { x: 64.9004, y: 47.4545, w: 5.1109, h: 5.0910 }, images: [{ src: "7-优雅的窗楣.png", caption: "窗楣" }, { src: "7-优雅的窗楣1.png", caption: "窗楣细部" }] },
-        { id: "9", title: "偶尔可见精美的人像装饰", text: "人像装饰像是给建筑加了表情，远看只是点缀，近看才发现很讲究。", area: { x: 85.0808, y: 33.7859, w: 5.1109, h: 5.0910 }, images: [{ src: "8-偶尔可见精美的人像装饰.JPG", caption: "人像装饰" }] },
-        { id: "10", title: "柔和流畅的构件交接", text: "这些构件交接处没有硬碰硬，而是用弧线慢慢过渡。新艺术最迷人的地方，常常就在这种细节里。", area: { x: 85.0808, y: 55.6927, w: 5.1109, h: 5.0910 }, images: [{ src: "9-柔和流畅的构件交接.png", caption: "构件交接" }] },
-        { id: "11", title: "悬挑式雨篷", text: "悬挑雨篷负责遮挡风雨，也顺手把入口标出来。金属支架的曲线让功能件不只是功能件。", area: { x: 86.6967, y: 72.2308, w: 5.1109, h: 5.0910 }, images: [{ src: "10-悬挑式雨篷.JPG", caption: "悬挑式雨篷" }, { src: "10-悬挑式雨篷.png", caption: "雨篷细部" }] },
-        { id: "12", title: "优雅精致的室内楼梯", text: "楼梯栏杆把重复的小构件做得很精细，走近时会有明显的手工质感。它让室内动线也延续了立面的装饰语言。", area: { x: 54.3029, y: 76.7356, w: 5.1109, h: 5.0910 }, images: [{ src: "11-优雅精致的室内楼梯.JPG", caption: "室内楼梯" }] }
+        { id: "1", title: "兼具实用与美观的木制屋檐", area: { x: 6.80, y: 42.95 }, img: "0-兼具实用与美观的木制屋檐.JPG" },
+        { id: "2", title: "方额圆角窗 / 椭圆额直角窗", area: { x: 11.56, y: 51.19 }, img: "1-方额圆角窗.png" },
+        { id: "3", title: "富有浪漫主义的雕饰", area: { x: 9.17, y: 72.23 }, img: "2-富有浪漫主义的雕饰.JPG" },
+        { id: "4", title: "曲线铁艺装饰", area: { x: 31.17, y: 76.74 }, img: "3-曲线铁艺装饰.JPG" },
+        { id: "5", title: "优美大方的女儿墙和金属装饰绣边", area: { x: 45.92, y: 31.50 }, img: "4-优美大方的女儿墙和金属装饰绣边.JPG" },
+        { id: "6", title: "门和曲线的结合", area: { x: 45.06, y: 68.84 }, img: "5-门和曲线的结合.png" },
+        { id: "7", title: "屋顶的金属线条装饰", area: { x: 59.06, y: 36.04 }, img: "6-屋顶的金属线条装饰.JPG" },
+        { id: "8", title: "优雅的窗楣", area: { x: 64.90, y: 47.45 }, img: "7-优雅的窗楣.png" },
+        { id: "9", title: "偶尔可见精美的人像装饰", area: { x: 85.08, y: 33.79 }, img: "8-偶尔可见精美的人像装饰.JPG" },
+        { id: "10", title: "柔和流畅的构件交接", area: { x: 85.08, y: 55.69 }, img: "9-柔和流畅的构件交接.png" },
+        { id: "11", title: "悬挑式雨篷", area: { x: 86.70, y: 72.23 }, img: "10-悬挑式雨篷.JPG" },
+        { id: "12", title: "优雅精致的室内楼梯", area: { x: 54.30, y: 76.74 }, img: "11-优雅精致的室内楼梯.JPG" }
       ];
 
-      var map = document.getElementById("featureMap");
-      var card = document.getElementById("featureDetail");
-      var backdrop = document.getElementById("featureBackdrop");
-      var closeButton = document.getElementById("featureCloseCard");
-      var titleEl = document.getElementById("featureDetailTitle");
-      var numberEl = document.getElementById("featureDetailNumber");
-      var textEl = document.getElementById("featureDetailText");
-      var mediaGrid = document.getElementById("featureMediaGrid");
-      var activeButton = null;
+      var leftEl = document.getElementById("featureCardsLeft");
+      var rightEl = document.getElementById("featureCardsRight");
+      var buildingEl = document.getElementById("featureBuilding");
+      var linesSvg = document.getElementById("featureLines");
 
-      function makeHotspot(feature) {
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "feature-hotspot";
-        btn.style.setProperty("--x", feature.area.x);
-        btn.style.setProperty("--y", feature.area.y);
-        btn.style.setProperty("--w", feature.area.w);
-        btn.style.setProperty("--h", feature.area.h);
-        btn.setAttribute("aria-label", feature.id + " " + feature.title);
+      if (!leftEl || !rightEl || !buildingEl) return;
 
-        // 桌面端移入弹出 / hover opens card
-        btn.addEventListener("mouseenter", function () {
-          if (activeButton === btn) return;
-          openCard(feature, btn);
-        });
+      // 按 x 坐标分左右：x<50 放左边，x>=50 放右边
+      var leftFeatures = [];
+      var rightFeatures = [];
+      features.forEach(function (f) {
+        if (f.area.x < 50) { leftFeatures.push(f); }
+        else { rightFeatures.push(f); }
+      });
 
-        // 手机端点击切换 / click toggles
-        btn.addEventListener("click", function (event) {
-          event.stopPropagation();
-          if (activeButton === btn) {
-            closeCard();
-          } else {
-            openCard(feature, btn);
-          }
-        });
+      // 渲染卡片
+      function renderCards(list, container) {
+        list.forEach(function (f) {
+          var card = document.createElement("div");
+          card.className = "feature-card";
+          card.setAttribute("data-feature", f.id);
 
-        map.appendChild(btn);
-      }
+          var num = document.createElement("span");
+          num.className = "feature-card__num";
+          num.textContent = f.id;
 
-      function renderImages(images) {
-        mediaGrid.replaceChildren();
-        images.forEach(function (item) {
-          var figure = document.createElement("figure");
-          figure.className = "feature-media-item";
-          var frame = document.createElement("div");
-          frame.className = "feature-media-item__frame";
           var img = document.createElement("img");
-          img.className = "feature-media-item__image";
-          img.alt = item.caption;
+          img.className = "feature-card__thumb";
+          img.src = IMG_BASE + f.img;
+          img.alt = f.title;
           img.loading = "lazy";
-          img.addEventListener("load", function () {
-            if (img.naturalWidth && img.naturalHeight) {
-              frame.style.setProperty("--ratio", img.naturalWidth + " / " + img.naturalHeight);
-            }
-          }, { once: true });
-          img.src = IMG_BASE + item.src;
-          if (img.complete && img.naturalWidth && img.naturalHeight) {
-            frame.style.setProperty("--ratio", img.naturalWidth + " / " + img.naturalHeight);
-          }
-          var caption = document.createElement("figcaption");
-          caption.className = "feature-media-item__caption";
-          caption.textContent = item.caption;
-          frame.appendChild(img);
-          figure.append(frame, caption);
-          mediaGrid.appendChild(figure);
+
+          var title = document.createElement("p");
+          title.className = "feature-card__title";
+          title.textContent = f.title;
+
+          card.appendChild(num);
+          card.appendChild(img);
+          card.appendChild(title);
+          container.appendChild(card);
         });
       }
 
-      function openCard(feature, btn) {
-        if (activeButton) activeButton.classList.remove("is-active");
-        activeButton = btn;
-        activeButton.classList.add("is-active");
-        numberEl.textContent = feature.id;
-        titleEl.textContent = feature.title;
-        textEl.textContent = feature.text;
-        renderImages(feature.images);
-        // 先隐藏 → 加 class → 定位 → 再显示，避免中间态闪烁
-        card.style.visibility = "hidden";
-        card.classList.add("is-open");
-        backdrop.classList.add("is-open");
-        positionCard(btn);
-      }
+      renderCards(leftFeatures, leftEl);
+      renderCards(rightFeatures, rightEl);
 
-      function closeCard() {
-        card.classList.remove("is-open");
-        backdrop.classList.remove("is-open");
-        card.style.visibility = "";
-        if (activeButton) { activeButton.classList.remove("is-active"); activeButton = null; }
-      }
+      // 渲染建筑图上的标记圆点
+      var allFeatures = leftFeatures.concat(rightFeatures);
+      allFeatures.forEach(function (f) {
+        var dot = document.createElement("div");
+        dot.className = "feature-marker";
+        dot.style.setProperty("--x", f.area.x);
+        dot.style.setProperty("--y", f.area.y);
+        dot.setAttribute("data-feature", f.id);
+        buildingEl.appendChild(dot);
 
-      function positionCard(btn) {
-        if (window.matchMedia("(max-width: 720px)").matches) {
-          card.style.left = ""; card.style.top = "";
-          card.style.visibility = "visible";
-          return;
-        }
-        var gap = 14, margin = 16;
-        var trigger = btn.getBoundingClientRect();
-        card.style.left = "0px"; card.style.top = "0px";
-        requestAnimationFrame(function () {
-          var cr = card.getBoundingClientRect();
-          var left = trigger.right + gap;
-          if (left + cr.width + margin > window.innerWidth) left = trigger.left - cr.width - gap;
-          left = Math.max(margin, Math.min(left, window.innerWidth - cr.width - margin));
-          var top = trigger.top + trigger.height / 2 - cr.height / 2;
-          top = Math.max(margin, Math.min(top, window.innerHeight - cr.height - margin));
-          card.style.left = left + "px";
-          card.style.top = top + "px";
-          card.style.visibility = "visible";
-        });
-      }
+        var label = document.createElement("span");
+        label.className = "feature-marker__num";
+        label.style.setProperty("--x", f.area.x);
+        label.style.setProperty("--y", f.area.y);
+        label.textContent = f.id;
+        buildingEl.appendChild(label);
+      });
 
-      features.forEach(makeHotspot);
+      // 绘制 SVG 连线
+      function drawLines() {
+        if (!linesSvg) return;
+        var buildingRect = buildingEl.getBoundingClientRect();
+        if (buildingRect.width === 0) return;
 
-      // 全局鼠标追踪：鼠标离开「整张贴图 + 卡片」范围时才关闭
-      document.addEventListener("mousemove", function (event) {
-        if (!activeButton) return;
+        var html = "";
+        allFeatures.forEach(function (f) {
+          // 标记在建筑图上的像素位置
+          var mx = (f.area.x / 100) * buildingRect.width;
+          var my = (f.area.y / 100) * buildingRect.height;
 
-        // 鼠标在任意热区上 → 保持
-        if (event.target.closest(".feature-hotspot")) return;
+          // 找到对应卡片
+          var card = document.querySelector('.feature-card[data-feature="' + f.id + '"]');
+          if (!card) return;
 
-        // 鼠标在整张贴图区域 → 保持（覆盖热区之间的间隙）
-        var mapScroll = document.querySelector(".feature-map-scroll");
-        if (mapScroll) {
-          var mr = mapScroll.getBoundingClientRect();
-          if (event.clientX >= mr.left && event.clientX <= mr.right &&
-              event.clientY >= mr.top && event.clientY <= mr.bottom) {
-            return;
+          var cardRect = card.getBoundingClientRect();
+
+          // 根据卡片在左还是右，决定连线起止
+          var x1, y1, x2, y2;
+          x2 = mx;
+          y2 = my;
+
+          if (f.area.x < 50) {
+            // 左侧卡片：从卡片右边 → 建筑物左边（标记位置）
+            x1 = cardRect.right - buildingRect.left;
+            y1 = cardRect.top + cardRect.height / 2 - buildingRect.top;
+          } else {
+            // 右侧卡片：从卡片左边 → 建筑物右边
+            x1 = cardRect.left - buildingRect.left;
+            y1 = cardRect.top + cardRect.height / 2 - buildingRect.top;
           }
-        }
 
-        // 鼠标在卡片范围 + 16px 缓冲 → 保持
-        var pad = 16;
-        var cr = card.getBoundingClientRect();
-        if (event.clientX >= cr.left - pad && event.clientX <= cr.right + pad &&
-            event.clientY >= cr.top - pad && event.clientY <= cr.bottom + pad) {
-          return;
-        }
+          html += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" data-feature="' + f.id + '" />';
+        });
 
-        closeCard();
-      });
+        linesSvg.innerHTML = html;
+      }
 
-      closeButton.addEventListener("click", closeCard);
-      backdrop.addEventListener("click", closeCard);
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") closeCard();
-      });
+      // 初始绘制 & 窗口变化时重绘
+      drawLines();
+      var drawTimer;
       window.addEventListener("resize", function () {
-        if (activeButton && card.classList.contains("is-open")) positionCard(activeButton);
+        clearTimeout(drawTimer);
+        drawTimer = setTimeout(drawLines, 200);
+      });
+
+      // hover 卡片时高亮对应连线和标记
+      document.querySelectorAll(".feature-card").forEach(function (card) {
+        card.addEventListener("mouseenter", function () {
+          var id = card.getAttribute("data-feature");
+          var line = linesSvg.querySelector('line[data-feature="' + id + '"]');
+          var marker = buildingEl.querySelector('.feature-marker[data-feature="' + id + '"]');
+          if (line) { line.style.stroke = "rgba(233,104,25,0.9)"; line.style.strokeWidth = "2"; }
+          if (marker) { marker.style.background = "#ff6a00"; marker.style.transform = "scale(1.5)"; }
+        });
+
+        card.addEventListener("mouseleave", function () {
+          var id = card.getAttribute("data-feature");
+          var line = linesSvg.querySelector('line[data-feature="' + id + '"]');
+          var marker = buildingEl.querySelector('.feature-marker[data-feature="' + id + '"]');
+          if (line) { line.style.stroke = ""; line.style.strokeWidth = ""; }
+          if (marker) { marker.style.background = ""; marker.style.transform = ""; }
+        });
       });
     })();
 
@@ -3076,7 +2992,7 @@
     ---------------------------------------------------------
     点击图表右上角全屏按钮。
     - 普通图表/iframe：克隆内容到遮罩层 → 横屏查看。
-    - 特征图（含交互热区）：移动原始 DOM 到遮罩层 + 横屏旋转，保留热区事件。
+    - 特征图卡片画廊：无需全屏（卡片已直接展示）。
   ========================================================== -->
   <script>
     (function () {
@@ -3085,23 +3001,11 @@
       var closeBtn = document.getElementById("fsClose");
       var hint = document.getElementById("fsHint");
       var isOpen = false;
-      var activeMode = null; // "clone" | "feature"
-      var movedEl = null;
-      var movedParent = null;
-      var movedNext = null;
-
-      function isFeatureDiagram(container) {
-        return !!(container.closest("#feature-diagram"));
-      }
+      var activeMode = null; // "clone"
 
       function openFS(container) {
         if (isOpen) return;
-
-        if (isFeatureDiagram(container)) {
-          openFeatureFS(container);
-        } else {
-          openCloneFS(container);
-        }
+        openCloneFS(container);
 
         overlay.classList.add("is-open");
         overlay.setAttribute("aria-hidden", "false");
@@ -3146,80 +3050,9 @@
         }
       }
 
-      function openFeatureFS(container) {
-        activeMode = "feature";
-        // 深灰背景填补旋转后边角
-        overlay.style.background = "#111";
-
-        // 移动原始 .feature-map-scroll 到遮罩层，保留热区事件
-        var mapScroll = container.querySelector(".feature-map-scroll");
-        if (!mapScroll) return;
-        movedParent = mapScroll.parentNode;
-        movedNext = mapScroll.nextSibling;
-        movedEl = mapScroll;
-
-        mapScroll.style.maxHeight = "none";
-        mapScroll.style.overflow = "auto";
-        mapScroll.style.width = "100%";
-        mapScroll.style.height = "100%";
-        mapScroll.style.boxShadow = "none";
-        mapScroll.style.borderRadius = "0";
-        mapScroll.style.borderColor = "transparent";
-
-        stage.innerHTML = "";
-        stage.appendChild(mapScroll);
-
-        // 提高 backdrop 和 detail card 的 z-index
-        var backdrop = document.getElementById("featureBackdrop");
-        var detail = document.getElementById("featureDetail");
-        if (backdrop) {
-          backdrop.setAttribute("data-fs-z", backdrop.style.zIndex || "");
-          backdrop.style.zIndex = "10001";
-        }
-        if (detail) {
-          detail.setAttribute("data-fs-z", detail.style.zIndex || "");
-          detail.style.zIndex = "10002";
-        }
-
-        applyMobileRotation();
-      }
-
       function closeFS() {
         if (!isOpen) return;
-
-        if (activeMode === "feature") {
-          // 还原原始 DOM
-          if (movedEl && movedParent) {
-            if (movedNext) {
-              movedParent.insertBefore(movedEl, movedNext);
-            } else {
-              movedParent.appendChild(movedEl);
-            }
-            movedEl.style.maxHeight = "";
-            movedEl.style.overflow = "";
-            movedEl.style.width = "";
-            movedEl.style.height = "";
-            movedEl.style.boxShadow = "";
-            movedEl.style.borderRadius = "";
-            movedEl.style.borderColor = "";
-            movedEl = null;
-            movedParent = null;
-            movedNext = null;
-          }
-          // 还原 z-index
-          var backdrop = document.getElementById("featureBackdrop");
-          var detail = document.getElementById("featureDetail");
-          if (backdrop) {
-            backdrop.style.zIndex = backdrop.getAttribute("data-fs-z") || "";
-            backdrop.removeAttribute("data-fs-z");
-          }
-          if (detail) {
-            detail.style.zIndex = detail.getAttribute("data-fs-z") || "";
-            detail.removeAttribute("data-fs-z");
-          }
-        } else {
-          stage.innerHTML = "";
-        }
+        stage.innerHTML = "";
 
         overlay.classList.remove("is-open");
         overlay.setAttribute("aria-hidden", "true");
