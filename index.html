@@ -1050,6 +1050,21 @@
       color: #fff;
     }
 
+    .feature-card__text {
+      margin: 5px 0 0;
+      color: rgba(255, 255, 255, 0);
+      font-size: 0;
+      line-height: 0;
+      overflow: hidden;
+      transition: color 0.35s ease, font-size 0.35s ease, line-height 0.35s ease;
+    }
+
+    .feature-card:hover .feature-card__text {
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
     /* ---- 中央建筑立面 ---- */
     .feature-building {
       position: relative;
@@ -2425,18 +2440,18 @@
       var IMG_BASE = "新艺术建筑风格图解/";
 
       var features = [
-        { id: "1", title: "兼具实用与美观的木制屋檐", area: { x: 6.80, y: 42.95 }, img: "0-兼具实用与美观的木制屋檐.JPG" },
-        { id: "2", title: "方额圆角窗 / 椭圆额直角窗", area: { x: 11.56, y: 51.19 }, img: "1-方额圆角窗.png" },
-        { id: "3", title: "富有浪漫主义的雕饰", area: { x: 9.17, y: 72.23 }, img: "2-富有浪漫主义的雕饰.JPG" },
-        { id: "4", title: "曲线铁艺装饰", area: { x: 31.17, y: 76.74 }, img: "3-曲线铁艺装饰.JPG" },
-        { id: "5", title: "优美大方的女儿墙和金属装饰绣边", area: { x: 45.92, y: 31.50 }, img: "4-优美大方的女儿墙和金属装饰绣边.JPG" },
-        { id: "6", title: "门和曲线的结合", area: { x: 45.06, y: 68.84 }, img: "5-门和曲线的结合.png" },
-        { id: "7", title: "屋顶的金属线条装饰", area: { x: 59.06, y: 36.04 }, img: "6-屋顶的金属线条装饰.JPG" },
-        { id: "8", title: "优雅的窗楣", area: { x: 64.90, y: 47.45 }, img: "7-优雅的窗楣.png" },
-        { id: "9", title: "偶尔可见精美的人像装饰", area: { x: 85.08, y: 33.79 }, img: "8-偶尔可见精美的人像装饰.JPG" },
-        { id: "10", title: "柔和流畅的构件交接", area: { x: 85.08, y: 55.69 }, img: "9-柔和流畅的构件交接.png" },
-        { id: "11", title: "悬挑式雨篷", area: { x: 86.70, y: 72.23 }, img: "10-悬挑式雨篷.JPG" },
-        { id: "12", title: "优雅精致的室内楼梯", area: { x: 54.30, y: 76.74 }, img: "11-优雅精致的室内楼梯.JPG" }
+        { id: "1", title: "兼具实用与美观的木制屋檐", text: "屋檐不只是遮雨，木构件被做成轻巧的层次，实用里带着温和的手工感。", area: { x: 6.80, y: 42.95 }, img: "0-兼具实用与美观的木制屋檐.JPG" },
+        { id: "2", title: "方额圆角窗 / 椭圆额直角窗", text: "窗洞把直线和圆角揉在一起，规整但不生硬。这样的窗型让立面多了柔和的节奏。", area: { x: 11.56, y: 51.19 }, img: "1-方额圆角窗.png" },
+        { id: "3", title: "富有浪漫主义的雕饰", text: "柱头和雕饰带一点植物感，装饰不抢戏，却把入口和转角衬得更浪漫。", area: { x: 9.17, y: 72.23 }, img: "2-富有浪漫主义的雕饰.JPG" },
+        { id: "4", title: "曲线铁艺装饰", text: "铁艺最适合新艺术的线条：卷曲、伸展，像藤蔓一样把阳台和护栏带活。", area: { x: 31.17, y: 76.74 }, img: "3-曲线铁艺装饰.JPG" },
+        { id: "5", title: "优美大方的女儿墙和金属装饰绣边", text: "女儿墙的轮廓被收得很优雅，再配上细细的金属边，屋顶线就不会显得平。", area: { x: 45.92, y: 31.50 }, img: "4-优美大方的女儿墙和金属装饰绣边.JPG" },
+        { id: "6", title: "门和曲线的结合", text: "门洞边缘顺着曲线过渡，开口像被轻轻推开。硬朗的入口因此多了一点亲近感。", area: { x: 45.06, y: 68.84 }, img: "5-门和曲线的结合.png" },
+        { id: "7", title: "屋顶的金属线条装饰", text: "屋顶上的金属线条很细，却能把天际线拉得更精神。它让屋面从远处看也有辨识度。", area: { x: 59.06, y: 36.04 }, img: "6-屋顶的金属线条装饰.JPG" },
+        { id: "8", title: "优雅的窗楣", text: "窗楣用弧线压住窗头，既有重量感，也不显笨重。重复出现时，整排窗会更有韵律。", area: { x: 64.90, y: 47.45 }, img: "7-优雅的窗楣.png" },
+        { id: "9", title: "偶尔可见精美的人像装饰", text: "人像装饰像是给建筑加了表情，远看只是点缀，近看才发现很讲究。", area: { x: 85.08, y: 33.79 }, img: "8-偶尔可见精美的人像装饰.JPG" },
+        { id: "10", title: "柔和流畅的构件交接", text: "这些构件交接处没有硬碰硬，而是用弧线慢慢过渡。新艺术最迷人的地方，常常就在这种细节里。", area: { x: 85.08, y: 55.69 }, img: "9-柔和流畅的构件交接.png" },
+        { id: "11", title: "悬挑式雨篷", text: "悬挑雨篷负责遮挡风雨，也顺手把入口标出来。金属支架的曲线让功能件不只是功能件。", area: { x: 86.70, y: 72.23 }, img: "10-悬挑式雨篷.JPG" },
+        { id: "12", title: "优雅精致的室内楼梯", text: "楼梯栏杆把重复的小构件做得很精细，走近时会有明显的手工质感。它让室内动线也延续了立面的装饰语言。", area: { x: 54.30, y: 76.74 }, img: "11-优雅精致的室内楼梯.JPG" }
       ];
 
       var leftEl = document.getElementById("featureCardsLeft");
@@ -2468,9 +2483,14 @@
         title.className = "feature-card__title";
         title.textContent = f.title;
 
+        var text = document.createElement("p");
+        text.className = "feature-card__text";
+        text.textContent = f.text;
+
         card.appendChild(num);
         card.appendChild(img);
         card.appendChild(title);
+        card.appendChild(text);
         container.appendChild(card);
       }
 
