@@ -60,6 +60,21 @@
     body.is-loading .feature-card__num,
     body.is-loading .subheading {
       opacity: 0;
+    }
+
+    /* transition 放在基础样式上，确保 is-loading 移除后动画能触发 */
+    .intro-box,
+    .new-intro,
+    .viz-intro,
+    .heading,
+    .feature-gallery__intro,
+    .site-footer,
+    .brand,
+    .menu-label,
+    .feature-card__title,
+    .feature-card__text,
+    .feature-card__num,
+    .subheading {
       transition: opacity 3s ease;
     }
 
@@ -1367,9 +1382,26 @@
         gap: 6px;
       }
 
+    /* 下列中的下滑按钮：取消绝对定位，融入 flex 布局 */
+    .feature-bottom-row .viz-next {
+      position: static;
+      transform: none;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      margin: 0 4px;
+    }
+
+    .feature-bottom-row .viz-next .progress-ring {
+      width: 48px;
+      height: 48px;
+    }
+
+    @media (max-width: 900px) {
       .feature-bottom-row .viz-next {
         display: none;
       }
+    }
 
       .feature-cards--left .feature-card,
       .feature-cards--right .feature-card,
