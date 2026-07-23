@@ -1382,7 +1382,7 @@
         gap: 6px;
       }
 
-    /* 下列中的下滑按钮：取消绝对定位，融入 flex 布局，保留圆形样式 */
+    /* 下列中的下滑按钮：取消绝对定位，融入 flex 布局 */
     .feature-bottom-row .viz-next {
       position: relative;
       top: auto;
@@ -1390,17 +1390,6 @@
       left: auto;
       transform: none;
       flex-shrink: 0;
-      width: 44px;
-      height: 44px;
-      margin: 0 8px;
-      background: rgba(20, 25, 22, 0.65);
-      border-color: rgba(216, 168, 78, 0.45);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.30);
-    }
-
-    .feature-bottom-row .viz-next .progress-ring {
-      width: 44px;
-      height: 44px;
     }
 
     @media (max-width: 900px) {
@@ -2011,7 +2000,7 @@
     黑屏 → 加载圈 → 点击开始 → 帷幕拉开 → 内容渐入。
     Black screen → spinner → click start → curtain reveal.
   ========================================================== -->
-  <div class="loader" id="loader" aria-hidden="false">
+  <div class="loader" id="loader" aria-hidden="false" style="display:none">
     <div class="loader__curtain loader__curtain--left" id="curtainL"></div>
     <div class="loader__curtain loader__curtain--right" id="curtainR"></div>
     <div class="loader__center" id="loaderCenter">
@@ -2443,6 +2432,15 @@
   <script>
     (function () {
       var loader = document.getElementById("loader");
+
+      // 非首次访问跳过入场动画
+      if (sessionStorage.getItem("visited")) {
+        document.body.classList.remove("is-loading");
+        return;
+      }
+      sessionStorage.setItem("visited", "1");
+      loader.style.display = ""; // 首次访问，显示入场动画
+
       var ring = document.getElementById("loaderRing");
       var pctEl = document.getElementById("loaderPct");
       var arrows = document.getElementById("loaderArrows");
