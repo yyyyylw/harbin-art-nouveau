@@ -39,7 +39,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: transparent;
       pointer-events: all;
     }
 
@@ -47,40 +46,59 @@
       pointer-events: none;
     }
 
-    /* 帷幕两半（遮住画面） */
+    /* ---- 帷幕：飘带质感 ---- */
     .loader__curtain {
       position: absolute;
       top: 0;
       width: 50vw;
       height: 100%;
-      background: #000;
-      transition: transform 1.2s cubic-bezier(0.82, 0, 0.12, 1);
+      background: #08090a;
       will-change: transform;
+      /* 幕布褶皱纹理 */
+      background-image:
+        repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(255,255,255,0.015) 18px, rgba(255,255,255,0.015) 19px);
     }
 
     .loader__curtain--left {
       left: 0;
+      background-image:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 19px);
+      transition: transform 1.4s cubic-bezier(0.76, 0, 0.24, 1);
     }
 
     .loader__curtain--right {
       right: 0;
+      background-image:
+        repeating-linear-gradient(90deg, transparent 0px, transparent 18px, rgba(255,255,255,0.015) 18px, rgba(255,255,255,0.015) 19px);
+      transition: transform 1.4s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    /* 飘带波浪阴影 */
+    .loader__curtain::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at 0% 50%, rgba(255,255,255,0.04) 0%, transparent 70%);
+    }
+
+    .loader__curtain--right::after {
+      background: radial-gradient(ellipse at 100% 50%, rgba(255,255,255,0.04) 0%, transparent 70%);
     }
 
     .loader.is-open .loader__curtain--left {
-      transform: translateX(-100%);
+      transform: translateX(-105%);
     }
 
     .loader.is-open .loader__curtain--right {
-      transform: translateX(100%);
+      transform: translateX(105%);
     }
 
-    /* 中央加载区域 */
+    /* ---- 中央加载环（与下滑按钮风格一致） ---- */
     .loader__center {
       position: relative;
       z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       transition: opacity 0.5s ease;
     }
 
@@ -89,17 +107,12 @@
       pointer-events: none;
     }
 
-    /* 加载环容器：精确定位"开始"文字在圆心 */
     .loader__ring-wrap {
       position: relative;
-      width: 100px;
-      height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 80px;
+      height: 80px;
     }
 
-    /* 加载环 */
     .loader__ring {
       position: absolute;
       inset: 0;
@@ -110,28 +123,28 @@
 
     .loader__ring-bg {
       fill: none;
-      stroke: rgba(255, 255, 255, 0.12);
-      stroke-width: 3;
+      stroke: rgba(255, 255, 255, 0.10);
+      stroke-width: 2;
     }
 
     .loader__ring-fill {
       fill: none;
       stroke: var(--gold);
-      stroke-width: 3;
+      stroke-width: 2;
       stroke-linecap: round;
-      stroke-dasharray: 263.89;
-      stroke-dashoffset: 263.89;
+      stroke-dasharray: 213.63;  /* 2*PI*34 */
+      stroke-dashoffset: 213.63;
       transition: stroke-dashoffset 0.4s ease;
     }
 
-    /* 百分比文字（环内居中） */
+    /* 百分比 */
     .loader__pct {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: rgba(255, 255, 255, 0.58);
-      font-size: 13px;
+      color: rgba(255, 255, 255, 0.50);
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 2px;
       transition: opacity 0.4s ease;
@@ -141,34 +154,39 @@
       opacity: 0;
     }
 
-    /* 开始文字（环内绝对居中） */
-    .loader__start {
+    /* 双箭头（环内居中） */
+    .loader__arrows {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0);
-      padding: 0;
-      border: 0;
-      background: none;
-      white-space: nowrap;
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
       cursor: pointer;
-      transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  color 0.3s ease;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .loader__start:hover {
-      color: #fff;
-    }
-
-    .loader__start.is-ready {
+    .loader__arrows.is-ready {
       transform: translate(-50%, -50%) scale(1);
     }
 
-    /* 封面大图过渡层：z-index 高于 center，帷幕开后覆盖一切 */
+    .loader__arrows svg {
+      width: 16px;
+      height: 16px;
+      stroke: rgba(255, 255, 255, 0.75);
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.3s ease;
+    }
+
+    .loader__arrows:hover svg {
+      stroke: #fff;
+    }
+
+    /* ---- 封面大图过渡 ---- */
     .loader__cover {
       position: absolute;
       inset: 0;
@@ -1963,12 +1981,15 @@
     <div class="loader__curtain loader__curtain--right" id="curtainR"></div>
     <div class="loader__center" id="loaderCenter">
       <div class="loader__ring-wrap">
-        <svg class="loader__ring" viewBox="0 0 100 100">
-          <circle class="loader__ring-bg" cx="50" cy="50" r="42" />
-          <circle class="loader__ring-fill" id="loaderRing" cx="50" cy="50" r="42" />
+        <svg class="loader__ring" viewBox="0 0 80 80">
+          <circle class="loader__ring-bg" cx="40" cy="40" r="34" />
+          <circle class="loader__ring-fill" id="loaderRing" cx="40" cy="40" r="34" />
         </svg>
         <span class="loader__pct" id="loaderPct">0%</span>
-        <button class="loader__start" id="loaderStart" type="button">开始</button>
+        <div class="loader__arrows" id="loaderArrows" title="展开">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
       </div>
     </div>
     <div class="loader__cover" id="loaderCover">
@@ -2385,22 +2406,22 @@
   <!-- =========================================================
     06-C. 入场动画脚本 / Entrance Animation
     ---------------------------------------------------------
-    加载进度 → 点击开始 → 帷幕拉开 → 内容依次入场。
+    加载进度 → 双箭头 → 点击 → 飘带帷幕拉开 → 封面大图 → 淡出。
   ========================================================== -->
   <script>
     (function () {
       var loader = document.getElementById("loader");
       var ring = document.getElementById("loaderRing");
       var pctEl = document.getElementById("loaderPct");
-      var startBtn = document.getElementById("loaderStart");
+      var arrows = document.getElementById("loaderArrows");
       var loaderCover = document.getElementById("loaderCover");
       var isStarted = false;
 
-      var CIRCUMFERENCE = 263.89;
+      var R = 34;
+      var CIRCUMFERENCE = 2 * Math.PI * R;
       ring.style.strokeDasharray = CIRCUMFERENCE;
       ring.style.strokeDashoffset = CIRCUMFERENCE;
 
-      /* ---- 追踪加载进度 ---- */
       var totalItems = 0;
       var loadedItems = 0;
 
@@ -2413,7 +2434,7 @@
 
         if (pct >= 100 && !isStarted) {
           pctEl.classList.add("is-done");
-          startBtn.classList.add("is-ready");
+          arrows.classList.add("is-ready");
         }
       }
 
@@ -2423,14 +2444,8 @@
           loadedItems++;
           updateProgress();
         } else {
-          img.addEventListener("load", function () {
-            loadedItems++;
-            updateProgress();
-          }, { once: true });
-          img.addEventListener("error", function () {
-            loadedItems++;
-            updateProgress();
-          }, { once: true });
+          img.addEventListener("load", function () { loadedItems++; updateProgress(); }, { once: true });
+          img.addEventListener("error", function () { loadedItems++; updateProgress(); }, { once: true });
         }
       }
 
@@ -2438,34 +2453,32 @@
       for (var i = 0; i < imgs.length; i++) { trackImage(imgs[i]); }
 
       var fallbackTimer = setTimeout(function () {
-        if (!isStarted && loadedItems < totalItems) {
-          loadedItems = totalItems;
-          updateProgress();
-        }
+        if (!isStarted && loadedItems < totalItems) { loadedItems = totalItems; updateProgress(); }
       }, 4000);
 
       if (totalItems === 0) { loadedItems = totalItems = 1; updateProgress(); }
 
-      /* ---- 点击开始 ---- */
-      startBtn.addEventListener("click", function () {
+      // 加载期间禁止滚动
+      document.body.style.overflow = "hidden";
+
+      /* ---- 点击双箭头 → 帷幕拉开 ---- */
+      arrows.addEventListener("click", function () {
         if (isStarted) return;
         isStarted = true;
         clearTimeout(fallbackTimer);
 
-        // 1. 帷幕拉开
         loader.classList.add("is-open");
 
-        // 2. 帷幕滑开后显示封面大图
         setTimeout(function () {
           loaderCover.classList.add("is-shown");
-        }, 900);
+        }, 1000);
 
-        // 3. 封面大图停留后淡出 → 露出主页面
         setTimeout(function () {
           loaderCover.classList.remove("is-shown");
           loader.classList.add("is-done");
           loader.setAttribute("aria-hidden", "true");
-        }, 2400);
+          document.body.style.overflow = "";
+        }, 2600);
       });
     })();
   </script>
