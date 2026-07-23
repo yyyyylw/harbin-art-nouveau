@@ -46,6 +46,14 @@
       pointer-events: none;
     }
 
+    /* 主页内容初始透明，帷幕拉开时渐显 */
+    body.is-loading main,
+    body.is-loading .site-header,
+    body.is-loading .site-footer {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
     /* ---- 帷幕：飘带质感 ---- */
     .loader__curtain {
       position: absolute;
@@ -1948,7 +1956,7 @@
   </style>
 </head>
 
-<body>
+<body class="is-loading">
   <!-- =========================================================
     02-B. 入场加载动画 / Entrance Loader
     ---------------------------------------------------------
@@ -2443,6 +2451,11 @@
         clearTimeout(fallbackTimer);
 
         loader.classList.add("is-open");
+
+        // 帷幕拉开 0.4s 后主页内容开始渐显
+        setTimeout(function () {
+          document.body.classList.remove("is-loading");
+        }, 400);
 
         // 帷幕动画结束后隐藏 loader
         setTimeout(function () {
