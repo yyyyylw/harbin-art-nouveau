@@ -1393,18 +1393,33 @@
         gap: 6px;
       }
 
-    /* 下列中的下滑按钮：取消绝对定位，融入 flex 布局 */
-    .feature-bottom-row .viz-next {
-      position: relative;
-      top: auto;
-      bottom: auto;
-      left: auto;
-      transform: none;
+    /* 下列中的下滑按钮 */
+    .feature-scroll-btn {
       flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      margin: 0 10px;
+      border: 1px solid rgba(216, 168, 78, 0.50);
+      border-radius: 50%;
+      color: var(--gold);
+      background: rgba(20, 25, 22, 0.60);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .feature-scroll-btn:hover {
+      background: rgba(20, 25, 22, 0.88);
+      border-color: rgba(216, 168, 78, 0.80);
+    }
+
+    .feature-scroll-btn svg {
+      width: 22px;
+      height: 22px;
     }
 
     @media (max-width: 900px) {
-      .feature-bottom-row .viz-next {
+      .feature-scroll-btn {
         display: none;
       }
     }
@@ -2219,12 +2234,8 @@
           </div>
           <div class="feature-bottom-row">
             <div class="feature-cards feature-cards--bottom" id="featureCardsBottomL"></div>
-            <a class="viz-next" id="viz-next-feature" href="#dot-explore-map" aria-label="向下滑动">
-              <svg class="progress-ring" viewBox="0 0 54 54">
-                <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-                <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-              </svg>
-              <span class="progress-text">0%</span>
+            <a class="feature-scroll-btn" href="#dot-explore-map" aria-label="向下滑动至散点地图">
+              <svg viewBox="0 0 24 24"><path d="M12 4v12m0 0l-5-5m5 5l5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
             <div class="feature-cards feature-cards--bottom" id="featureCardsBottomR"></div>
           </div>
@@ -2722,15 +2733,6 @@
         iframeSelector: ".dot-nonexistent iframe",
         trackedKey: "spreadVizTracked",
         loadedKey: "spreadVizLoaded",
-        expectedCount: 1
-      });
-
-      // 特征卡片底部：3s 兜底 / Feature cards bottom ring
-      createProgressLoader({
-        ringSelector: "#viz-next-feature",
-        iframeSelector: ".dot-nonexistent iframe",
-        trackedKey: "featureVizTracked",
-        loadedKey: "featureVizLoaded",
         expectedCount: 1
       });
 
