@@ -46,10 +46,19 @@
       pointer-events: none;
     }
 
-    /* 主页内容初始透明，帷幕拉开时渐显 */
-    body.is-loading main,
-    body.is-loading .site-header,
-    body.is-loading .site-footer {
+    /* 文字初始透明，帷幕拉开时渐显；背景图保持不动 */
+    body.is-loading .intro-box,
+    body.is-loading .new-intro,
+    body.is-loading .viz-intro,
+    body.is-loading .heading,
+    body.is-loading .feature-gallery__intro,
+    body.is-loading .site-footer,
+    body.is-loading .brand,
+    body.is-loading .menu-label,
+    body.is-loading .feature-card__title,
+    body.is-loading .feature-card__text,
+    body.is-loading .feature-card__num,
+    body.is-loading .subheading {
       opacity: 0;
       transition: opacity 1s ease;
     }
