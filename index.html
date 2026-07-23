@@ -60,7 +60,7 @@
     body.is-loading .feature-card__num,
     body.is-loading .subheading {
       opacity: 0;
-      transition: opacity 1s ease;
+      transition: opacity 1.2s ease;
     }
 
     /* ---- 帷幕：飘带质感 ---- */
@@ -2461,10 +2461,10 @@
 
         loader.classList.add("is-open");
 
-        // 帷幕拉开 0.4s 后主页内容开始渐显
+        // 帷幕拉开 0.6s 后文字开始渐显（帷幕开到一半时）
         setTimeout(function () {
           document.body.classList.remove("is-loading");
-        }, 400);
+        }, 600);
 
         // 帷幕动画结束后隐藏 loader
         setTimeout(function () {
