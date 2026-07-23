@@ -54,7 +54,7 @@
       width: 50vw;
       height: 100%;
       background: #000;
-      transition: transform 0.9s cubic-bezier(0.86, 0, 0.07, 1);
+      transition: transform 1.2s cubic-bezier(0.82, 0, 0.12, 1);
       will-change: transform;
     }
 
@@ -126,44 +126,51 @@
       opacity: 0;
     }
 
-    /* 开始按钮 */
+    /* 开始文字（加载环中央，纯文字无边框） */
     .loader__start {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0);
-      padding: 10px 28px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      border-radius: 30px;
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      font-size: 16px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 18px;
       font-weight: 700;
-      letter-spacing: 4px;
+      letter-spacing: 6px;
       cursor: pointer;
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  background 0.3s ease;
-      backdrop-filter: blur(6px);
+      transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  color 0.3s ease;
     }
 
     .loader__start:hover {
-      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
     }
 
     .loader__start.is-ready {
       transform: translate(-50%, -50%) scale(1);
     }
 
-    /* 内容入场动画 */
-    .reveal {
+    /* 封面大图过渡层 */
+    .loader__cover {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
       opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
     }
 
-    .reveal.is-visible {
+    .loader__cover.is-shown {
       opacity: 1;
-      transform: translateY(0);
+    }
+
+    .loader__cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 50%;
     }
 
     :root {
@@ -1946,6 +1953,9 @@
       <span class="loader__pct" id="loaderPct">0%</span>
       <button class="loader__start" id="loaderStart" type="button">开始</button>
     </div>
+    <div class="loader__cover" id="loaderCover">
+      <img src="assets/cover.jpg" alt="">
+    </div>
   </div>
 
   <!-- =========================================================
@@ -2362,15 +2372,13 @@
   <script>
     (function () {
       var loader = document.getElementById("loader");
-      var curtainL = document.getElementById("curtainL");
-      var curtainR = document.getElementById("curtainR");
-      var loaderCenter = document.getElementById("loaderCenter");
       var ring = document.getElementById("loaderRing");
       var pctEl = document.getElementById("loaderPct");
       var startBtn = document.getElementById("loaderStart");
+      var loaderCover = document.getElementById("loaderCover");
       var isStarted = false;
 
-      var CIRCUMFERENCE = 263.89; // 2*PI*42
+      var CIRCUMFERENCE = 263.89;
       ring.style.strokeDasharray = CIRCUMFERENCE;
       ring.style.strokeDashoffset = CIRCUMFERENCE;
 
@@ -2386,13 +2394,9 @@
         pctEl.textContent = pct + "%";
 
         if (pct >= 100 && !isStarted) {
-          showStartButton();
+          pctEl.classList.add("is-done");
+          startBtn.classList.add("is-ready");
         }
-      }
-
-      function showStartButton() {
-        pctEl.classList.add("is-done");
-        startBtn.classList.add("is-ready");
       }
 
       function trackImage(img) {
@@ -2412,13 +2416,9 @@
         }
       }
 
-      // 追踪所有关键图片
       var imgs = document.querySelectorAll("img");
-      for (var i = 0; i < imgs.length; i++) {
-        trackImage(imgs[i]);
-      }
+      for (var i = 0; i < imgs.length; i++) { trackImage(imgs[i]); }
 
-      // Fallback: 3s 后即使图片未全部加载也显示开始
       var fallbackTimer = setTimeout(function () {
         if (!isStarted && loadedItems < totalItems) {
           loadedItems = totalItems;
@@ -2426,62 +2426,29 @@
         }
       }, 4000);
 
-      // 如果初始没有图片则直接可开始
-      if (totalItems === 0) {
-        loadedItems = totalItems = 1;
-        updateProgress();
-      }
+      if (totalItems === 0) { loadedItems = totalItems = 1; updateProgress(); }
 
-      /* ---- 点击开始 → 帷幕拉开 ---- */
+      /* ---- 点击开始 ---- */
       startBtn.addEventListener("click", function () {
         if (isStarted) return;
         isStarted = true;
         clearTimeout(fallbackTimer);
 
+        // 1. 帷幕拉开
         loader.classList.add("is-open");
 
-        // 帷幕拉开后 900ms 隐藏 loader
+        // 2. 帷幕滑开后显示封面大图
         setTimeout(function () {
+          loaderCover.classList.add("is-shown");
+        }, 900);
+
+        // 3. 封面大图停留后淡出 → 露出主页面
+        setTimeout(function () {
+          loaderCover.classList.remove("is-shown");
           loader.classList.add("is-done");
           loader.setAttribute("aria-hidden", "true");
-        }, 950);
-
-        // 内容依次入场
-        revealContent();
+        }, 2400);
       });
-
-      function revealContent() {
-        // 封面文字延迟入场
-        var introBox = document.querySelector(".intro-box");
-        if (introBox) {
-          introBox.classList.add("reveal");
-          setTimeout(function () { introBox.classList.add("is-visible"); }, 600);
-        }
-
-        // 目标区域：滚动触发展示
-        var revealSections = document.querySelectorAll(
-          ".standard, .viz-slide, .feature-gallery, .chapter-section, .site-footer"
-        );
-
-        var observer = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("is-visible");
-            }
-          });
-        }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
-
-        for (var k = 0; k < revealSections.length; k++) {
-          revealSections[k].classList.add("reveal");
-          observer.observe(revealSections[k]);
-        }
-
-        // 章节卡片单独延迟
-        var chapters = document.querySelector(".chapter-section");
-        if (chapters) {
-          chapters.style.transitionDelay = "0.3s";
-        }
-      }
     })();
   </script>
 
