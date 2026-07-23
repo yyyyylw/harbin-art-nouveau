@@ -29,6 +29,143 @@
       颜色、字体、宽度和阴影。
       colors, type, widths, and shadows. 
     ======================================================== */
+    /* =========================================================
+      02-00. 入场加载动画 / Entrance Loader
+    ======================================================== */
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      pointer-events: all;
+    }
+
+    .loader.is-done {
+      pointer-events: none;
+    }
+
+    /* 帷幕两半（遮住画面） */
+    .loader__curtain {
+      position: absolute;
+      top: 0;
+      width: 50vw;
+      height: 100%;
+      background: #000;
+      transition: transform 0.9s cubic-bezier(0.86, 0, 0.07, 1);
+      will-change: transform;
+    }
+
+    .loader__curtain--left {
+      left: 0;
+    }
+
+    .loader__curtain--right {
+      right: 0;
+    }
+
+    .loader.is-open .loader__curtain--left {
+      transform: translateX(-100%);
+    }
+
+    .loader.is-open .loader__curtain--right {
+      transform: translateX(100%);
+    }
+
+    /* 中央加载区域 */
+    .loader__center {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      transition: opacity 0.5s ease;
+    }
+
+    .loader.is-open .loader__center {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* 加载环 */
+    .loader__ring {
+      width: 100px;
+      height: 100px;
+      transform: rotate(-90deg);
+    }
+
+    .loader__ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.12);
+      stroke-width: 3;
+    }
+
+    .loader__ring-fill {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 263.89;
+      stroke-dashoffset: 263.89;
+      transition: stroke-dashoffset 0.4s ease;
+    }
+
+    /* 百分比文字 */
+    .loader__pct {
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      transition: opacity 0.4s ease;
+    }
+
+    .loader__pct.is-done {
+      opacity: 0;
+    }
+
+    /* 开始按钮 */
+    .loader__start {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      padding: 10px 28px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      cursor: pointer;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background 0.3s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    .loader__start:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .loader__start.is-ready {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* 内容入场动画 */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     :root {
       --ink: #16212a;
       --ink-soft: #4f5c65;
@@ -1793,6 +1930,25 @@
 
 <body>
   <!-- =========================================================
+    02-B. 入场加载动画 / Entrance Loader
+    ---------------------------------------------------------
+    黑屏 → 加载圈 → 点击开始 → 帷幕拉开 → 内容渐入。
+    Black screen → spinner → click start → curtain reveal.
+  ========================================================== -->
+  <div class="loader" id="loader" aria-hidden="false">
+    <div class="loader__curtain loader__curtain--left" id="curtainL"></div>
+    <div class="loader__curtain loader__curtain--right" id="curtainR"></div>
+    <div class="loader__center" id="loaderCenter">
+      <svg class="loader__ring" viewBox="0 0 100 100">
+        <circle class="loader__ring-bg" cx="50" cy="50" r="42" />
+        <circle class="loader__ring-fill" id="loaderRing" cx="50" cy="50" r="42" />
+      </svg>
+      <span class="loader__pct" id="loaderPct">0%</span>
+      <button class="loader__start" id="loaderStart" type="button">开始</button>
+    </div>
+  </div>
+
+  <!-- =========================================================
     03. 顶部栏 / Header
     ---------------------------------------------------------
     page identity & sharing buttons.
@@ -2197,6 +2353,137 @@
     <span class="fs-hint" id="fsHint">旋转手机以获得最佳观看体验</span>
     <div class="fs-stage" id="fsStage"></div>
   </div>
+
+  <!-- =========================================================
+    06-C. 入场动画脚本 / Entrance Animation
+    ---------------------------------------------------------
+    加载进度 → 点击开始 → 帷幕拉开 → 内容依次入场。
+  ========================================================== -->
+  <script>
+    (function () {
+      var loader = document.getElementById("loader");
+      var curtainL = document.getElementById("curtainL");
+      var curtainR = document.getElementById("curtainR");
+      var loaderCenter = document.getElementById("loaderCenter");
+      var ring = document.getElementById("loaderRing");
+      var pctEl = document.getElementById("loaderPct");
+      var startBtn = document.getElementById("loaderStart");
+      var isStarted = false;
+
+      var CIRCUMFERENCE = 263.89; // 2*PI*42
+      ring.style.strokeDasharray = CIRCUMFERENCE;
+      ring.style.strokeDashoffset = CIRCUMFERENCE;
+
+      /* ---- 追踪加载进度 ---- */
+      var totalItems = 0;
+      var loadedItems = 0;
+
+      function updateProgress() {
+        var pct = totalItems === 0 ? 0 : Math.round((loadedItems / totalItems) * 100);
+        pct = Math.min(pct, 100);
+        var offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+        ring.style.strokeDashoffset = String(offset);
+        pctEl.textContent = pct + "%";
+
+        if (pct >= 100 && !isStarted) {
+          showStartButton();
+        }
+      }
+
+      function showStartButton() {
+        pctEl.classList.add("is-done");
+        startBtn.classList.add("is-ready");
+      }
+
+      function trackImage(img) {
+        totalItems++;
+        if (img.complete && img.naturalWidth > 0) {
+          loadedItems++;
+          updateProgress();
+        } else {
+          img.addEventListener("load", function () {
+            loadedItems++;
+            updateProgress();
+          }, { once: true });
+          img.addEventListener("error", function () {
+            loadedItems++;
+            updateProgress();
+          }, { once: true });
+        }
+      }
+
+      // 追踪所有关键图片
+      var imgs = document.querySelectorAll("img");
+      for (var i = 0; i < imgs.length; i++) {
+        trackImage(imgs[i]);
+      }
+
+      // Fallback: 3s 后即使图片未全部加载也显示开始
+      var fallbackTimer = setTimeout(function () {
+        if (!isStarted && loadedItems < totalItems) {
+          loadedItems = totalItems;
+          updateProgress();
+        }
+      }, 4000);
+
+      // 如果初始没有图片则直接可开始
+      if (totalItems === 0) {
+        loadedItems = totalItems = 1;
+        updateProgress();
+      }
+
+      /* ---- 点击开始 → 帷幕拉开 ---- */
+      startBtn.addEventListener("click", function () {
+        if (isStarted) return;
+        isStarted = true;
+        clearTimeout(fallbackTimer);
+
+        loader.classList.add("is-open");
+
+        // 帷幕拉开后 900ms 隐藏 loader
+        setTimeout(function () {
+          loader.classList.add("is-done");
+          loader.setAttribute("aria-hidden", "true");
+        }, 950);
+
+        // 内容依次入场
+        revealContent();
+      });
+
+      function revealContent() {
+        // 封面文字延迟入场
+        var introBox = document.querySelector(".intro-box");
+        if (introBox) {
+          introBox.classList.add("reveal");
+          setTimeout(function () { introBox.classList.add("is-visible"); }, 600);
+        }
+
+        // 目标区域：滚动触发展示
+        var revealSections = document.querySelectorAll(
+          ".standard, .viz-slide, .feature-gallery, .chapter-section, .site-footer"
+        );
+
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+            }
+          });
+        }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+
+        for (var k = 0; k < revealSections.length; k++) {
+          revealSections[k].classList.add("reveal");
+          observer.observe(revealSections[k]);
+        }
+
+        // 章节卡片单独延迟
+        var chapters = document.querySelector(".chapter-section");
+        if (chapters) {
+          chapters.style.transitionDelay = "0.3s";
+        }
+      }
+    })();
+  </script>
 
   <!-- =========================================================
     07. 页面脚本 / Page Scripts
