@@ -81,7 +81,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
       transition: opacity 0.5s ease;
     }
 
@@ -90,10 +89,22 @@
       pointer-events: none;
     }
 
-    /* 加载环 */
-    .loader__ring {
+    /* 加载环容器：精确定位"开始"文字在圆心 */
+    .loader__ring-wrap {
+      position: relative;
       width: 100px;
       height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 加载环 */
+    .loader__ring {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       transform: rotate(-90deg);
     }
 
@@ -113,8 +124,12 @@
       transition: stroke-dashoffset 0.4s ease;
     }
 
-    /* 百分比文字 */
+    /* 百分比文字（环内居中） */
     .loader__pct {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       color: rgba(255, 255, 255, 0.58);
       font-size: 13px;
       font-weight: 600;
@@ -126,7 +141,7 @@
       opacity: 0;
     }
 
-    /* 开始文字（加载环中央，纯文字无边框） */
+    /* 开始文字（环内绝对居中） */
     .loader__start {
       position: absolute;
       top: 50%;
@@ -135,6 +150,7 @@
       padding: 0;
       border: 0;
       background: none;
+      white-space: nowrap;
       color: rgba(255, 255, 255, 0.82);
       font-size: 18px;
       font-weight: 700;
@@ -152,11 +168,11 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
-    /* 封面大图过渡层 */
+    /* 封面大图过渡层：z-index 高于 center，帷幕开后覆盖一切 */
     .loader__cover {
       position: absolute;
       inset: 0;
-      z-index: 1;
+      z-index: 3;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.6s ease;
@@ -1946,12 +1962,14 @@
     <div class="loader__curtain loader__curtain--left" id="curtainL"></div>
     <div class="loader__curtain loader__curtain--right" id="curtainR"></div>
     <div class="loader__center" id="loaderCenter">
-      <svg class="loader__ring" viewBox="0 0 100 100">
-        <circle class="loader__ring-bg" cx="50" cy="50" r="42" />
-        <circle class="loader__ring-fill" id="loaderRing" cx="50" cy="50" r="42" />
-      </svg>
-      <span class="loader__pct" id="loaderPct">0%</span>
-      <button class="loader__start" id="loaderStart" type="button">开始</button>
+      <div class="loader__ring-wrap">
+        <svg class="loader__ring" viewBox="0 0 100 100">
+          <circle class="loader__ring-bg" cx="50" cy="50" r="42" />
+          <circle class="loader__ring-fill" id="loaderRing" cx="50" cy="50" r="42" />
+        </svg>
+        <span class="loader__pct" id="loaderPct">0%</span>
+        <button class="loader__start" id="loaderStart" type="button">开始</button>
+      </div>
     </div>
     <div class="loader__cover" id="loaderCover">
       <img src="assets/cover.jpg" alt="">
