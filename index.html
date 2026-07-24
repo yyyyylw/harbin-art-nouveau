@@ -592,6 +592,21 @@
       filter: saturate(1.08) contrast(1.30) brightness(0.82);
     }
 
+    /* 初始亮度层：is-loading时可见（图像偏亮），移除后渐隐（图像恢复暗调） */
+    .cover-brightness {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.18);
+      opacity: 0;
+      transition: opacity 3s ease;
+    }
+
+    body.is-loading .cover-brightness {
+      opacity: 1;
+    }
+
     /* ---- 左下角图片说明 ---- */
     .cover-caption {
       position: absolute;
@@ -2121,6 +2136,7 @@
         <div class="cover-hero">
           <img src="assets/cover.jpg" alt="冬季的哈尔滨历史建筑街景">
         </div>
+        <div class="cover-brightness" id="coverBrightness"></div>
         <div class="intro-gradient"></div>
         <p class="cover-caption" id="coverCaption">图中为哈尔滨新艺术建筑代表建筑：马迭尔宾馆</p>
       </div>
