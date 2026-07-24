@@ -2208,13 +2208,6 @@
         <p class="date">2026年7月25日</p>
       </div>
 
-      <a class="cont-page" href="#overview" aria-label="向下阅读 / Scroll down">
-        <svg class="progress-ring" viewBox="0 0 54 54">
-          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-        </svg>
-        <span class="progress-text">0%</span>
-      </a>
     </section>
 
     <!-- =======================================================
@@ -2234,13 +2227,6 @@
         </p>
       </div>
 
-      <a class="viz-next" id="viz-next-overview" href="#spread-map" aria-label="向下滑动 / Scroll down">
-        <svg class="progress-ring" viewBox="0 0 54 54">
-          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-        </svg>
-        <span class="progress-text">0%</span>
-      </a>
     </section>
 
     <!-- =======================================================
@@ -2271,13 +2257,6 @@
         </div>
       </div>
 
-      <a class="viz-next" id="viz-next-spread" href="#feature-diagram" aria-label="向下滑动 / Scroll down">
-        <svg class="progress-ring" viewBox="0 0 54 54">
-          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-        </svg>
-        <span class="progress-text">0%</span>
-      </a>
     </section>
 
     <!-- =======================================================
@@ -2310,9 +2289,6 @@
           </div>
           <div class="feature-bottom-row">
             <div class="feature-cards feature-cards--bottom" id="featureCardsBottomL"></div>
-            <a class="feature-scroll-btn" href="#dot-explore-map" aria-label="向下滑动至散点地图">
-              <svg viewBox="0 0 24 24"><path d="M12 4v12m0 0l-5-5m5 5l5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
             <div class="feature-cards feature-cards--bottom" id="featureCardsBottomR"></div>
           </div>
         </div>
@@ -2347,13 +2323,6 @@
         </div>
       </div>
 
-      <a class="viz-next" id="viz-next-dotmap" href="#sankey-diagram" aria-label="向下滑动 / Scroll down">
-        <svg class="progress-ring" viewBox="0 0 54 54">
-          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-        </svg>
-        <span class="progress-text">0%</span>
-      </a>
     </section>
 
     <!-- =======================================================
@@ -2387,13 +2356,6 @@
         <div class="sankey-shield" id="sankeyShield"></div>
       </div>
 
-      <a class="viz-next" id="viz-next-sankey" href="#protection-chart" aria-label="向下滑动 / Scroll down">
-        <svg class="progress-ring" viewBox="0 0 54 54">
-          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-        </svg>
-        <span class="progress-text">0%</span>
-      </a>
     </section>
 
     <!-- =======================================================
@@ -2425,13 +2387,6 @@
         </div>
       </div>
 
-      <a class="viz-next" id="viz-next-protection" href="#chapters" aria-label="向下滑动 / Scroll down">
-        <svg class="progress-ring" viewBox="0 0 54 54">
-          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
-          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
-        </svg>
-        <span class="progress-text">0%</span>
-      </a>
     </section>
 
     <section class="standard chapter-section">
@@ -2540,9 +2495,6 @@
     </div>
   </footer>
 
-  <a class="global-scroll-btn" id="globalScrollBtn" href="#overview" aria-label="向下滑动至下一页">
-    <svg viewBox="0 0 24 24"><path d="M12 4v12m0 0l-5-5m5 5l5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </a>
 
   <!-- =========================================================
     06-B. 全屏查看遮罩 / Fullscreen Overlay
@@ -2555,53 +2507,6 @@
     <span class="fs-hint" id="fsHint">旋转手机以获得最佳观看体验</span>
     <div class="fs-stage" id="fsStage"></div>
   </div>
-
-  <!-- =========================================================
-    06-C. 全局下滑按钮 / Global Scroll Button
-    ---------------------------------------------------------
-    悬浮固定在右下角，检测当前页并滚动到下一页。
-  ========================================================== -->
-  <script>
-    (function () {
-      var btn = document.getElementById("globalScrollBtn");
-      if (!btn) return;
-
-      var pages = ["#overview", "#spread-map", "#feature-diagram", "#dot-explore-map", "#sankey-diagram", "#protection-chart", "#chapters"];
-
-      function findCurrent() {
-        var scrollPos = window.scrollY + window.innerHeight * 0.4;
-        for (var i = pages.length - 1; i >= 0; i--) {
-          var el = document.querySelector(pages[i]);
-          if (el && el.offsetTop <= scrollPos) {
-            return { index: i, id: pages[i] };
-          }
-        }
-        return { index: -1, id: pages[0] };
-      }
-
-      function updateBtn() {
-        var curr = findCurrent();
-        if (curr.index >= 0 && curr.index < pages.length - 1) {
-          var nextId = pages[curr.index + 1];
-          btn.setAttribute("href", nextId);
-          btn.classList.remove("is-end");
-        } else {
-          btn.classList.add("is-end");
-        }
-      }
-
-      btn.addEventListener("click", function (e) {
-        var href = btn.getAttribute("href");
-        if (!href || btn.classList.contains("is-end")) {
-          e.preventDefault();
-          return;
-        }
-      });
-
-      window.addEventListener("scroll", updateBtn, { passive: true });
-      updateBtn();
-    })();
-  </script>
 
   <!-- =========================================================
     06-D. 入场动画脚本 / Entrance Animation
@@ -2791,140 +2696,6 @@
 
     updateHeader();
     window.addEventListener("scroll", updateHeader, { passive: true });
-
-    /* =======================================================
-      08-06. 数据可视化加载进度 / Embed Loading Progress
-      -----------------------------------------------------
-      封面加载环 → 追踪传播图 (flourish-map)
-      传播图加载环 → 追踪桑基图 (flourish-sankey)
-      如果 2s 内未检测到对应 iframe，使用 3s 模拟进度兜底。
-      最长 10s 后强制完成。
-      Cover ring tracks spread-map; viz-next ring tracks Sankey.
-      Falls back to 3s simulated progress if the target iframe
-      isn't detected within 2s. Hard-completes at 10s.
-    ======================================================= */
-    (function () {
-      function createProgressLoader(config) {
-        var ring = document.querySelector(config.ringSelector);
-        if (!ring) return;
-        var fill = ring.querySelector(".progress-ring__fill");
-        var text = ring.querySelector(".progress-text");
-        var CIRCUMFERENCE = 138.23;
-        var progress = 0;
-        var targetsFound = 0;
-        var targetsLoaded = 0;
-        var checkTimer = null;
-
-        function setProgress(pct) {
-          progress = Math.min(Math.max(pct, progress), 100);
-          fill.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress / 100);
-          text.textContent = Math.round(progress) + "%";
-          if (progress >= 100) finish();
-        }
-
-        function finish() {
-          if (checkTimer) clearInterval(checkTimer);
-          ring.classList.add("is-loaded");
-        }
-
-        function trackIframe(iframe) {
-          if (iframe.dataset[config.trackedKey]) return;
-          iframe.dataset[config.trackedKey] = "1";
-          targetsFound++;
-
-          function markLoaded() {
-            if (iframe.dataset[config.loadedKey]) return;
-            iframe.dataset[config.loadedKey] = "1";
-            targetsLoaded++;
-            setProgress((targetsLoaded / Math.max(targetsFound, config.expectedCount || 1)) * 100);
-          }
-
-          iframe.addEventListener("load", markLoaded);
-          try {
-            if (iframe.contentDocument && iframe.contentDocument.readyState === "complete") {
-              markLoaded();
-            }
-          } catch (_) { /* cross-origin, rely on load event */ }
-        }
-
-        function scan() {
-          document.querySelectorAll(config.iframeSelector).forEach(trackIframe);
-        }
-
-        checkTimer = setInterval(scan, 400);
-
-        setTimeout(function () {
-          if (progress > 0) return;
-          var start = Date.now();
-          var duration = 3000;
-          (function tick() {
-            var elapsed = Date.now() - start;
-            var ratio = Math.min(elapsed / duration, 1);
-            ratio = 1 - Math.pow(1 - ratio, 3);
-            setProgress(ratio * 100);
-            if (ratio < 1) requestAnimationFrame(tick);
-          })();
-        }, 2000);
-
-        setTimeout(function () {
-          if (progress < 100) setProgress(100);
-        }, 10000);
-      }
-
-      // 封面：追踪传播图 / Cover tracks spread-map
-      createProgressLoader({
-        ringSelector: ".cont-page",
-        iframeSelector: ".flourish-map iframe",
-        trackedKey: "progressTracked",
-        loadedKey: "progressLoaded",
-        expectedCount: 1
-      });
-
-      // 引语底部：追踪传播图 / Overview bottom ring tracks spread-map
-      createProgressLoader({
-        ringSelector: "#viz-next-overview",
-        iframeSelector: ".flourish-map iframe",
-        trackedKey: "overviewVizTracked",
-        loadedKey: "overviewVizLoaded",
-        expectedCount: 1
-      });
-
-      // 传播图底部：追踪散点地图（无 iframe，3s 兜底） / Spread-map bottom ring
-      createProgressLoader({
-        ringSelector: "#viz-next-spread",
-        iframeSelector: ".dot-nonexistent iframe",
-        trackedKey: "spreadVizTracked",
-        loadedKey: "spreadVizLoaded",
-        expectedCount: 1
-      });
-
-      // 散点地图底部：追踪桑基图 / Dot-map bottom ring tracks Sankey
-      createProgressLoader({
-        ringSelector: "#viz-next-dotmap",
-        iframeSelector: ".flourish-sankey iframe",
-        trackedKey: "dotmapVizTracked",
-        loadedKey: "dotmapVizLoaded",
-        expectedCount: 1
-      });
-
-      // 桑基图底部：追踪保护等级图
-      createProgressLoader({
-        ringSelector: "#viz-next-sankey",
-        iframeSelector: ".flourish-chart iframe",
-        trackedKey: "sankeyVizTracked",
-        loadedKey: "sankeyVizLoaded",
-        expectedCount: 1
-      });
-
-      // 保护等级图底部：3s 兜底
-      createProgressLoader({
-        ringSelector: "#viz-next-protection",
-        iframeSelector: ".dot-nonexistent iframe",
-        trackedKey: "protectionVizTracked",
-        loadedKey: "protectionVizLoaded",
-        expectedCount: 1
-      });
-    })();
 
     /* =======================================================
       08-07. 建筑特征卡片画廊 / Feature Card Gallery
