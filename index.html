@@ -1007,7 +1007,51 @@
       pointer-events: none;
     }
 
-    /* 底部加载环 + 下滑箭头 / Bottom loading ring + scroll arrow */
+    /* 全局悬浮下滑按钮 */
+    .global-scroll-btn {
+      position: fixed;
+      z-index: 20;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(216, 168, 78, 0.55);
+      border-radius: 50%;
+      color: var(--gold);
+      background: rgba(7, 19, 29, 0.72);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      opacity: 0.85;
+    }
+
+    .global-scroll-btn:hover {
+      opacity: 1;
+      transform: scale(1.08);
+      border-color: rgba(216, 168, 78, 0.85);
+    }
+
+    .global-scroll-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* 最后一页隐藏 */
+    .global-scroll-btn.is-end {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* 旧下滑按钮全部隐藏 */
+    .viz-next,
+    .cont-page,
+    .feature-scroll-btn {
+      display: none;
+    }
+
+    /* 底部加载环 + 下滑箭头 / Bottom loading ring + scroll arrow (保留样式供复用) */
     .viz-next {
       position: absolute;
       z-index: 3;
@@ -2326,9 +2370,6 @@
         <p>
           55座建筑中，有8处遭到拆除、原址重建或长年荒废，如耀景街、文昌街的原中东铁路高级官员住宅，以及原尼德兰斯中学等。鼠标悬停在色带上，即可查看每条流向的具体数量。
         </p>
-        <p>
-          截至2026年，哈尔滨已将全市1310处历史文化建筑纳入系统性保护名录，完成了数字化测绘建档与一体化智慧管理平台搭建。从修缮活化到立法保护，这些百年建筑正逐步走出被遗忘的命运，成为城市可读、可逛、可生活的文化地标。
-        </p>
       </div>
 
       <div class="viz-panel fs-container">
@@ -2362,6 +2403,9 @@
     ======================================================== -->
     <section class="viz-slide" id="protection-chart">
       <div class="viz-intro">
+        <p>
+          截至2026年，哈尔滨已将全市1310处历史文化建筑纳入系统性保护名录，完成了数字化测绘建档与一体化智慧管理平台搭建。从修缮活化到立法保护，这些百年建筑正逐步走出被遗忘的命运，成为城市可读、可逛、可生活的文化地标。
+        </p>
         <p>
           60 栋哈尔滨新艺术建筑中，6 栋已毁。现存 54 栋建筑里，6 栋列为全国重点文物保护单位，7 栋为省级或一类保护建筑，其余约 41 栋作为"中东铁路建筑群"组成部分登记为不可移动文物。从保护等级分布来看，大多数建筑虽已纳入文物保护体系，但单体保护级别仍有提升空间。
         </p>
@@ -2496,6 +2540,10 @@
     </div>
   </footer>
 
+  <a class="global-scroll-btn" id="globalScrollBtn" href="#overview" aria-label="向下滑动至下一页">
+    <svg viewBox="0 0 24 24"><path d="M12 4v12m0 0l-5-5m5 5l5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
   <!-- =========================================================
     06-B. 全屏查看遮罩 / Fullscreen Overlay
     ---------------------------------------------------------
@@ -2509,7 +2557,54 @@
   </div>
 
   <!-- =========================================================
-    06-C. 入场动画脚本 / Entrance Animation
+    06-C. 全局下滑按钮 / Global Scroll Button
+    ---------------------------------------------------------
+    悬浮固定在右下角，检测当前页并滚动到下一页。
+  ========================================================== -->
+  <script>
+    (function () {
+      var btn = document.getElementById("globalScrollBtn");
+      if (!btn) return;
+
+      var pages = ["#overview", "#spread-map", "#feature-diagram", "#dot-explore-map", "#sankey-diagram", "#protection-chart", "#chapters"];
+
+      function findCurrent() {
+        var scrollPos = window.scrollY + window.innerHeight * 0.4;
+        for (var i = pages.length - 1; i >= 0; i--) {
+          var el = document.querySelector(pages[i]);
+          if (el && el.offsetTop <= scrollPos) {
+            return { index: i, id: pages[i] };
+          }
+        }
+        return { index: -1, id: pages[0] };
+      }
+
+      function updateBtn() {
+        var curr = findCurrent();
+        if (curr.index >= 0 && curr.index < pages.length - 1) {
+          var nextId = pages[curr.index + 1];
+          btn.setAttribute("href", nextId);
+          btn.classList.remove("is-end");
+        } else {
+          btn.classList.add("is-end");
+        }
+      }
+
+      btn.addEventListener("click", function (e) {
+        var href = btn.getAttribute("href");
+        if (!href || btn.classList.contains("is-end")) {
+          e.preventDefault();
+          return;
+        }
+      });
+
+      window.addEventListener("scroll", updateBtn, { passive: true });
+      updateBtn();
+    })();
+  </script>
+
+  <!-- =========================================================
+    06-D. 入场动画脚本 / Entrance Animation
     ---------------------------------------------------------
     加载进度 → 双箭头 → 点击 → 飘带帷幕拉开 → 封面大图 → 淡出。
   ========================================================== -->
