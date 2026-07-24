@@ -2099,6 +2099,7 @@
         <li><a href="#feature-diagram">哈尔滨新艺术建筑特征细节 / Facade Diagram</a></li>
         <li><a href="#dot-explore-map">哈尔滨新艺术建筑分布情况 / Distribution Map</a></li>
         <li><a href="#sankey-diagram">哈尔滨新艺术建筑的变迁 / Sankey Diagram</a></li>
+        <li><a href="#protection-chart">保护等级分布 / Protection Status</a></li>
         <li><a href="#chapters">典型建筑图鉴 / Chapters</a></li>
       </ul>
     </nav>
@@ -2320,7 +2321,42 @@
         <div class="sankey-shield" id="sankeyShield"></div>
       </div>
 
-      <a class="viz-next" id="viz-next-sankey" href="#chapters" aria-label="向下滑动 / Scroll down">
+      <a class="viz-next" id="viz-next-sankey" href="#protection-chart" aria-label="向下滑动 / Scroll down">
+        <svg class="progress-ring" viewBox="0 0 54 54">
+          <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
+          <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
+        </svg>
+        <span class="progress-text">0%</span>
+      </a>
+    </section>
+
+    <!-- =======================================================
+      05-02-E. 保护等级图表 / Protection Status Chart
+      -------------------------------------------------------
+      全屏滑动页：上方简介 + 交互式柱状图（Flourish）。
+    ======================================================== -->
+    <section class="viz-slide" id="protection-chart">
+      <div class="viz-intro">
+        <p>
+          60 栋哈尔滨新艺术建筑中，6 栋已毁。现存 54 栋建筑里，6 栋列为全国重点文物保护单位，7 栋为省级或一类保护建筑，其余约 41 栋作为"中东铁路建筑群"组成部分登记为不可移动文物。从保护等级分布来看，大多数建筑虽已纳入文物保护体系，但单体保护级别仍有提升空间。
+        </p>
+      </div>
+
+      <div class="viz-panel fs-container">
+        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+        <div class="flourish-panel">
+          <div class="flourish-embed flourish-chart" data-src="visualisation/29779591">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+            <noscript>
+              <img src="https://public.flourish.studio/visualisation/29779591/thumbnail" width="100%" alt="chart visualization" />
+            </noscript>
+          </div>
+        </div>
+      </div>
+
+      <a class="viz-next" id="viz-next-protection" href="#chapters" aria-label="向下滑动 / Scroll down">
         <svg class="progress-ring" viewBox="0 0 54 54">
           <circle class="progress-ring__bg" cx="27" cy="27" r="22" />
           <circle class="progress-ring__fill" cx="27" cy="27" r="22" />
@@ -2751,12 +2787,21 @@
         expectedCount: 1
       });
 
-      // 桑基图底部：追踪图鉴（无 iframe，3s 兜底）
+      // 桑基图底部：追踪保护等级图
       createProgressLoader({
         ringSelector: "#viz-next-sankey",
-        iframeSelector: ".dot-nonexistent iframe",
+        iframeSelector: ".flourish-chart iframe",
         trackedKey: "sankeyVizTracked",
         loadedKey: "sankeyVizLoaded",
+        expectedCount: 1
+      });
+
+      // 保护等级图底部：3s 兜底
+      createProgressLoader({
+        ringSelector: "#viz-next-protection",
+        iframeSelector: ".dot-nonexistent iframe",
+        trackedKey: "protectionVizTracked",
+        loadedKey: "protectionVizLoaded",
         expectedCount: 1
       });
     })();
