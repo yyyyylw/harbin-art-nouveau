@@ -1532,6 +1532,28 @@
       overflow: visible;
     }
 
+    /* 保护等级图：与桑基图一致，桌面端深色文字 */
+    #protection-chart .viz-intro p {
+      color: rgba(15, 24, 32, 0.88);
+    }
+
+    @media (max-width: 720px) {
+      #protection-chart .viz-intro p {
+        color: rgba(255, 255, 255, 0.90);
+      }
+    }
+
+    #protection-chart {
+      height: auto;
+      min-height: 100svh;
+      overflow: visible;
+    }
+
+    #protection-chart .viz-panel {
+      max-height: none;
+      overflow: visible;
+    }
+
     .reveal-scroll {
       height: 900vh;
     }
