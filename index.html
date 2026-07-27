@@ -1546,13 +1546,92 @@
       padding-bottom: 0;
     }
 
-    #dot-explore-map .viz-panel {
+    /* ---- 三栏布局：左照片 | 散点图 | 右照片 ---- */
+    .dot-map-layout {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 6px;
+      width: min(1400px, calc(100% - 16px));
+      margin: 0 auto;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .dot-map-side {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+      width: 120px;
+    }
+
+    .dot-map-center {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .dot-map-img {
       width: 100%;
-      max-width: 100%;
-      padding: 0;
-      flex: auto;
-      max-height: none;
-      overflow: visible;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .dot-map-credit {
+      margin: 4px 0 0;
+      color: rgba(255, 255, 255, 0.40);
+      font-size: 10px;
+      font-weight: 500;
+      text-align: left;
+      width: 100%;
+    }
+
+    .dot-map-card {
+      position: relative;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(20, 25, 22, 0.50);
+      line-height: 0;
+    }
+
+    .dot-map-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    .dot-map-card__label {
+      display: block;
+      padding: 3px 4px;
+      color: rgba(255, 255, 255, 0.70);
+      font-size: 9px;
+      font-weight: 500;
+      line-height: 1.2;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    @media (max-width: 900px) {
+      .dot-map-layout {
+        flex-direction: column;
+        align-items: center;
+      }
+      .dot-map-side {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: center;
+        gap: 3px;
+      }
+      .dot-map-card {
+        width: 70px;
+      }
     }
 
     /* 桑基图：桌面端深色文字，手机端白色文字（背景渐变更亮） */
@@ -2310,11 +2389,14 @@
           图上用白点标记的建筑均已被毁坏或拆除重建，其中的尚志小学、中东铁路管理局局长官邸等的具体位置已无从考究。
         </p>
       </div>
-      <div class="viz-panel">
-        <img src="dot-map/assets/map-final.png" alt="哈尔滨新艺术建筑分布散点图" style="width:80%;height:80%;object-fit:contain;margin:0 auto;">
+      <div class="dot-map-layout">
+        <div class="dot-map-side dot-map-side--left" id="dotSideLeft"></div>
+        <div class="dot-map-center">
+          <img src="dot-map/assets/map-final.png" alt="哈尔滨新艺术建筑分布散点图" class="dot-map-img">
+          <p class="dot-map-credit">图片内容参考刘大平，王岩《哈尔滨新艺术建筑》</p>
+        </div>
+        <div class="dot-map-side dot-map-side--right" id="dotSideRight"></div>
       </div>
-      <p style="margin:6px 0 0;color:rgba(255,255,255,0.45);font-size:11px;font-weight:500;text-align:left;width:min(980px,calc(100% - 40px));">图片内容参考刘大平，王岩《哈尔滨新艺术建筑》</p>
-
     </section>
 
     <!-- =======================================================
@@ -2361,7 +2443,7 @@
           截至2026年，哈尔滨已将全市1310处历史文化建筑纳入系统性保护名录，完成了数字化测绘建档与一体化智慧管理平台搭建。从修缮活化到立法保护，这些百年建筑正逐步走出被遗忘的命运，成为城市可读、可逛、可生活的文化地标。
         </p>
         <p>
-          60 栋哈尔滨新艺术建筑中，6 栋已毁。现存 54 栋建筑里，6 栋列为全国重点文物保护单位，7 栋为省级或一类保护建筑，其余约 41 栋作为"中东铁路建筑群"组成部分登记为不可移动文物。从保护等级分布来看，大多数建筑虽已纳入文物保护体系，但单体保护级别仍有提升空间。
+          55 栋哈尔滨新艺术建筑中，8 栋已毁或拆除重建。现存 47 栋建筑里，6 栋列为全国重点文物保护单位，7 栋为省级或一类保护建筑，其余约 34 栋作为"中东铁路建筑群"组成部分登记为不可移动文物。从保护等级分布来看，大多数建筑虽已纳入文物保护体系，但单体保护级别仍有提升空间。
         </p>
       </div>
 
@@ -2849,7 +2931,53 @@
     })();
 
     /* =======================================================
-      08-08. 桑基图加载遮罩 / Sankey Loading Shield
+      08-08. 散点图侧边照片 / Dot Map Side Photos
+      -------------------------------------------------------
+      从 assets/side/ 读取照片，均匀分布在散点图两侧。
+    ======================================================= */
+    (function () {
+      var leftEl = document.getElementById("dotSideLeft");
+      var rightEl = document.getElementById("dotSideRight");
+      if (!leftEl || !rightEl) return;
+
+      var IMG_BASE = "assets/side/";
+      var photos = [
+        { file: "东省特别区地方法院.png", label: "东省特别区地方法院" },
+        { file: "中东铁路技术学校.png", label: "中东铁路技术学校" },
+        { file: "中东铁路管理局宾馆.png", label: "中东铁路管理局宾馆" },
+        { file: "买卖街92号.png", label: "买卖街92号" },
+        { file: "原中东铁路警察管理局.png", label: "原中东铁路警察管理局" },
+        { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原中东铁路高级官员住宅（红军街38号）" },
+        { file: "原中东铁路高级官员住宅（西大直街）.png", label: "原中东铁路高级官员住宅（西大直街）" },
+        { file: "原哈尔滨工业大学宿舍.png", label: "原哈尔滨工业大学宿舍" },
+        { file: "原意大利领事馆.png", label: "原意大利领事馆" },
+        { file: "哈尔滨火车站（史）.png", label: "哈尔滨火车站（史）" },
+        { file: "日满商会.png", label: "日满商会" },
+        { file: "阿基谢耶夫洋行.png", label: "阿基谢耶夫洋行" }
+      ];
+
+      function makeCard(p, container) {
+        var card = document.createElement("div");
+        card.className = "dot-map-card";
+        var img = document.createElement("img");
+        img.src = IMG_BASE + p.file;
+        img.alt = p.label;
+        img.loading = "lazy";
+        var label = document.createElement("span");
+        label.className = "dot-map-card__label";
+        label.textContent = p.label;
+        card.appendChild(img);
+        card.appendChild(label);
+        container.appendChild(card);
+      }
+
+      // 左 6 张，右 6 张
+      for (var i = 0; i < 6; i++) { makeCard(photos[i], leftEl); }
+      for (var j = 6; j < 12; j++) { makeCard(photos[j], rightEl); }
+    })();
+
+    /* =======================================================
+      08-09. 桑基图加载遮罩 / Sankey Loading Shield
       -----------------------------------------------------
       桑基图 60% 进入视口时开始 5s 倒计时，期间阻挡鼠标交互。
       5s countdown starts when 80% of the Sankey section is
