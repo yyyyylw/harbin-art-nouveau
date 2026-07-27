@@ -1603,6 +1603,16 @@
       z-index: 1;
     }
 
+    /* 左侧卡片向右（向地图）展开 */
+    .dot-map-side--left .dot-map-card {
+      transform-origin: right center;
+    }
+
+    /* 右侧卡片向左（向地图）展开 */
+    .dot-map-side--right .dot-map-card {
+      transform-origin: left center;
+    }
+
     .dot-map-card:hover {
       transform: scale(2);
       z-index: 10;
