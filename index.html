@@ -1605,12 +1605,12 @@
 
     /* 左侧卡片向右（向地图）展开 */
     .dot-map-side--left .dot-map-card {
-      transform-origin: right center;
+      transform-origin: left center;
     }
 
     /* 右侧卡片向左（向地图）展开 */
     .dot-map-side--right .dot-map-card {
-      transform-origin: left center;
+      transform-origin: right center;
     }
 
     .dot-map-card:hover {
@@ -1626,27 +1626,6 @@
       height: auto;
       display: block;
       object-fit: cover;
-    }
-
-    /* 连接线：从卡片边缘伸向地图 */
-    .dot-map-side--left .dot-map-card::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      right: -18px;
-      width: 18px;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.30);
-    }
-
-    .dot-map-side--right .dot-map-card::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: -18px;
-      width: 18px;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.30);
     }
 
     .dot-map-card__label {
@@ -1674,10 +1653,6 @@
       }
       .dot-map-card {
         width: 80px;
-      }
-      .dot-map-side--left .dot-map-card::after,
-      .dot-map-side--right .dot-map-card::after {
-        display: none;
       }
     }
 
