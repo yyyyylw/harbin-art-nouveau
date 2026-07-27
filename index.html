@@ -1552,8 +1552,8 @@
       flex-direction: row;
       align-items: flex-start;
       justify-content: center;
-      gap: 6px;
-      width: min(1400px, calc(100% - 16px));
+      gap: 16px;
+      width: min(1500px, calc(100% - 16px));
       margin: 0 auto;
       flex: 1 1 auto;
       min-height: 0;
@@ -1562,9 +1562,10 @@
     .dot-map-side {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 8px;
       flex-shrink: 0;
-      width: 120px;
+      width: 160px;
+      padding-top: 10px;
     }
 
     .dot-map-center {
@@ -1594,8 +1595,8 @@
       position: relative;
       border-radius: 3px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(20, 25, 22, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(20, 25, 22, 0.55);
       line-height: 0;
     }
 
@@ -1606,15 +1607,36 @@
       object-fit: cover;
     }
 
+    /* 连接线：从卡片边缘伸向地图 */
+    .dot-map-side--left .dot-map-card::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -12px;
+      width: 12px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .dot-map-side--right .dot-map-card::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -12px;
+      width: 12px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
     .dot-map-card__label {
       display: block;
-      padding: 3px 4px;
-      color: rgba(255, 255, 255, 0.70);
-      font-size: 9px;
-      font-weight: 500;
-      line-height: 1.2;
+      padding: 4px 5px;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.25;
       text-align: center;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(0, 0, 0, 0.50);
     }
 
     @media (max-width: 900px) {
@@ -1630,7 +1652,11 @@
         gap: 3px;
       }
       .dot-map-card {
-        width: 70px;
+        width: 80px;
+      }
+      .dot-map-side--left .dot-map-card::after,
+      .dot-map-side--right .dot-map-card::after {
+        display: none;
       }
     }
 
@@ -2934,6 +2960,7 @@
       08-08. 散点图侧边照片 / Dot Map Side Photos
       -------------------------------------------------------
       从 assets/side/ 读取照片，均匀分布在散点图两侧。
+      卡片与地图上标记点通过 SVG 线条连接。
     ======================================================= */
     (function () {
       var leftEl = document.getElementById("dotSideLeft");
@@ -2941,24 +2968,27 @@
       if (!leftEl || !rightEl) return;
 
       var IMG_BASE = "assets/side/";
+      // 照片 + 对应地图坐标（百分比，基于 2209×2185 原图）
       var photos = [
-        { file: "东省特别区地方法院.png", label: "东省特别区地方法院" },
-        { file: "中东铁路技术学校.png", label: "中东铁路技术学校" },
-        { file: "中东铁路管理局宾馆.png", label: "中东铁路管理局宾馆" },
-        { file: "买卖街92号.png", label: "买卖街92号" },
-        { file: "原中东铁路警察管理局.png", label: "原中东铁路警察管理局" },
-        { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原中东铁路高级官员住宅（红军街38号）" },
-        { file: "原中东铁路高级官员住宅（西大直街）.png", label: "原中东铁路高级官员住宅（西大直街）" },
-        { file: "原哈尔滨工业大学宿舍.png", label: "原哈尔滨工业大学宿舍" },
-        { file: "原意大利领事馆.png", label: "原意大利领事馆" },
-        { file: "哈尔滨火车站（史）.png", label: "哈尔滨火车站（史）" },
-        { file: "日满商会.png", label: "日满商会" },
-        { file: "阿基谢耶夫洋行.png", label: "阿基谢耶夫洋行" }
+        { file: "东省特别区地方法院.png", label: "东省特别区地方法院", x: 5.8, y: 24.9, side: "L" },
+        { file: "中东铁路技术学校.png", label: "中东铁路技术学校", x: 47.5, y: 20.1, side: "L" },
+        { file: "中东铁路管理局宾馆.png", label: "中东铁路管理局宾馆", x: 37.3, y: 39.6, side: "L" },
+        { file: "买卖街92号.png", label: "买卖街92号", x: 27.1, y: 57.8, side: "L" },
+        { file: "原中东铁路警察管理局.png", label: "原中东铁路警察管理局", x: 13.0, y: 42.0, side: "L" },
+        { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原高级官员住宅 (红军街38号)", x: 39.0, y: 32.0, side: "L" },
+        { file: "原中东铁路高级官员住宅（西大直街）.png", label: "原高级官员住宅 (西大直街)", x: 61.0, y: 28.0, side: "R" },
+        { file: "原哈尔滨工业大学宿舍.png", label: "原哈尔滨工业大学宿舍", x: 72.0, y: 48.5, side: "R" },
+        { file: "原意大利领事馆.png", label: "原意大利领事馆", x: 58.6, y: 55.0, side: "R" },
+        { file: "哈尔滨火车站（史）.png", label: "哈尔滨火车站（史）", x: 80.5, y: 38.0, side: "R" },
+        { file: "日满商会.png", label: "日满商会", x: 66.0, y: 65.8, side: "R" },
+        { file: "阿基谢耶夫洋行.png", label: "阿基谢耶夫洋行", x: 78.8, y: 72.5, side: "R" }
       ];
 
+      // 渲染卡片
       function makeCard(p, container) {
         var card = document.createElement("div");
         card.className = "dot-map-card";
+        card.setAttribute("data-dot", p.label);
         var img = document.createElement("img");
         img.src = IMG_BASE + p.file;
         img.alt = p.label;
@@ -2971,9 +3001,83 @@
         container.appendChild(card);
       }
 
-      // 左 6 张，右 6 张
-      for (var i = 0; i < 6; i++) { makeCard(photos[i], leftEl); }
-      for (var j = 6; j < 12; j++) { makeCard(photos[j], rightEl); }
+      for (var i = 0; i < photos.length; i++) {
+        var target = photos[i].side === "L" ? leftEl : rightEl;
+        makeCard(photos[i], target);
+      }
+
+      // 添加 SVG 连线层和标记圆点
+      var center = document.querySelector(".dot-map-center");
+      if (!center) return;
+      var img = center.querySelector(".dot-map-img");
+      if (!img) return;
+
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "dot-map-lines");
+      svg.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;";
+
+      // 将 .dot-map-center 设为 relative 并插入 SVG
+      center.style.position = "relative";
+      center.insertBefore(svg, img.nextSibling);
+
+      // 在 SVG 中添加标记圆点
+      photos.forEach(function (p) {
+        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", p.x + "%");
+        circle.setAttribute("cy", p.y + "%");
+        circle.setAttribute("r", "3");
+        circle.setAttribute("fill", "none");
+        circle.setAttribute("stroke", "rgba(255,255,255,0.45)");
+        circle.setAttribute("stroke-width", "1");
+        circle.setAttribute("data-dot", p.label);
+        svg.appendChild(circle);
+      });
+
+      // 绘制连线
+      function drawLines() {
+        var lines = svg.querySelectorAll("line");
+        for (var k = 0; k < lines.length; k++) { lines[k].remove(); }
+
+        var mapRect = img.getBoundingClientRect();
+        var svgRect = svg.getBoundingClientRect();
+        if (mapRect.width === 0) return;
+
+        photos.forEach(function (p) {
+          var card = document.querySelector('.dot-map-card[data-dot="' + p.label + '"]');
+          if (!card) return;
+          var cardRect = card.getBoundingClientRect();
+
+          // 标记在 SVG 坐标系中的位置
+          var mx = (p.x / 100) * svgRect.width;
+          var my = (p.y / 100) * svgRect.height;
+
+          // 卡片边缘在 SVG 坐标系中的位置
+          var x1, y1;
+          y1 = cardRect.top + cardRect.height / 2 - svgRect.top;
+          if (p.side === "L") {
+            x1 = cardRect.right - svgRect.left + 4;
+          } else {
+            x1 = cardRect.left - svgRect.left - 4;
+          }
+
+          var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("x1", x1);
+          line.setAttribute("y1", y1);
+          line.setAttribute("x2", mx);
+          line.setAttribute("y2", my);
+          line.setAttribute("stroke", "rgba(255,255,255,0.22)");
+          line.setAttribute("stroke-width", "1");
+          line.setAttribute("stroke-dasharray", "3 3");
+          line.setAttribute("data-dot", p.label);
+          svg.appendChild(line);
+        });
+      }
+
+      drawLines();
+      window.addEventListener("resize", function () {
+        clearTimeout(window.__dotLinesTimer);
+        window.__dotLinesTimer = setTimeout(drawLines, 200);
+      });
     })();
 
     /* =======================================================
