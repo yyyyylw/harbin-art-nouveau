@@ -3137,6 +3137,65 @@
         marker.addEventListener("mouseenter", function () { highlight(label); });
         marker.addEventListener("mouseleave", function () { unhighlight(label); });
       });
+
+      // ---- 调试模式：拖拽标记框调整位置 ----
+      var debugBtn = document.createElement("button");
+      debugBtn.textContent = "调试";
+      debugBtn.style.cssText = "position:absolute;bottom:8px;right:8px;z-index:10;padding:4px 10px;" +
+        "border:1px solid rgba(255,255,255,0.4);border-radius:4px;background:rgba(0,0,0,0.6);" +
+        "color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;";
+      debugBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var isOn = markerLayer.classList.toggle("is-debug");
+        debugBtn.textContent = isOn ? "调试中" : "调试";
+        debugBtn.style.color = isOn ? "#ff0" : "rgba(255,255,255,0.7)";
+        if (isOn) { console.log("=== 拖拽标记框，松开时输出坐标 ==="); }
+      });
+      center.appendChild(debugBtn);
+
+      // 拖拽逻辑
+      var dragging = null;
+      var dragStartX = 0, dragStartY = 0, origLeft = 0, origTop = 0;
+
+      function onDragStart(e) {
+        if (!markerLayer.classList.contains("is-debug")) return;
+        dragging = this;
+        var rect = markerLayer.getBoundingClientRect();
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        origLeft = parseFloat(this.style.left);
+        origTop = parseFloat(this.style.top);
+        this.style.zIndex = "20";
+        this.style.borderColor = "#ff0";
+        e.preventDefault();
+      }
+
+      function onDragMove(e) {
+        if (!dragging) return;
+        var rect = markerLayer.getBoundingClientRect();
+        var dx = ((e.clientX - dragStartX) / rect.width) * 100;
+        var dy = ((e.clientY - dragStartY) / rect.height) * 100;
+        dragging.style.left = (origLeft + dx) + "%";
+        dragging.style.top = (origTop + dy) + "%";
+      }
+
+      function onDragEnd() {
+        if (!dragging) return;
+        var label = dragging.getAttribute("data-dot");
+        console.log(label + ": x=" + parseFloat(dragging.style.left).toFixed(2) + ", y=" + parseFloat(dragging.style.top).toFixed(2));
+        dragging.style.zIndex = "";
+        dragging.style.borderColor = "";
+        dragging = null;
+      }
+
+      allMarkers.forEach(function (m) {
+        m.addEventListener("mousedown", onDragStart);
+        m.addEventListener("touchstart", onDragStart, { passive: false });
+      });
+      document.addEventListener("mousemove", onDragMove);
+      document.addEventListener("touchmove", onDragMove, { passive: false });
+      document.addEventListener("mouseup", onDragEnd);
+      document.addEventListener("touchend", onDragEnd);
     })();
 
     /* =======================================================
