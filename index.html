@@ -2631,8 +2631,8 @@
       ring.style.strokeDasharray = CIRCUMFERENCE;
       ring.style.strokeDashoffset = CIRCUMFERENCE;
 
-      var totalItems = 0;
-      var loadedItems = 0;
+      var totalItems = 1;
+      var loadedItems = 1;
 
       function updateProgress() {
         var pct = totalItems === 0 ? 0 : Math.round((loadedItems / totalItems) * 100);
@@ -2658,14 +2658,29 @@
         }
       }
 
+      // 追踪已存在的图片
       var imgs = document.querySelectorAll("img");
       for (var i = 0; i < imgs.length; i++) { trackImage(imgs[i]); }
 
+      // 追踪JS动态添加的图片
+      var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (m) {
+          m.addedNodes.forEach(function (node) {
+            if (node.tagName === "IMG") { trackImage(node); }
+            if (node.querySelectorAll) {
+              var nested = node.querySelectorAll("img");
+              for (var k = 0; k < nested.length; k++) { trackImage(nested[k]); }
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
       var fallbackTimer = setTimeout(function () {
         if (!isStarted && loadedItems < totalItems) { loadedItems = totalItems; updateProgress(); }
-      }, 4000);
+      }, 8000);
 
-      if (totalItems === 0) { loadedItems = totalItems = 1; updateProgress(); }
+      updateProgress();
 
       /* ---- 点击双箭头 → 帷幕拉开 ---- */
       arrows.addEventListener("click", function () {
@@ -2840,7 +2855,7 @@
         img.className = "feature-card__thumb";
         img.src = IMG_BASE + f.img;
         img.alt = f.title;
-        img.loading = "lazy";
+        img.loading = "eager";
 
         var title = document.createElement("p");
         title.className = "feature-card__title";
@@ -2988,7 +3003,7 @@
         var img = document.createElement("img");
         img.src = IMG_BASE + p.file;
         img.alt = p.label;
-        img.loading = "lazy";
+        img.loading = "eager";
         var label = document.createElement("span");
         label.className = "dot-map-card__label";
         label.textContent = p.label;
