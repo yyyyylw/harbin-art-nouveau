@@ -47,7 +47,9 @@
       "Bash(command -v zbarimg qrencode python3)",
       "Bash(python3 -c \"import qrcode\")",
       "Bash(python3 -c \"import PIL\")",
-      "Bash(node -e 'for \\(const m of [\"ethers\",\"bitcoinjs-lib\",\"tiny-secp256k1\",\"ecpair\",\"bs58\",\"@solana/web3.js\"]\\) { try { require.resolve\\(m\\); console.log\\(\"OK  \", m\\); } catch\\(e\\){ console.log\\(\"MISS\", m\\); } }')"
+      "Bash(node -e 'for \\(const m of [\"ethers\",\"bitcoinjs-lib\",\"tiny-secp256k1\",\"ecpair\",\"bs58\",\"@solana/web3.js\"]\\) { try { require.resolve\\(m\\); console.log\\(\"OK  \", m\\); } catch\\(e\\){ console.log\\(\"MISS\", m\\); } }')",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

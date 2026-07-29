@@ -2981,18 +2981,18 @@
       var IMG_BASE = "assets/side/";
       // 照片 + 对应地图坐标（百分比，基于 2209×2185 原图）
       var photos = [
-        { file: "东省特别区地方法院.png", label: "东省特别区地方法院", x: 5.8, y: 24.9, side: "L" },
-        { file: "中东铁路技术学校.png", label: "中东铁路技术学校", x: 47.5, y: 20.1, side: "L" },
-        { file: "中东铁路管理局宾馆.png", label: "中东铁路管理局宾馆", x: 37.3, y: 39.6, side: "L" },
-        { file: "买卖街92号.png", label: "买卖街92号", x: 27.1, y: 57.8, side: "L" },
-        { file: "原中东铁路警察管理局.png", label: "原中东铁路警察管理局", x: 13.0, y: 42.0, side: "L" },
+        { file: "东省特别区地方法院.jpg", label: "东省特别区地方法院", x: 5.8, y: 24.9, side: "L" },
+        { file: "中东铁路技术学校.jpg", label: "中东铁路技术学校", x: 47.5, y: 20.1, side: "L" },
+        { file: "中东铁路管理局宾馆.jpg", label: "中东铁路管理局宾馆", x: 37.3, y: 39.6, side: "L" },
+        { file: "买卖街92号.jpg", label: "买卖街92号", x: 27.1, y: 57.8, side: "L" },
+        { file: "原中东铁路警察管理局.jpg", label: "原中东铁路警察管理局", x: 13.0, y: 42.0, side: "L" },
         { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原高级官员住宅 (红军街38号)", x: 39.0, y: 32.0, side: "L" },
-        { file: "原中东铁路高级官员住宅（西大直街）.png", label: "原高级官员住宅 (西大直街)", x: 61.0, y: 28.0, side: "R" },
-        { file: "原哈尔滨工业大学宿舍.png", label: "原哈尔滨工业大学宿舍", x: 72.0, y: 48.5, side: "R" },
-        { file: "原意大利领事馆.png", label: "原意大利领事馆", x: 58.6, y: 55.0, side: "R" },
-        { file: "哈尔滨火车站（史）.png", label: "哈尔滨火车站（史）", x: 80.5, y: 38.0, side: "R" },
-        { file: "日满商会.png", label: "日满商会", x: 66.0, y: 65.8, side: "R" },
-        { file: "阿基谢耶夫洋行.png", label: "阿基谢耶夫洋行", x: 78.8, y: 72.5, side: "R" }
+        { file: "原中东铁路高级官员住宅（西大直街）.jpg", label: "原高级官员住宅 (西大直街)", x: 61.0, y: 28.0, side: "R" },
+        { file: "原哈尔滨工业大学宿舍.jpg", label: "原哈尔滨工业大学宿舍", x: 72.0, y: 48.5, side: "R" },
+        { file: "原意大利领事馆.jpg", label: "原意大利领事馆", x: 58.6, y: 55.0, side: "R" },
+        { file: "哈尔滨火车站（史）.jpg", label: "哈尔滨火车站（史）", x: 80.5, y: 38.0, side: "R" },
+        { file: "日满商会.jpg", label: "日满商会", x: 66.0, y: 65.8, side: "R" },
+        { file: "阿基谢耶夫洋行.jpg", label: "阿基谢耶夫洋行", x: 78.8, y: 72.5, side: "R" }
       ];
 
       // 渲染卡片
@@ -3017,65 +3017,69 @@
         makeCard(photos[i], target);
       }
 
-      // 添加 SVG 连线层和标记圆点
+      // 添加 SVG 连线层和交互标记框
       var center = document.querySelector(".dot-map-center");
       if (!center) return;
       var img = center.querySelector(".dot-map-img");
       if (!img) return;
+      center.style.position = "relative";
 
       var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("class", "dot-map-lines");
       svg.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;";
-
-      // 将 .dot-map-center 设为 relative 并插入 SVG
-      center.style.position = "relative";
       center.insertBefore(svg, img.nextSibling);
 
-      // 在 SVG 中添加标记圆点
+      // 交互标记框：覆盖在散点图上方，可 hover
+      var markerLayer = document.createElement("div");
+      markerLayer.className = "dot-map-markers";
+      markerLayer.style.cssText = "position:absolute;inset:0;z-index:3;pointer-events:none;";
+      center.appendChild(markerLayer);
+
+      // 在 markerLayer 和 SVG 中添加标记
       photos.forEach(function (p) {
+        // SVG 圆点
         var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", p.x + "%");
         circle.setAttribute("cy", p.y + "%");
-        circle.setAttribute("r", "3");
-        circle.setAttribute("fill", "none");
-        circle.setAttribute("stroke", "rgba(255,255,255,0.45)");
-        circle.setAttribute("stroke-width", "1");
+        circle.setAttribute("r", "4");
+        circle.setAttribute("fill", "rgba(255,255,255,0.18)");
+        circle.setAttribute("stroke", "rgba(255,255,255,0.50)");
+        circle.setAttribute("stroke-width", "1.5");
         circle.setAttribute("data-dot", p.label);
+        circle.classList.add("dot-marker-svg");
         svg.appendChild(circle);
+
+        // HTML 交互热区：覆盖在标记位置
+        var marker = document.createElement("div");
+        marker.className = "dot-map-marker";
+        marker.setAttribute("data-dot", p.label);
+        marker.style.cssText = "position:absolute;left:" + p.x + "%;top:" + p.y +
+          "%;width:3%;height:2.5%;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;" +
+          "border:1.5px solid rgba(255,255,255,0.35);border-radius:2px;background:rgba(255,255,255,0.06);" +
+          "transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),border-color 0.3s,background 0.3s,box-shadow 0.3s;";
+        markerLayer.appendChild(marker);
       });
 
       // 绘制连线
       function drawLines() {
         var lines = svg.querySelectorAll("line");
         for (var k = 0; k < lines.length; k++) { lines[k].remove(); }
-
-        var mapRect = img.getBoundingClientRect();
+        if (img.getBoundingClientRect().width === 0) return;
         var svgRect = svg.getBoundingClientRect();
-        if (mapRect.width === 0) return;
 
         photos.forEach(function (p) {
           var card = document.querySelector('.dot-map-card[data-dot="' + p.label + '"]');
           if (!card) return;
           var cardRect = card.getBoundingClientRect();
-
-          // 标记在 SVG 坐标系中的位置
           var mx = (p.x / 100) * svgRect.width;
           var my = (p.y / 100) * svgRect.height;
-
-          // 卡片边缘在 SVG 坐标系中的位置
           var x1, y1;
           y1 = cardRect.top + cardRect.height / 2 - svgRect.top;
-          if (p.side === "L") {
-            x1 = cardRect.right - svgRect.left + 4;
-          } else {
-            x1 = cardRect.left - svgRect.left - 4;
-          }
+          x1 = (p.side === "L") ? cardRect.right - svgRect.left + 4 : cardRect.left - svgRect.left - 4;
 
           var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-          line.setAttribute("x1", x1);
-          line.setAttribute("y1", y1);
-          line.setAttribute("x2", mx);
-          line.setAttribute("y2", my);
+          line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+          line.setAttribute("x2", mx); line.setAttribute("y2", my);
           line.setAttribute("stroke", "rgba(255,255,255,0.22)");
           line.setAttribute("stroke-width", "1");
           line.setAttribute("stroke-dasharray", "3 3");
@@ -3088,6 +3092,50 @@
       window.addEventListener("resize", function () {
         clearTimeout(window.__dotLinesTimer);
         window.__dotLinesTimer = setTimeout(drawLines, 200);
+      });
+
+      // hover 联动：卡片 ↔ 标记框同步跳动放大
+      var allCards = document.querySelectorAll(".dot-map-card");
+      var allMarkers = document.querySelectorAll(".dot-map-marker");
+      var allCircles = document.querySelectorAll(".dot-marker-svg");
+      var allLines = []; // populated below
+
+      function getElements(label) {
+        var card = document.querySelector('.dot-map-card[data-dot="' + label + '"]');
+        var marker = markerLayer.querySelector('.dot-map-marker[data-dot="' + label + '"]');
+        var circle = svg.querySelector('.dot-marker-svg[data-dot="' + label + '"]');
+        var line = svg.querySelector('line[data-dot="' + label + '"]');
+        return { card: card, marker: marker, circle: circle, line: line };
+      }
+
+      function highlight(label) {
+        var els = getElements(label);
+        if (els.card) { els.card.style.transform = "scale(2)"; els.card.style.zIndex = "10"; els.card.style.overflow = "visible"; }
+        if (els.marker) { els.marker.style.transform = "translate(-50%,-50%) scale(2.5)"; els.marker.style.borderColor = "rgba(255,255,255,0.9)"; els.marker.style.background = "rgba(255,255,255,0.20)"; els.marker.style.boxShadow = "0 0 12px rgba(255,255,255,0.3)"; }
+        if (els.circle) { els.circle.setAttribute("r", "8"); els.circle.setAttribute("fill", "rgba(255,255,255,0.35)"); els.circle.setAttribute("stroke", "rgba(255,255,255,0.9)"); }
+        if (els.line) { els.line.setAttribute("stroke", "rgba(255,255,255,0.7)"); els.line.setAttribute("stroke-width", "2"); }
+      }
+
+      function unhighlight(label) {
+        var els = getElements(label);
+        if (els.card) { els.card.style.transform = ""; els.card.style.zIndex = ""; els.card.style.overflow = ""; }
+        if (els.marker) { els.marker.style.transform = "translate(-50%,-50%)"; els.marker.style.borderColor = ""; els.marker.style.background = ""; els.marker.style.boxShadow = ""; }
+        if (els.circle) { els.circle.setAttribute("r", "4"); els.circle.setAttribute("fill", "rgba(255,255,255,0.18)"); els.circle.setAttribute("stroke", "rgba(255,255,255,0.50)"); }
+        if (els.line) { els.line.setAttribute("stroke", "rgba(255,255,255,0.22)"); els.line.setAttribute("stroke-width", "1"); }
+      }
+
+      // 绑定卡片 hover
+      allCards.forEach(function (card) {
+        var label = card.getAttribute("data-dot");
+        card.addEventListener("mouseenter", function () { highlight(label); });
+        card.addEventListener("mouseleave", function () { unhighlight(label); });
+      });
+
+      // 绑定标记框 hover
+      allMarkers.forEach(function (marker) {
+        var label = marker.getAttribute("data-dot");
+        marker.addEventListener("mouseenter", function () { highlight(label); });
+        marker.addEventListener("mouseleave", function () { unhighlight(label); });
       });
     })();
 
