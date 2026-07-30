@@ -593,6 +593,13 @@
       transition: filter 3s ease;
     }
 
+    /* 手机端填满屏幕 */
+    @media (max-width: 720px) {
+      .cover-hero img {
+        object-fit: cover;
+      }
+    }
+
     /* 初始提亮：降低对比、提升亮度，视觉更通透 */
     body.is-loading .cover-hero img {
       filter: saturate(1.02) contrast(1.08) brightness(1.06);
@@ -1970,7 +1977,8 @@
 
       .viz-slide {
         padding: 70px 14px 80px;
-        height: 100svh;
+        min-height: 100svh;
+        height: auto;
       }
 
       .viz-panel {
@@ -1990,6 +1998,52 @@
       .column a,
       .column img {
         min-height: 220px;
+      }
+
+      /* 封面说明文字 */
+      .cover-caption {
+        bottom: 16px;
+        left: 16px;
+        font-size: 10px;
+      }
+
+      /* 引言标题 */
+      .new-intro__heading {
+        font-size: 22px;
+      }
+
+      .new-intro p {
+        font-size: 15px;
+      }
+
+      /* 特征图导语 */
+      .feature-gallery__intro p {
+        font-size: 12px;
+      }
+
+      /* 散点图标注 */
+      .dot-map-credit {
+        font-size: 9px;
+      }
+
+      .dot-map-card__label {
+        font-size: 8px;
+      }
+
+      /* 图表说明文字 */
+      .viz-intro p {
+        font-size: 13px;
+      }
+
+      /* 入场加载环缩小 */
+      .loader__ring-wrap {
+        width: 64px;
+        height: 64px;
+      }
+
+      .loader__arrows svg {
+        width: 14px;
+        height: 14px;
       }
 
     }
