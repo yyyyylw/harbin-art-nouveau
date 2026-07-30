@@ -1426,61 +1426,32 @@
 
     /* ---- 响应式：手机端 ---- */
     @media (max-width: 900px) {
-      .feature-gallery__layout {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+      .feature-gallery {
+        padding: 30px 12px 40px;
       }
 
-      .feature-center {
-        order: -1;
-        grid-column: 1 / -1;
+      .feature-gallery__layout {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .feature-building {
+        max-width: 100%;
       }
 
       .feature-cards--left,
       .feature-cards--right {
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 4px;
+        justify-content: center;
+        gap: 3px;
         padding-top: 0;
       }
 
-      .feature-cards--left { justify-content: flex-end; }
-      .feature-cards--right { justify-content: flex-start; }
-
       .feature-bottom-row {
-        gap: 6px;
+        gap: 4px;
       }
-
-    /* 下列中的下滑按钮 */
-    .feature-scroll-btn {
-      flex-shrink: 0;
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      margin: 0 10px;
-      border: 1px solid rgba(216, 168, 78, 0.50);
-      border-radius: 50%;
-      color: var(--gold);
-      background: rgba(20, 25, 22, 0.60);
-      transition: background 0.3s ease, border-color 0.3s ease;
-    }
-
-    .feature-scroll-btn:hover {
-      background: rgba(20, 25, 22, 0.88);
-      border-color: rgba(216, 168, 78, 0.80);
-    }
-
-    .feature-scroll-btn svg {
-      width: 22px;
-      height: 22px;
-    }
-
-    @media (max-width: 900px) {
-      .feature-scroll-btn {
-        display: none;
-      }
-    }
 
       .feature-cards--left .feature-card,
       .feature-cards--right .feature-card,
@@ -1499,6 +1470,10 @@
       .feature-marker,
       .feature-marker__num,
       .feature-lines {
+        display: none;
+      }
+
+      .feature-scroll-btn {
         display: none;
       }
     }
@@ -1650,16 +1625,23 @@
       .dot-map-layout {
         flex-direction: column;
         align-items: center;
+        gap: 6px;
       }
       .dot-map-side {
         flex-direction: row;
         flex-wrap: wrap;
         width: 100%;
         justify-content: center;
-        gap: 3px;
+        gap: 4px;
       }
+      .dot-map-side--left { order: 2; }
+      .dot-map-center { order: 1; }
+      .dot-map-side--right { order: 3; }
       .dot-map-card {
-        width: 80px;
+        width: 85px;
+      }
+      .dot-map-img {
+        max-width: 100%;
       }
     }
 
