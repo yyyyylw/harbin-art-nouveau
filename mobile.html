@@ -1,0 +1,3570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+
+
+  
+  <!-- =========================================================
+    01. 基础信息 / Basics
+    ---------------------------------------------------------
+    网页编码 & 移动端缩放 & 搜索摘要 & 页面标题。
+    encoding & mobile scaling & search snippets & page title
+  ========================================================== -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="一篇关于哈尔滨新艺术建筑的可视化报道，梳理其传播路径、立面细部、用途变迁与保护现状。">
+  <meta name="keywords" content="哈尔滨,新艺术建筑,中东铁路,历史建筑,建筑保护,可视化报道">
+  <meta name="author" content="">
+  <title>哈尔滨新艺术建筑 | Art Nouveau Architecture in Harbin</title>
+
+  <!-- =========================================================
+    02. 页面样式 / Page Styles
+  ========================================================== -->
+  <style>
+    /* =========================================================
+      02-01. 设计变量 / Design Tokens
+      -------------------------------------------------------
+      颜色、字体、宽度和阴影。
+      colors, type, widths, and shadows. 
+    ======================================================== */
+    /* =========================================================
+      02-00. 入场加载动画 / Entrance Loader
+    ======================================================== */
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: all;
+    }
+
+    .loader.is-done {
+      pointer-events: none;
+    }
+
+    /* 文字初始透明，帷幕拉开时渐显；背景图保持不动 */
+    body.is-loading .intro-box,
+    body.is-loading .new-intro,
+    body.is-loading .new-intro__heading,
+    body.is-loading .viz-intro,
+    body.is-loading .heading,
+    body.is-loading .feature-gallery__intro,
+    body.is-loading .site-footer,
+    body.is-loading .brand,
+    body.is-loading .menu-label,
+    body.is-loading .feature-card__title,
+    body.is-loading .feature-card__text,
+    body.is-loading .feature-card__num,
+    body.is-loading .subheading {
+      opacity: 0;
+    }
+
+    /* transition 放在基础样式上，确保 is-loading 移除后动画能触发 */
+    .intro-box,
+    .new-intro,
+    .new-intro__heading,
+    .viz-intro,
+    .heading,
+    .feature-gallery__intro,
+    .site-footer,
+    .brand,
+    .menu-label,
+    .feature-card__title,
+    .feature-card__text,
+    .feature-card__num,
+    .subheading {
+      transition: opacity 3s ease;
+    }
+
+    /* ---- 帷幕：飘带质感 ---- */
+    .loader__curtain {
+      position: absolute;
+      top: 0;
+      width: 50vw;
+      height: 100%;
+      background: #08090a;
+      will-change: transform;
+      /* 幕布褶皱纹理 */
+      background-image:
+        repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(255,255,255,0.015) 18px, rgba(255,255,255,0.015) 19px);
+    }
+
+    .loader__curtain--left {
+      left: 0;
+      background-image:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 19px);
+      transition: transform 1.4s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    .loader__curtain--right {
+      right: 0;
+      background-image:
+        repeating-linear-gradient(90deg, transparent 0px, transparent 18px, rgba(255,255,255,0.015) 18px, rgba(255,255,255,0.015) 19px);
+      transition: transform 1.4s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    /* 飘带波浪阴影 */
+    .loader__curtain::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at 0% 50%, rgba(255,255,255,0.04) 0%, transparent 70%);
+    }
+
+    .loader__curtain--right::after {
+      background: radial-gradient(ellipse at 100% 50%, rgba(255,255,255,0.04) 0%, transparent 70%);
+    }
+
+    .loader.is-open .loader__curtain--left {
+      transform: translateX(-105%);
+    }
+
+    .loader.is-open .loader__curtain--right {
+      transform: translateX(105%);
+    }
+
+    /* ---- 中央加载环（与下滑按钮风格一致） ---- */
+    .loader__center {
+      position: relative;
+      z-index: 2;
+      transition: opacity 0.5s ease;
+    }
+
+    .loader.is-open .loader__center {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader__ring-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .loader__ring {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .loader__ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.10);
+      stroke-width: 2;
+    }
+
+    .loader__ring-fill {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 213.63;  /* 2*PI*34 */
+      stroke-dashoffset: 213.63;
+      transition: stroke-dashoffset 0.4s ease;
+    }
+
+    /* 百分比 */
+    .loader__pct {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.50);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      transition: opacity 0.4s ease;
+    }
+
+    .loader__pct.is-done {
+      opacity: 0;
+    }
+
+    /* 双箭头（环内居中） */
+    .loader__arrows {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .loader__arrows.is-ready {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .loader__arrows svg {
+      width: 16px;
+      height: 16px;
+      stroke: rgba(255, 255, 255, 0.75);
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.3s ease;
+    }
+
+    .loader__arrows:hover svg {
+      stroke: #fff;
+    }
+
+    :root {
+      --ink: #16212a;
+      --ink-soft: #4f5c65;
+      --paper: #f6f6f4;
+      --paper-deep: #d9dcdd;
+      --night: #030405;
+      --night-blue: #111315;
+      --brick: #983b31;
+      --brick-dark: #64261f;
+      --dome-green: #49786d;
+      --ice-blue: #cfe6ef;
+      --gold: #d8a84e;
+      --white: #ffffff;
+      --line: rgba(22, 33, 42, 0.14);
+      --glass: rgba(7, 19, 29, 0.58);
+      --shadow: 0 22px 70px rgba(7, 19, 29, 0.28);
+      --radius: 8px;
+      --content-width: 1120px;
+      --article-width: 620px;
+      --serif: "Times New Roman", "Noto Serif SC", "Songti SC", "SimSun", "STSong", serif;
+      --sans: "PingFang SC", "Microsoft YaHei", "SimHei", "Heiti SC", "Noto Sans SC", sans-serif;
+      --font-size-base: 17px;
+    }
+
+    /* =========================================================
+      02-02. 全局重置 / Global Reset
+      -------------------------------------------------------
+      Normalizes browser defaults and enables smooth anchor scrolling.
+    ======================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background-color: #f6f6f4;
+      background:
+        linear-gradient(
+          180deg,
+          #030405 0%,
+          #08090a 18%,
+          #17191b 40%,
+          #45494c 64%,
+          #94989a 79%,
+          #d9dbda 91%,
+          #f6f6f4 100%
+        );
+      font-family: var(--sans);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      line-height: 1.7;
+      text-rendering: optimizeLegibility;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .container {
+      width: min(var(--content-width), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* =========================================================
+      02-03. 顶部导航 / Header Navigation
+      -------------------------------------------------------
+      header & logo & social media
+    ======================================================== */
+    .site-header {
+      position: fixed;
+      z-index: 30;
+      top: 0;
+      left: 0;
+      width: 100%;
+      color: var(--white);
+      background: linear-gradient(180deg, rgba(7, 19, 29, 0.72), rgba(7, 19, 29, 0));
+      transition: background 220ms ease, border-color 220ms ease;
+    }
+
+    .site-header.is-solid {
+      background: rgba(7, 19, 29, 0.88);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 68px;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 40px;
+      height: 48px;
+      place-items: center;
+      border: 0;
+      border-radius: 0;
+      font-size: 0;
+      line-height: 1;
+    }
+
+    .logo-mark {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+    }
+
+    .brand-title {
+      display: block;
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .brand-subtitle {
+      display: block;
+      margin-top: 2px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-button {
+      display: inline-grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 50%;
+      padding: 0;
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      overflow: hidden;
+      text-decoration: none;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .action-icon {
+      display: block;
+      width: 21px;
+      height: 21px;
+      object-fit: contain;
+      filter: invert(1);
+      pointer-events: none;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible {
+      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    /* =========================================================
+      02-04. 左侧菜单 / Left Side Menu
+      -------------------------------------------------------
+      menuIcon & leftmenu; 
+      click the top-right button to open and close the drawer.
+    ======================================================== */
+    .menu-icon {
+      position: fixed;
+      z-index: 35;
+      right: 20px;
+      bottom: 22px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 0 16px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 999px;
+      color: var(--white);
+      background: rgba(7, 19, 29, 0.72);
+      box-shadow: 0 12px 32px rgba(7, 19, 29, 0.28);
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .menu-lines,
+    .menu-lines::before,
+    .menu-lines::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      content: "";
+    }
+
+    .menu-lines {
+      position: relative;
+    }
+
+    .menu-lines::before {
+      position: absolute;
+      top: -6px;
+      left: 0;
+    }
+
+    .menu-lines::after {
+      position: absolute;
+      top: 6px;
+      left: 0;
+    }
+
+    .menu-label {
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .sidenav {
+      position: fixed;
+      z-index: 34;
+      top: 0;
+      right: 0;
+      width: min(360px, 88vw);
+      height: 100vh;
+      padding: 88px 28px 30px;
+      color: var(--white);
+      background: rgba(7, 19, 29, 0.94);
+      box-shadow: -18px 0 50px rgba(0, 0, 0, 0.32);
+      transform: translateX(105%);
+      transition: transform 260ms ease;
+      backdrop-filter: blur(16px);
+    }
+
+    .sidenav.is-open {
+      transform: translateX(0);
+    }
+
+    .sidenav h2 {
+      margin: 0 0 22px;
+      font-family: var(--serif);
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    .sidenav ul {
+      display: grid;
+      gap: 2px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .sidenav a {
+      display: block;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.82);
+      transition: color 180ms ease, padding-left 180ms ease;
+    }
+
+    .sidenav a:hover,
+    .sidenav a:focus-visible {
+      color: var(--white);
+      padding-left: 8px;
+      outline: none;
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      z-index: 33;
+      inset: 0;
+      display: none;
+      background: rgba(7, 19, 29, 0.42);
+    }
+
+    .menu-backdrop.is-open {
+      display: block;
+    }
+
+    /* =========================================================
+      02-05. 首屏封面 / Intro Cover
+      -------------------------------------------------------
+      intro cover & scene & intro-box & scroll-down cue
+    ======================================================== */
+    .intro {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--white);
+      background: transparent;
+    }
+
+    .cover {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: #030405;
+      transition: opacity 0.4s ease;
+    }
+
+    /* 封面暗角 + 暖色滤镜：增强厚重感 */
+    .cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 40%, transparent 0 38%, rgba(0, 0, 0, 0.55) 100%);
+      mix-blend-mode: multiply;
+    }
+
+    /* ---- 主图：全幅全景背景，尽量展示完整画面 ---- */
+    .cover-hero {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .cover-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: 50% 50%;
+      filter: saturate(1.08) contrast(1.30) brightness(0.82);
+      transition: filter 3s ease;
+    }
+
+    @media (max-width: 720px) {
+      .cover-hero img {
+        object-fit: cover;
+        object-position: 50% 50%;
+      }
+    }
+
+    /* 初始提亮：降低对比、提升亮度，视觉更通透 */
+    body.is-loading .cover-hero img {
+      filter: saturate(1.02) contrast(1.08) brightness(1.06);
+    }
+
+    /* ---- 左下角图片说明 ---- */
+    .cover-caption {
+      position: absolute;
+      z-index: 4;
+      bottom: 28px;
+      left: 28px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 12px;
+      font-weight: 500;
+      font-style: italic;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .cover-caption.is-hidden {
+      opacity: 0;
+    }
+
+    /* ---- 暗角 + 渐变 ---- */
+    .intro-gradient {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.04) 32%, rgba(0, 0, 0, 0.80) 100%),
+        radial-gradient(ellipse at 50% 42%, rgba(220, 205, 175, 0.06), transparent 50%);
+    }
+
+    .intro-box {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      min-height: 100vh;
+      align-content: center;
+      justify-items: center;
+      width: min(1120px, calc(100% - 40px));
+      padding: 120px 0 90px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 18px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      color: transparent;
+      background: linear-gradient(135deg, #e8c56d 0%, #f5e3a9 35%, #d4a03c 65%, #e8c56d 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      filter: drop-shadow(0 2px 6px rgba(180, 140, 60, 0.5));
+    }
+
+    .kicker::before,
+    .kicker::after {
+      width: 42px;
+      height: 2px;
+      border-radius: 1px;
+      background: rgba(216, 168, 78, 0.88);
+      content: "";
+    }
+
+    .intro-box h1 {
+      max-width: 920px;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: 0.98;
+      overflow-wrap: anywhere;
+      text-wrap: balance;
+      text-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+    }
+
+    .intro-box h2 {
+      max-width: 100%;
+      margin: 22px 0 0;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: clamp(11px, 2.45vw, 28px);
+      font-weight: 400;
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .date {
+      margin: 22px 0 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 14px;
+    }
+
+    .cont-page {
+      position: absolute;
+      z-index: 3;
+      bottom: 30px;
+      left: 50%;
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      border: 1px solid rgba(216, 168, 78, 0.58);
+      border-radius: 50%;
+      color: var(--gold);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04)),
+        rgba(7, 19, 29, 0.28);
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.36),
+        inset 0 -18px 26px rgba(7, 19, 29, 0.22);
+      font-size: 0;
+      transform: translateX(-50%);
+      transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, background 220ms ease;
+      backdrop-filter: blur(14px) saturate(1.1);
+    }
+
+    .cont-page::before {
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: inherit;
+      content: "";
+    }
+
+    .cont-page::after {
+      width: 14px;
+      height: 14px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      content: "";
+      filter: drop-shadow(0 6px 10px rgba(216, 168, 78, 0.38));
+      transform: rotate(45deg) translate(-2px, -2px);
+      animation: scrollCue 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    .cont-page:hover,
+    .cont-page:focus-visible {
+      border-color: rgba(238, 204, 130, 0.9);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08)),
+        rgba(7, 19, 29, 0.34);
+      box-shadow:
+        0 22px 52px rgba(0, 0, 0, 0.38),
+        0 0 0 6px rgba(216, 168, 78, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.44),
+        inset 0 -18px 26px rgba(7, 19, 29, 0.2);
+      transform: translate(-50%, 4px);
+      outline: none;
+    }
+
+    /* ---- 加载进度环 / Loading Progress Ring ---- */
+    .cont-page .progress-ring {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      transform: rotate(-90deg);
+    }
+
+    .cont-page .progress-ring__bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.12);
+      stroke-width: 2.5;
+    }
+
+    .cont-page .progress-ring__fill {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 138.23;
+      stroke-dashoffset: 138.23;
+      transition: stroke-dashoffset 180ms ease;
+    }
+
+    .cont-page .progress-text {
+      position: relative;
+      z-index: 1;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    /* 加载中隐藏装饰圆圈和箭头 / Hide ring + arrow during loading */
+    .cont-page:not(.is-loaded)::before,
+    .cont-page:not(.is-loaded)::after {
+      display: none;
+    }
+
+    /* 加载完成后隐藏进度环 / Hide progress when loaded */
+    .cont-page.is-loaded .progress-ring,
+    .cont-page.is-loaded .progress-text {
+      display: none;
+    }
+
+    @keyframes scrollCue {
+
+      0%,
+      100% {
+        opacity: 0.62;
+        transform: rotate(45deg) translate(-3px, -3px);
+      }
+
+      50% {
+        opacity: 1;
+        transform: rotate(45deg) translate(3px, 3px);
+      }
+    }
+
+    /* =========================================================
+      02-06. 正文引言与标题 / Standard Intro And Heading
+    ======================================================== */
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    #overview {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 100px 0 120px;
+    }
+
+    .standard {
+      position: relative;
+      padding: 82px 0 90px;
+      color: var(--white);
+      background: transparent;
+    }
+
+    .new-intro {
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .new-intro__heading {
+      margin: 0 0 24px;
+      color: rgba(255, 255, 255, 0.95);
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 4px;
+    }
+
+    .new-intro p {
+      margin: 20px 0;
+      color: rgba(255, 255, 255, 0.90);
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.65;
+    }
+
+    .new-intro p + p {
+      margin-top: 24px;
+    }
+
+    .new-intro .source-note {
+      margin-top: 26px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.75;
+    }
+
+    .source-note a {
+      color: rgba(255, 255, 255, 0.82);
+      text-decoration: underline;
+      text-decoration-color: rgba(216, 168, 78, 0.58);
+      text-underline-offset: 3px;
+    }
+
+    .flourish-visuals {
+      width: min(980px, calc(100% - 40px));
+      margin: 38px auto 0;
+    }
+
+    .flourish-panel {
+      position: relative;
+      min-height: 560px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: 0 22px 58px rgba(0, 0, 0, 0.26);
+    }
+
+    .flourish-panel .flourish-embed {
+      min-height: 560px;
+    }
+
+    .flourish-panel .flourish-embed iframe {
+      display: block;
+      width: 100%;
+      border: 0;
+      background: var(--white);
+    }
+
+    .flourish-divider {
+      width: min(720px, 76%);
+      height: 1px;
+      margin: 42px auto;
+      border: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.58), transparent);
+    }
+
+    /* =========================================================
+      02-06-A. 可视化全屏滑动页 / Full-Viewport Viz Slides
+      -------------------------------------------------------
+      传播图 & 桑基图各占一个完整视口，上方放置三段报道文字，
+      底部有加载进度环 + 下滑箭头。
+      Spread-map & Sankey each occupy a full viewport, with
+      a short reported intro above and a loading ring + arrow below.
+    ======================================================== */
+    .viz-slide {
+      position: relative;
+      height: 100vh;
+      height: 100svh;
+      scroll-margin-top: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 90px 20px 90px;
+      color: var(--white);
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .viz-intro {
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto 16px;
+      text-align: left;
+      flex-shrink: 0;
+    }
+
+    .viz-intro p {
+      margin: 8px 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .viz-intro p + p {
+      margin-top: 8px;
+    }
+
+    .viz-panel {
+      position: relative;
+      width: min(980px, calc(100% - 40px));
+      flex: 1 1 auto;
+      min-height: 280px;
+      max-height: calc(100svh - 230px);
+      overflow: hidden;
+    }
+
+    .viz-panel .flourish-panel,
+    .viz-panel .flourish-embed {
+      min-height: 460px;
+    }
+
+    /* 遮掉 Flourish iframe 下方的白边 / cover white edges below iframes */
+    .viz-panel .flourish-panel {
+      background: #0d0e10;
+    }
+
+    .viz-panel .flourish-embed iframe {
+      background: #0d0e10;
+    }
+
+    /* 桑基图加载遮罩：阻挡鼠标直到 iframe 就绪 */
+    .sankey-shield {
+      position: absolute;
+      z-index: 5;
+      inset: 0;
+      cursor: default;
+    }
+
+    .sankey-shield.is-gone {
+      display: none;
+    }
+
+    .viz-panel::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      bottom: -14px;
+      left: 2%;
+      right: 2%;
+      height: 24px;
+      background: radial-gradient(
+        ellipse at 50% 0%,
+        rgba(3, 4, 5, 0.45) 0%,
+        rgba(3, 4, 5, 0.1) 50%,
+        transparent 72%
+      );
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    /* 全局悬浮下滑按钮 */
+    .global-scroll-btn {
+      position: fixed;
+      z-index: 20;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(216, 168, 78, 0.55);
+      border-radius: 50%;
+      color: var(--gold);
+      background: rgba(7, 19, 29, 0.72);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      opacity: 0.85;
+    }
+
+    .global-scroll-btn:hover {
+      opacity: 1;
+      transform: scale(1.08);
+      border-color: rgba(216, 168, 78, 0.85);
+    }
+
+    .global-scroll-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* 最后一页隐藏 */
+    .global-scroll-btn.is-end {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* 旧下滑按钮全部隐藏 */
+    .viz-next,
+    .cont-page,
+    .feature-scroll-btn {
+      display: none;
+    }
+
+    /* 底部加载环 + 下滑箭头 / Bottom loading ring + scroll arrow (保留样式供复用) */
+    .viz-next {
+      position: absolute;
+      z-index: 3;
+      bottom: 30px;
+      left: 50%;
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      border: 1px solid rgba(216, 168, 78, 0.58);
+      border-radius: 50%;
+      color: var(--gold);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04)),
+        rgba(7, 19, 29, 0.28);
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.36),
+        inset 0 -18px 26px rgba(7, 19, 29, 0.22);
+      font-size: 0;
+      transform: translateX(-50%);
+      transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, background 220ms ease;
+      backdrop-filter: blur(14px) saturate(1.1);
+    }
+
+    .viz-next::before {
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: inherit;
+      content: "";
+    }
+
+    .viz-next::after {
+      width: 14px;
+      height: 14px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      content: "";
+      filter: drop-shadow(0 6px 10px rgba(216, 168, 78, 0.38));
+      transform: rotate(45deg) translate(-2px, -2px);
+      animation: scrollCue 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    .viz-next:hover,
+    .viz-next:focus-visible {
+      border-color: rgba(238, 204, 130, 0.9);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08)),
+        rgba(7, 19, 29, 0.34);
+      box-shadow:
+        0 22px 52px rgba(0, 0, 0, 0.38),
+        0 0 0 6px rgba(216, 168, 78, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.44),
+        inset 0 -18px 26px rgba(7, 19, 29, 0.2);
+      transform: translate(-50%, 4px);
+      outline: none;
+    }
+
+    /* 加载进度环复用 / reuse progress ring styles */
+    .viz-next .progress-ring {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      transform: rotate(-90deg);
+    }
+
+    .viz-next .progress-ring__bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.12);
+      stroke-width: 2.5;
+    }
+
+    .viz-next .progress-ring__fill {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 138.23;
+      stroke-dashoffset: 138.23;
+      transition: stroke-dashoffset 180ms ease;
+    }
+
+    .viz-next .progress-text {
+      position: relative;
+      z-index: 1;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .viz-next:not(.is-loaded)::before,
+    .viz-next:not(.is-loaded)::after {
+      display: none;
+    }
+
+    .viz-next.is-loaded .progress-ring,
+    .viz-next.is-loaded .progress-text {
+      display: none;
+    }
+
+    /* =========================================================
+      02-06-B. 建筑特征卡片画廊 / Feature Card Gallery
+      -------------------------------------------------------
+      12 张卡片左右环绕建筑立面图，SVG 直线连接对应位置。
+      Cards surround the facade, lines connect to markers.
+    ======================================================== */
+    .feature-gallery {
+      padding: 40px 20px 50px;
+      color: var(--white);
+      background: transparent;
+      scroll-margin-top: 80px;
+    }
+
+    .feature-gallery__intro {
+      width: min(var(--article-width), calc(100% - 40px));
+      margin: 0 auto 20px;
+      text-align: left;
+    }
+
+    .feature-gallery__intro p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    /* 三面环绕：与散点图结构一致 */
+    .feature-gallery__layout {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 30px;
+      width: min(1500px, calc(100% - 16px));
+      margin: 0 auto;
+    }
+
+    /* ---- 中央区域 ---- */
+    .feature-center {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ---- 左右列：纵向堆叠 ---- */
+    .feature-cards--left,
+    .feature-cards--right {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      flex-shrink: 0;
+      width: 200px;
+      padding-top: 10px;
+    }
+
+    /* ---- 下列：两两分组 ---- */
+    .feature-bottom-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      width: 100%;
+    }
+
+    .feature-cards--bottom {
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+    }
+
+    .feature-cards--bottom .feature-card {
+      width: 200px;
+    }
+
+    /* ---- 单张卡片 ---- */
+    .feature-card {
+      position: relative;
+      width: 200px;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(20, 25, 22, 0.55);
+      line-height: 0;
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0s;
+      z-index: 1;
+    }
+
+    .feature-cards--left .feature-card {
+      transform-origin: left center;
+    }
+
+    .feature-cards--right .feature-card {
+      transform-origin: right center;
+    }
+
+    .feature-cards--bottom .feature-card {
+      transform-origin: bottom center;
+    }
+
+    .feature-card:hover {
+      transform: scale(2);
+      z-index: 10;
+      overflow: visible;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .feature-card__num {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      z-index: 2;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      border-radius: 50%;
+      background: rgba(233, 104, 25, 0.85);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .feature-card__thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      display: block;
+    }
+
+    .feature-card__title {
+      margin: 0;
+      padding: 5px 6px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.3;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .feature-card__text {
+      display: none;
+    }
+
+    /* ---- 中央建筑立面 ---- */
+    .feature-building {
+      position: relative;
+      width: 100%;
+      line-height: 0;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 4px;
+      overflow: hidden;
+      background: #f3f5f2;
+    }
+
+    .feature-building__img {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+    }
+
+    /* 标记圆点 — 默认较小，hover 时放大高亮 */
+    .feature-marker {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      margin: -4px 0 0 -4px;
+      left: calc(var(--x) * 1%);
+      top: calc(var(--y) * 1%);
+      border-radius: 50%;
+      background: rgba(233, 104, 25, 0.65);
+      border: 1.5px solid rgba(255, 255, 255, 0.60);
+      box-shadow: 0 0 0 2px rgba(233, 104, 25, 0.15);
+      pointer-events: none;
+      z-index: 2;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background 0.35s ease,
+                  box-shadow 0.35s ease;
+    }
+
+    .feature-marker.is-highlight {
+      transform: scale(2.8);
+      background: #ff5c00;
+      border-color: #fff;
+      box-shadow: 0 0 0 6px rgba(255, 92, 0, 0.45), 0 0 18px rgba(255, 92, 0, 0.35);
+      z-index: 3;
+    }
+
+    /* 标记编号 */
+    .feature-marker__num {
+      position: absolute;
+      left: calc(var(--x) * 1%);
+      top: calc(var(--y) * 1%);
+      transform: translate(-50%, calc(-100% - 5px));
+      color: #fff;
+      font-size: 8px;
+      font-weight: 700;
+      background: rgba(233, 104, 25, 0.60);
+      padding: 1px 4px;
+      border-radius: 8px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 2;
+      transition: background 0.35s ease, transform 0.35s ease, font-size 0.35s ease;
+    }
+
+    .feature-marker__num.is-highlight {
+      background: #ff5c00;
+      transform: translate(-50%, calc(-100% - 12px)) scale(1.6);
+      font-size: 11px;
+      font-weight: 800;
+      z-index: 3;
+    }
+
+    /* SVG 连线层 */
+    .feature-lines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .feature-lines line {
+      stroke: rgba(233, 104, 25, 0.35);
+      stroke-width: 1;
+      stroke-dasharray: 4 3;
+      transition: stroke 0.3s ease, stroke-width 0.3s ease, stroke-dasharray 0.3s ease;
+    }
+
+    .feature-lines line.is-highlight {
+      stroke: rgba(255, 92, 0, 0.85);
+      stroke-width: 2.2;
+      stroke-dasharray: none;
+    }
+
+    /* ---- 响应式：手机端 ---- */
+    @media (max-width: 768px) {
+      .feature-gallery {
+        padding: 30px 12px 40px;
+      }
+
+      .feature-gallery__layout {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .feature-building {
+        max-width: 100%;
+      }
+
+      .feature-cards--left,
+      .feature-cards--right {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: center;
+        gap: 4px;
+        padding-top: 0;
+      }
+
+      .feature-cards--left .feature-card,
+      .feature-cards--right .feature-card,
+      .feature-cards--bottom .feature-card {
+        width: 80px;
+      }
+
+      .feature-bottom-row {
+        gap: 4px;
+      }
+
+      .feature-cards--bottom {
+        gap: 4px;
+      }
+
+      .feature-card:hover {
+        transform: scale(1.5);
+      }
+
+      .feature-card__title { font-size: 9px; }
+      .feature-card__num { font-size: 10px; width: 16px; height: 16px; line-height: 16px; }
+
+      .feature-marker,
+      .feature-marker__num,
+      .feature-lines {
+        display: none;
+      }
+    }
+
+    .heading {
+      width: min(820px, calc(100% - 40px));
+      margin: 72px auto 34px;
+      text-align: center;
+      scroll-margin-top: 100px;
+    }
+
+    .heading-mark {
+      display: inline-grid;
+      width: 86px;
+      height: 104px;
+      place-items: center;
+      margin-bottom: 18px;
+      border: 0;
+      border-radius: 0;
+      font-size: 0;
+    }
+
+    .heading h3 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .heading h5 {
+      margin: 14px 0 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* =========================================================
+      02-06-D. 散点探索地图 / Dot Exploration Map
+      -------------------------------------------------------
+      底图盖在散点图之上，小人沿路线行走，滚轮控制小人的位置。
+      小人走过的地方底图被擦除，露出下方的散点标注图。
+      Scroll-driven reveal: basemap overlays the annotated map;
+      a walker follows a dot route, erasing the basemap to
+      reveal building markers and labels underneath.
+    ======================================================== */
+    #dot-explore-map {
+      height: auto;
+      min-height: 100vh;
+      overflow: visible;
+      justify-content: flex-start;
+      padding-bottom: 0;
+    }
+
+    /* ---- 三栏布局：左照片 | 散点图 | 右照片 ---- */
+    .dot-map-layout {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 30px;
+      width: min(1500px, calc(100% - 16px));
+      margin: 0 auto;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .dot-map-side {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      flex-shrink: 0;
+      width: 200px;
+      padding-top: 10px;
+    }
+
+    .dot-map-center {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .dot-map-img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .dot-map-credit {
+      margin: 4px 0 0;
+      color: rgba(255, 255, 255, 0.40);
+      font-size: 10px;
+      font-weight: 500;
+      text-align: left;
+      width: 100%;
+    }
+
+    .dot-map-card {
+      position: relative;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(20, 25, 22, 0.55);
+      line-height: 0;
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0s;
+      z-index: 1;
+    }
+
+    /* 左侧卡片向右（向地图）展开 */
+    .dot-map-side--left .dot-map-card {
+      transform-origin: left center;
+    }
+
+    /* 右侧卡片向左（向地图）展开 */
+    .dot-map-side--right .dot-map-card {
+      transform-origin: right center;
+    }
+
+    .dot-map-card:hover {
+      transform: scale(2);
+      z-index: 10;
+      overflow: visible;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .dot-map-card img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      display: block;
+      object-fit: cover;
+    }
+
+    .dot-map-card__label {
+      display: block;
+      padding: 4px 5px;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.25;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.50);
+    }
+
+    @media (max-width: 768px) {
+      .dot-map-layout {
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+      .dot-map-side {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: center;
+        gap: 4px;
+      }
+      .dot-map-side--left { order: 2; }
+      .dot-map-center { order: 1; }
+      .dot-map-side--right { order: 3; }
+      .dot-map-card {
+        width: 85px;
+      }
+      .dot-map-img {
+        max-width: 100%;
+      }
+    }
+
+    /* 桑基图：桌面端深色文字，手机端白色文字（背景渐变更亮） */
+    #sankey-diagram .viz-intro p {
+      color: rgba(15, 24, 32, 0.88);
+    }
+
+    @media (max-width: 720px) {
+      #sankey-diagram .viz-intro p {
+        color: rgba(255, 255, 255, 0.90);
+      }
+    }
+
+    /* 桑基图不限高，避免桌面端显示不全 */
+    #sankey-diagram {
+      height: auto;
+      min-height: 100svh;
+      overflow: visible;
+    }
+
+    #sankey-diagram .viz-panel {
+      max-height: none;
+      overflow: visible;
+    }
+
+    /* 保护等级图：与桑基图一致，桌面端深色文字 */
+    #protection-chart .viz-intro p {
+      color: rgba(15, 24, 32, 0.88);
+    }
+
+    @media (max-width: 720px) {
+      #protection-chart .viz-intro p {
+        color: rgba(255, 255, 255, 0.90);
+      }
+    }
+
+    #protection-chart {
+      height: auto;
+      min-height: 100svh;
+      overflow: visible;
+    }
+
+    #protection-chart .viz-panel {
+      max-height: none;
+      overflow: visible;
+    }
+
+    .reveal-scroll {
+      height: 900vh;
+    }
+
+    .reveal-stage {
+      position: sticky;
+      top: 68px;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: calc(100vh - 68px);
+      height: calc(100svh - 68px);
+      overflow: hidden;
+      background: transparent;
+    }
+
+    #revealCanvas {
+      display: block;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='13' cy='13' r='9' fill='none' stroke='white' stroke-width='2.5'/%3E%3Cline x1='20' y1='20' x2='28' y2='28' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") 16 16, crosshair;
+    }
+
+    /* 手机端：canvas 不拦截触摸，滚动直接穿透到页面以驱动动画 */
+    @media (max-width: 720px) {
+      #revealCanvas {
+        pointer-events: none;
+      }
+      .reveal-scroll {
+        height: 900vh;
+      }
+    }
+
+    #magnifier {
+      position: fixed;
+      z-index: 50;
+      width: 340px;
+      height: 340px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    #magnifier.is-on {
+      opacity: 1;
+    }
+
+    @media (max-width: 720px) {
+      .reveal-scroll {
+        height: 700vh;
+      }
+    }
+
+    /* =========================================================
+      02-06-E. 侧边浮动图集 / Floating Side Gallery
+      -------------------------------------------------------
+      页面两侧随滚动时隐时现的图片资料卡片。
+      Floating image cards that fade in/out as user scrolls.
+    ======================================================== */
+    .side-card {
+      position: fixed;
+      z-index: 1;
+      border-radius: 6px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      pointer-events: none;
+    }
+    .side-card.is-visible {
+      opacity: 0.92;
+      transform: translateY(0);
+    }
+
+    /* =========================================================
+      02-07. 章节卡片网格 / Chapter Cards Grid
+    ======================================================== */
+    .chapters {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .column {
+      min-height: clamp(260px, 21vw, 320px);
+    }
+
+    .column a {
+      position: relative;
+      display: block;
+      height: auto;
+      min-height: clamp(260px, 21vw, 320px);
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: #050506;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+    }
+
+    .column img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: var(--card-position, center);
+      transform: scale(1.06);
+      transition: transform 420ms ease, filter 420ms ease;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.36) 42%, rgba(0, 0, 0, 0.94) 100%),
+        radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.12), transparent 36%),
+        linear-gradient(125deg, rgba(0, 0, 0, 0.46), rgba(18, 18, 18, 0.16) 48%, rgba(0, 0, 0, 0.72));
+      transition: opacity 300ms ease;
+    }
+
+    .subheading {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      left: 18px;
+      color: var(--white);
+      font-family: var(--serif);
+      font-size: clamp(16px, 1.45vw, 22px);
+      font-weight: 700;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+      text-shadow: 0 10px 26px rgba(0, 0, 0, 0.48);
+    }
+
+    .subheading span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--gold);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .column a:hover img,
+    .column a:focus-visible img {
+      filter: saturate(1.08) contrast(1.06);
+      transform: scale(1.13);
+    }
+
+    .column a:hover .overlay,
+    .column a:focus-visible .overlay {
+      opacity: 0.84;
+    }
+
+    .column a:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    /* =========================================================
+      02-08. 页脚 / Footer
+    ======================================================== */
+    .site-footer {
+      padding: 54px 0;
+      color: rgba(22, 33, 42, 0.72);
+      background: transparent;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .site-footer strong {
+      color: var(--ink);
+    }
+
+    .chapter-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: var(--ink);
+      padding-bottom: 60px;
+    }
+
+    .chapter-section .heading h3 {
+      color: var(--ink);
+    }
+
+    .chapter-section .heading h5 {
+      color: rgba(22, 33, 42, 0.64);
+    }
+
+    .footer-mark {
+      display: grid;
+      width: 62px;
+      height: 76px;
+      place-items: center;
+      margin: 24px auto 0;
+      border: 0;
+      border-radius: 0;
+      font-size: 0;
+    }
+
+    /* 桌面端小窗口不缩放，出横向滚动条 */
+    @media (min-width: 769px) {
+      body {
+        min-width: 1024px;
+      }
+    }
+
+    /* =========================================================
+      02-09. 响应式适配 / Responsive Layout
+      -------------------------------------------------------
+      让手机、平板、桌面都能保持类似原网页的卡片节奏。
+      Keeps the reference-style card rhythm across mobile, tablet,
+      and desktop screens.
+    ======================================================== */
+    @media (max-width: 768px) {
+      .row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+    }
+
+    @media (max-width: 680px) {
+      .container {
+        width: min(100% - 28px, var(--content-width));
+      }
+
+      .header-inner {
+        min-height: 62px;
+      }
+
+      .brand-subtitle,
+      .menu-label {
+        display: none;
+      }
+
+      .header-actions {
+        padding-right: 52px;
+      }
+
+      .menu-icon {
+        top: 12px;
+        right: 14px;
+        bottom: auto;
+        width: 42px;
+        min-height: 42px;
+        justify-content: center;
+        padding: 0;
+        border-radius: 50%;
+      }
+
+      .intro-box {
+        width: min(100% - 28px, 1120px);
+      }
+
+      .kicker::before,
+      .kicker::after {
+        width: 24px;
+      }
+
+      .standard {
+        padding-top: 66px;
+      }
+
+      .new-intro,
+      .viz-intro {
+        width: min(100% - 28px, var(--article-width));
+      }
+
+      .viz-slide {
+        padding: 70px 14px 80px;
+        min-height: 100svh;
+        height: auto;
+      }
+
+      .viz-panel {
+        width: min(100% - 28px, 980px);
+      }
+
+      .viz-panel .flourish-panel,
+      .viz-panel .flourish-embed {
+        min-height: 420px;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .column,
+      .column a,
+      .column img {
+        min-height: 220px;
+      }
+
+      /* 封面说明文字 */
+      .cover-caption {
+        bottom: 16px;
+        left: 16px;
+        font-size: 10px;
+      }
+
+      /* 引言标题 */
+      .new-intro__heading {
+        font-size: 22px;
+      }
+
+      .new-intro p {
+        font-size: 15px;
+      }
+
+      /* 特征图导语 */
+      .feature-gallery__intro p {
+        font-size: 12px;
+      }
+
+      /* 散点图标注 */
+      .dot-map-credit {
+        font-size: 9px;
+      }
+
+      .dot-map-card__label {
+        font-size: 8px;
+      }
+
+      /* 图表说明文字 */
+      .viz-intro p {
+        font-size: 13px;
+      }
+
+      /* 入场加载环缩小 */
+      .loader__ring-wrap {
+        width: 64px;
+        height: 64px;
+      }
+
+      .loader__arrows svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* 侧边照片隐藏，只保留标记框 */
+      .dot-map-side {
+        display: none;
+      }
+
+      .dot-map-card {
+        display: none;
+      }
+
+      /* 标记框手机端放大，方便点击 */
+      .dot-map-marker {
+        width: 6% !important;
+        height: 5% !important;
+        border-width: 2px !important;
+      }
+
+      /* 特征图侧边卡片隐藏 */
+      .feature-cards--left,
+      .feature-cards--right,
+      .feature-cards--bottom {
+        display: none;
+      }
+
+      .feature-bottom-row {
+        display: none;
+      }
+
+      /* 章节卡片单列小尺寸 */
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .column,
+      .column a,
+      .column img {
+        min-height: 180px;
+      }
+
+      .chapters {
+        width: min(100% - 24px, 400px);
+      }
+
+      /* 手机端弹出大图 */
+      .mobile-preview {
+        position: fixed;
+        z-index: 9999;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        max-height: 50vh;
+        background: rgba(0, 0, 0, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        display: none;
+      }
+
+      .mobile-preview.is-shown {
+        display: block;
+      }
+
+      .mobile-preview img {
+        width: 100%;
+        height: auto;
+        max-height: 50vh;
+        object-fit: contain;
+        display: block;
+      }
+
+      .mobile-preview__label {
+        padding: 6px 10px;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.7);
+      }
+
+      .mobile-preview-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+      }
+
+      .mobile-preview-backdrop.is-shown {
+        display: block;
+      }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .cont-page::after,
+      .viz-next::after {
+        opacity: 1;
+        transform: rotate(45deg) translate(0, 0);
+        animation: none;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+      }
+    }
+
+    /* =========================================================
+      02-10. 图表全屏查看 / Chart Fullscreen
+      -------------------------------------------------------
+      手机端在图表右上角显示全屏按钮，点击后弹出横屏全屏查看。
+      Mobile fullscreen button on chart top-right corner,
+      opens landscape-oriented fullscreen overlay.
+    ======================================================== */
+    .fs-container {
+      position: relative;
+    }
+
+    .chart-fs-btn {
+      position: absolute;
+      z-index: 15;
+      top: 8px;
+      right: 8px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 6px;
+      background: rgba(7, 19, 29, 0.62);
+      color: #fff;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.22s ease, background 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chart-fs-btn:hover {
+      background: rgba(7, 19, 29, 0.84);
+    }
+
+    .chart-fs-btn:active {
+      background: rgba(7, 19, 29, 0.94);
+    }
+
+    .chart-fs-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      pointer-events: none;
+    }
+
+    /* 手机端始终显示按钮，桌面端 hover 时显示 */
+    @media (max-width: 768px) {
+      .chart-fs-btn {
+        opacity: 0.82;
+        width: 32px;
+        height: 32px;
+        top: 6px;
+        right: 6px;
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .fs-container:hover .chart-fs-btn,
+      .viz-panel:hover .chart-fs-btn,
+      .inline-graphic:hover .chart-fs-btn,
+      figure:hover .chart-fs-btn {
+        opacity: 0.82;
+      }
+    }
+
+    /* 全屏遮罩 */
+    .chart-fs-overlay {
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .chart-fs-overlay.is-open {
+      display: flex;
+    }
+
+    .chart-fs-overlay .fs-close {
+      position: fixed;
+      z-index: 10001;
+      top: 12px;
+      right: 12px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 50%;
+      background: rgba(7, 19, 29, 0.62);
+      color: #fff;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chart-fs-overlay .fs-close:hover {
+      background: rgba(7, 19, 29, 0.84);
+    }
+
+    .chart-fs-overlay .fs-hint {
+      position: fixed;
+      z-index: 10000;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 13px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .chart-fs-overlay .fs-hint.is-visible {
+      opacity: 1;
+    }
+
+    .chart-fs-overlay .fs-stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 手机端：内容旋转 90° 实现横屏观看 */
+    @media (max-width: 768px) {
+      .chart-fs-overlay .fs-stage.is-landscape {
+        width: 100vh;
+        height: 100vw;
+        transform: rotate(90deg);
+        transform-origin: center center;
+      }
+
+      .chart-fs-overlay .fs-stage.is-landscape > * {
+        max-width: 100vh;
+        max-height: 100vw;
+      }
+
+      .chart-fs-overlay .fs-stage.is-landscape img {
+        max-width: 100vh;
+        max-height: 100vw;
+        object-fit: contain;
+      }
+    }
+
+    /* 确保全屏下的内容自适应 */
+    .chart-fs-overlay .fs-stage img,
+    .chart-fs-overlay .fs-stage iframe,
+    .chart-fs-overlay .fs-stage canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .chart-fs-overlay .fs-stage > * {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+  </style>
+</head>
+
+<body class="is-loading">
+  <!-- =========================================================
+    02-B. 入场加载动画 / Entrance Loader
+    ---------------------------------------------------------
+    黑屏 → 加载圈 → 点击开始 → 帷幕拉开 → 内容渐入。
+    Black screen → spinner → click start → curtain reveal.
+  ========================================================== -->
+  <div class="loader" id="loader" aria-hidden="false" style="display:none">
+    <div class="loader__curtain loader__curtain--left" id="curtainL"></div>
+    <div class="loader__curtain loader__curtain--right" id="curtainR"></div>
+    <div class="loader__center" id="loaderCenter">
+      <div class="loader__ring-wrap">
+        <svg class="loader__ring" viewBox="0 0 80 80">
+          <circle class="loader__ring-bg" cx="40" cy="40" r="34" />
+          <circle class="loader__ring-fill" id="loaderRing" cx="40" cy="40" r="34" />
+        </svg>
+        <span class="loader__pct" id="loaderPct">0%</span>
+        <div class="loader__arrows" id="loaderArrows" title="展开">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+    03. 顶部栏 / Header
+    ---------------------------------------------------------
+    page identity & sharing buttons.
+  ========================================================== -->
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="返回页面顶部 / Back to top">
+        <span class="brand-mark" aria-hidden="true">
+          <img class="logo-mark" src="assets/ecnu-comm-logo-symbol.png" alt="">
+        </span>
+        <span>
+          <strong class="brand-title">哈尔滨新艺术建筑</strong>
+          <small class="brand-subtitle">Art Nouveau architecture in Harbin</small>
+        </span>
+      </a>
+
+      <div class="header-actions" aria-label="页面操作 / Page actions">
+        <button class="icon-button" type="button" id="shareButton" aria-label="复制页面链接 / Copy page link" title="复制链接">
+          <img class="action-icon" src="assets/share.png" alt="" aria-hidden="true">
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+    04. 侧边导航 / Side Navigation
+    ---------------------------------------------------------
+    中文：对应原网页的“SECTIONS”按钮和右侧滑出菜单。
+    English: Matches the reference "SECTIONS" button and slide-out menu.
+  ========================================================== -->
+  <button class="menu-icon" type="button" id="menuToggle" aria-controls="leftmenu" aria-expanded="false">
+    <span class="menu-lines" aria-hidden="true"><!-- 菜单三横线图标 / Three-line menu icon --></span>
+    <span class="menu-label">SECTIONS</span>
+    <span class="sr-only">打开章节菜单 / Open section menu</span>
+  </button>
+
+  <div class="menu-backdrop" id="menuBackdrop" aria-hidden="true"></div>
+
+  <aside class="sidenav" id="leftmenu" aria-hidden="true">
+    <h2>目录<br>Sections</h2>
+    <nav aria-label="页面章节 / Page sections">
+      <ul>
+        <li><a href="#top">封面 / Cover</a></li>
+        <li><a href="#overview">引言 / Overview</a></li>
+        <li><a href="#spread-map">新艺术建筑传播史 / Spread Map</a></li>
+        <li><a href="#feature-diagram">哈尔滨新艺术建筑特征细节 / Facade Diagram</a></li>
+        <li><a href="#dot-explore-map">哈尔滨新艺术建筑分布情况 / Distribution Map</a></li>
+        <li><a href="#sankey-diagram">哈尔滨新艺术建筑的变迁 / Sankey Diagram</a></li>
+        <li><a href="#protection-chart">保护等级分布 / Protection Status</a></li>
+        <li><a href="#chapters">典型建筑图鉴 / Chapters</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- =========================================================
+    05. 主体内容 / Main Content
+    ---------------------------------------------------------
+    中文：主体内容保留原网页“首屏 + 引言 + 章节卡片”的结构。
+    English: The main content keeps the reference structure: hero, intro,
+    and chapter cards.
+  ========================================================== -->
+  <main>
+
+    <!-- =======================================================
+      05-01. 首屏封面 / Hero Intro
+      -------------------------------------------------------
+      如果要替换封面图，把 img 的 src 改成你的图片路径即可。
+      To replace the hero image, change the img src value below.
+    ======================================================== -->
+    <section class="intro" aria-labelledby="page-title">
+      <div class="cover" id="cover">
+        <div class="cover-hero">
+          <img src="assets/cover.jpg" alt="冬季的哈尔滨历史建筑街景">
+        </div>
+        <div class="intro-gradient"></div>
+        <p class="cover-caption" id="coverCaption">图中为哈尔滨新艺术建筑代表建筑：马迭尔宾馆</p>
+      </div>
+
+      <div class="intro-box">
+        <p class="kicker">哈尔滨</p>
+        <h1 id="page-title">冰城里的欧陆余韵</h1>
+        <h2>哈尔滨新艺术建筑的前世今生</h2>
+        <p class="date">2026年7月25日</p>
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+      05-02. 主题引言 / Theme Introduction
+      -------------------------------------------------------
+      Write the page overview here. 
+      One or two paragraphs usually work best for this layout.
+    ======================================================== -->
+    <section class="standard" id="overview">
+      <div class="new-intro">
+        <h3 class="new-intro__heading">引言</h3>
+        <p>
+          19 世纪末，俄国修建的中东铁路为哈尔滨带来了城市化与繁荣的工商业，也带来了当时正在欧洲流行的新艺术运动（Art Nouveau）思潮。1898 至 1917 年间，哈尔滨经历大规模城市建设，新艺术风格广泛渗透到火车站、银行、商店、住宅及市政设施中，形成了独具特色的"东方莫斯科"城市风貌。
+        </p>
+        <p>
+          纯粹的新艺术建筑作品集中在 1900 至 1915 年的黄金时期，此后作为一种装饰风格一直延续到 20 世纪 30 年代。这些建筑摒弃了繁琐的古典装饰，以流畅的铁艺线条、不对称的构图以及植物纹样为特征，是东西方文化碰撞与融合的结晶，为哈尔滨留下了不可复制的建筑文化遗产。
+        </p>
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+      05-02-A. 传播图 / Spread Map
+      -------------------------------------------------------
+      全屏滑动页：上方报道简介 + 交互式地图 + 底部加载指示箭头。
+      Full-viewport slide: reported intro + interactive map +
+      bottom loading indicator arrow.
+    ======================================================== -->
+    <section class="viz-slide" id="spread-map">
+      <div class="viz-intro">
+        <p>
+          19世纪末，新艺术运动建筑萌芽于西班牙的世博会，旨在以自然曲线对抗工业化的机械风格。随后，这一风格在法国、英国、比利时、德国、奥地利等国迅速扩散，形成国际性潮流。下面的动画展示的是新艺术建筑在各国蓬勃发展和逐渐衰落的过程。新艺术的潮流从西欧兴起，之后迅速向东扩散到俄罗斯、芬兰等国家，最终通过中东铁路延伸至哈尔滨。放大和拖动地图即可具体查看不同区域；拖动下方进度条查看不同时期新艺术建筑发展传播的大致情况。
+        </p>
+      </div>
+
+      <div class="viz-panel fs-container">
+        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+        <div class="flourish-panel">
+          <div class="flourish-embed flourish-map" data-src="visualisation/29593517">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+            <noscript>
+              <img src="https://public.flourish.studio/visualisation/29593517/thumbnail" width="100%" alt="新艺术运动传播时间地图">
+            </noscript>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+      05-02-B. 建筑特征卡片 / Feature Card Gallery
+      -------------------------------------------------------
+      12 张特征卡片环绕建筑立面图，直线连接对应位置。
+      Cards surround the facade diagram with connector lines.
+    ======================================================== -->
+    <section class="feature-gallery" id="feature-diagram">
+      <div class="feature-gallery__intro">
+        <p>
+          新艺术建筑的特色在于大量运用流畅的曲线和自然元素（花卉、藤蔓）作为装饰母题，体现在铁艺栏杆、窗框及檐部设计中。以下12处细节是哈尔滨新艺术建筑最具代表性的特征语言。
+        </p>
+      </div>
+
+      <div class="feature-gallery__layout" id="featureLayout">
+        <!-- 左列卡片 1-4 -->
+        <div class="feature-cards feature-cards--left" id="featureCardsLeft"></div>
+
+        <!-- 中央：建筑立面 + 下方卡片 5-8 -->
+        <div class="feature-center">
+          <div class="feature-building" id="featureBuilding">
+            <img
+              class="feature-building__img" id="featureImg"
+              src="新艺术建筑风格图解/正立面图222.png"
+              width="5322" height="3241"
+              alt="哈尔滨新艺术建筑正立面细部图解"
+            >
+            <svg class="feature-lines" id="featureLines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="feature-bottom-row">
+            <div class="feature-cards feature-cards--bottom" id="featureCardsBottomL"></div>
+            <div class="feature-cards feature-cards--bottom" id="featureCardsBottomR"></div>
+          </div>
+        </div>
+
+        <!-- 右列卡片 9-12 -->
+        <div class="feature-cards feature-cards--right" id="featureCardsRight"></div>
+      </div>
+    </section>
+
+    <!-- =======================================================
+      05-02-C. 散点探索地图 / Dot Exploration Map
+      -------------------------------------------------------
+      底图盖在散点图之上，小人沿路线行走。
+      滚轮控制小人位置，走过的地方底图被擦除，露出下方散点图。
+    ======================================================== -->
+    <section class="viz-slide" id="dot-explore-map">
+      <div class="viz-intro">
+        <p>
+          经过近三十年的修建，哈尔滨市区内散布着五十处左右的比较典型的新艺术建筑，这些建筑散布在南岗、道里、道外等老城区，沿着中东铁路主线两侧展开，至今仍向我们展示着哈尔滨的城市肌理。
+        </p>
+        <p>
+          图上用白点标记的建筑均已被毁坏或拆除重建，其中的尚志小学、中东铁路管理局局长官邸等的具体位置已无从考究。
+        </p>
+      </div>
+      <div class="dot-map-layout">
+        <div class="dot-map-side dot-map-side--left" id="dotSideLeft"></div>
+        <div class="dot-map-center">
+          <img src="dot-map/assets/map-final.png" alt="哈尔滨新艺术建筑分布散点图" class="dot-map-img">
+          <p class="dot-map-credit">图片内容参考刘大平，王岩《哈尔滨新艺术建筑》</p>
+        </div>
+        <div class="dot-map-side dot-map-side--right" id="dotSideRight"></div>
+      </div>
+    </section>
+
+    <!-- =======================================================
+      05-02-D. 桑基图 / Sankey Diagram
+      -------------------------------------------------------
+      全屏滑动页：上方报道简介 + 交互式桑基图。
+      Full-viewport slide: reported intro + interactive Sankey.
+    ======================================================== -->
+    <section class="viz-slide" id="sankey-diagram">
+      <div class="viz-intro">
+        <p>
+          建于20世纪初的55处哈尔滨新艺术建筑，最初大多只承担两种角色：住宅与商业。24座为住宅，其余多用于经商。此后百年间，战争与政权更迭反复改写它们的命运——不少建筑一度转为军政机关驻地。到今天，多数建筑经过修缮保护，回归了住宅和商业功能，另有一些改造为博物馆，服务于公共文化事业。随着保护工作持续推进，这些建筑正被越来越多人认识和珍视，成为哈尔滨"东方小巴黎"城市景观的一部分。
+        </p>
+        <p>
+          55座建筑中，有8处遭到拆除、原址重建或长年荒废，如耀景街、文昌街的原中东铁路高级官员住宅，以及原尼德兰斯中学等。鼠标悬停在色带上，即可查看每条流向的具体数量。
+        </p>
+      </div>
+
+      <div class="viz-panel fs-container">
+        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+        <div class="flourish-panel">
+          <div class="flourish-embed flourish-sankey" data-src="visualisation/29601001">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+            <noscript>
+              <img src="https://public.flourish.studio/visualisation/29601001/thumbnail" width="100%" alt="哈尔滨新艺术建筑用途变迁桑基图">
+            </noscript>
+          </div>
+        </div>
+        <div class="sankey-shield" id="sankeyShield"></div>
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+      05-02-E. 保护等级图表 / Protection Status Chart
+      -------------------------------------------------------
+      全屏滑动页：上方简介 + 交互式柱状图（Flourish）。
+    ======================================================== -->
+    <section class="viz-slide" id="protection-chart">
+      <div class="viz-intro">
+        <p>
+          截至2026年，哈尔滨已将全市1310处历史文化建筑纳入系统性保护名录，完成了数字化测绘建档与一体化智慧管理平台搭建。从修缮活化到立法保护，这些百年建筑正逐步走出被遗忘的命运，成为城市可读、可逛、可生活的文化地标。
+        </p>
+        <p>
+          55 栋哈尔滨新艺术建筑中，8 栋已毁或拆除重建。现存 47 栋建筑里，6 栋列为全国重点文物保护单位，7 栋为省级或一类保护建筑，其余约 34 栋作为"中东铁路建筑群"组成部分登记为不可移动文物。从保护等级分布来看，大多数建筑虽已纳入文物保护体系，但单体保护级别仍有提升空间。
+        </p>
+      </div>
+
+      <div class="viz-panel fs-container">
+        <button class="chart-fs-btn" type="button" aria-label="全屏查看">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+        <div class="flourish-panel">
+          <div class="flourish-embed flourish-chart" data-src="visualisation/29779591">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+            <noscript>
+              <img src="https://public.flourish.studio/visualisation/29779591/thumbnail" width="100%" alt="chart visualization" />
+            </noscript>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="standard chapter-section">
+      <div class="heading" id="chapters">
+        <div class="heading-mark" aria-hidden="true">
+          <img class="logo-mark" src="assets/ecnu-comm-logo-symbol.png" alt="">
+        </div>
+        <h3>哈尔滨新艺术建筑风格图鉴</h3>
+        <h5>选择一个章节 / Choose a chapter</h5>
+      </div>
+
+      <!-- =====================================================
+        05-03. 章节卡片 / Chapter Cards
+        -----------------------------------------------------
+        Each card has a link, image, overlay, and title.
+        Change src for images, href for destinations, and subheading text for labels.
+      ====================================================== -->
+      <div class="chapters">
+        <div class="row">
+          <article class="column">
+            <a href="chapter-1.html" style="--card-position: 52% 45%;">
+              <img src="assets/modern-hotel.jpg" alt="马迭尔宾馆外观">
+              <div class="overlay"></div>
+              <div class="subheading"><span>1. Modern Hotel</span>马迭尔宾馆</div>
+            </a>
+          </article>
+
+          <article class="column">
+            <a href="chapter-2.html" style="--card-position: 30% 58%;">
+              <img src="assets/moscow-shopping-mall.JPG" alt="莫斯科商场旧址，现黑龙江省博物馆">
+              <div class="overlay"></div>
+              <div class="subheading"><span>2. Moscow Shopping Mall (Heilongjiang Provincial Museum)</span>莫斯科商场（黑龙江省博物馆）</div>
+            </a>
+          </article>
+
+          <article class="column">
+            <a href="chapter-3.html" style="--card-position: 72% 56%;">
+              <img src="assets/nangang-museum.JPG" alt="南岗博物馆外观">
+              <div class="overlay"></div>
+              <div class="subheading"><span>3. Nangang Museum</span>南岗博物馆</div>
+            </a>
+          </article>
+
+          <article class="column">
+            <a href="chapter-4.html" style="--card-position: 44% 50%;">
+              <img src="assets/qiulin.JPG" alt="秋林公司道里商店旧址">
+              <div class="overlay"></div>
+              <div class="subheading"><span>4. Churin Company Building</span>秋林公司道里商店旧址</div>
+            </a>
+          </article>
+
+          <article class="column">
+            <a href="chapter-5.html" style="--card-position: 18% 48%;">
+              <img src="assets/ch-e-railway.JPG" alt="中东铁路管理局旧址">
+              <div class="overlay"></div>
+              <div class="subheading"><span>5. Former Chinese Eastern Railway Administration</span>中东铁路管理局旧址</div>
+            </a>
+          </article>
+
+          <article class="column">
+            <a href="chapter-6.html" style="--card-position: 60% 64%;">
+              <img src="assets/garden-st-405.JPG" alt="中东铁路高级职员住宅旧址">
+              <div class="overlay"></div>
+              <div class="subheading"><span>6. Former Senior Staff Residences of the Chinese Eastern Railway</span>中东铁路高级职员住宅旧址</div>
+            </a>
+          </article>
+
+          <article class="column">
+            <a href="chapter-7.html" style="--card-position: 50% 54%;">
+              <img src="assets/aksheyev.JPG" alt="阿基谢耶夫洋行旧址">
+              <div class="overlay"></div>
+              <div class="subheading"><span>7. Former Site of the Akisheyev Trading House</span>阿基谢耶夫洋行旧址</div>
+            </a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+    06. 页脚 / Footer
+    ---------------------------------------------------------
+    author & class & instructor & publication info
+  ========================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        <strong>哈尔滨新艺术建筑数据新闻报道</strong><br>
+        冰城里的欧陆余韵<br>
+        哈尔滨新艺术建筑的前世今生
+      <p>
+        <strong>制作人员</strong>
+      </p>
+      <p>
+        杨乐文 冯靖博 苏比伊努尔·阿曼 徐菁 严歆雨 张暖忻
+      </p>
+      <p>
+        <strong>发布日期：</strong>2026年7月25日<br>
+        <strong>资料来源：</strong>刘大平、王岩《哈尔滨新艺术建筑》
+      </p>
+      <div class="footer-mark" aria-hidden="true">
+        <img class="logo-mark" src="assets/ecnu-comm-logo-symbol.png" alt="">
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- 手机端弹出预览 -->
+  <div class="mobile-preview-backdrop" id="mobileBackdrop"></div>
+  <div class="mobile-preview" id="mobilePreview">
+    <img src="" alt="" id="mobilePreviewImg">
+    <div class="mobile-preview__label" id="mobilePreviewLabel"></div>
+  </div>
+
+  <!-- =========================================================
+    06-B. 全屏查看遮罩 / Fullscreen Overlay
+    ---------------------------------------------------------
+    点击图表右上角全屏按钮后弹出的横屏全屏查看层。
+    Landscape fullscreen overlay triggered by chart corner button.
+  ========================================================== -->
+  <div class="chart-fs-overlay" id="fsOverlay" aria-hidden="true">
+    <button class="fs-close" id="fsClose" type="button" aria-label="退出全屏">&times;</button>
+    <span class="fs-hint" id="fsHint">旋转手机以获得最佳观看体验</span>
+    <div class="fs-stage" id="fsStage"></div>
+  </div>
+
+  <!-- =========================================================
+    06-D. 入场动画脚本 / Entrance Animation
+    ---------------------------------------------------------
+    加载进度 → 双箭头 → 点击 → 飘带帷幕拉开 → 封面大图 → 淡出。
+  ========================================================== -->
+  <script>
+    (function () {
+      var loader = document.getElementById("loader");
+
+      // 非首次访问跳过入场动画
+      if (sessionStorage.getItem("visited")) {
+        document.body.classList.remove("is-loading");
+        return;
+      }
+      sessionStorage.setItem("visited", "1");
+      loader.style.display = ""; // 首次访问，显示入场动画
+
+      var ring = document.getElementById("loaderRing");
+      var pctEl = document.getElementById("loaderPct");
+      var arrows = document.getElementById("loaderArrows");
+      var isStarted = false;
+
+      var R = 34;
+      var CIRCUMFERENCE = 2 * Math.PI * R;
+      ring.style.strokeDasharray = CIRCUMFERENCE;
+      ring.style.strokeDashoffset = CIRCUMFERENCE;
+
+      var totalItems = 1;
+      var loadedItems = 1;
+
+      function updateProgress() {
+        var pct = totalItems === 0 ? 0 : Math.round((loadedItems / totalItems) * 100);
+        pct = Math.min(pct, 100);
+        var offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+        ring.style.strokeDashoffset = String(offset);
+        pctEl.textContent = pct + "%";
+
+        if (pct >= 100 && !isStarted) {
+          pctEl.classList.add("is-done");
+          arrows.classList.add("is-ready");
+        }
+      }
+
+      function trackImage(img) {
+        totalItems++;
+        if (img.complete && img.naturalWidth > 0) {
+          loadedItems++;
+          updateProgress();
+        } else {
+          img.addEventListener("load", function () { loadedItems++; updateProgress(); }, { once: true });
+          img.addEventListener("error", function () { loadedItems++; updateProgress(); }, { once: true });
+        }
+      }
+
+      // 追踪已存在的图片
+      var imgs = document.querySelectorAll("img");
+      for (var i = 0; i < imgs.length; i++) { trackImage(imgs[i]); }
+
+      // 追踪JS动态添加的图片
+      var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (m) {
+          m.addedNodes.forEach(function (node) {
+            if (node.tagName === "IMG") { trackImage(node); }
+            if (node.querySelectorAll) {
+              var nested = node.querySelectorAll("img");
+              for (var k = 0; k < nested.length; k++) { trackImage(nested[k]); }
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      var fallbackTimer = setTimeout(function () {
+        if (!isStarted && loadedItems < totalItems) { loadedItems = totalItems; updateProgress(); }
+      }, 8000);
+
+      updateProgress();
+
+      /* ---- 点击双箭头 → 帷幕拉开 ---- */
+      arrows.addEventListener("click", function () {
+        if (isStarted) return;
+        isStarted = true;
+        clearTimeout(fallbackTimer);
+
+        loader.classList.add("is-open");
+
+        // 帷幕拉开 1.2s 后文字开始 3s 渐显
+        setTimeout(function () {
+          document.body.classList.remove("is-loading");
+        }, 1200);
+
+        // 帷幕动画结束后隐藏 loader
+        setTimeout(function () {
+          loader.classList.add("is-done");
+          loader.setAttribute("aria-hidden", "true");
+        }, 1600);
+      });
+    })();
+  </script>
+
+  <!-- =========================================================
+    07. 页面脚本 / Page Scripts
+    ---------------------------------------------------------
+    侧边菜单、复制分享链接、首屏视差和滚动时导航变色。
+    side-menu behavior & share/copy link & hero parallax & header color changes on scroll.
+  ========================================================== -->
+  <script>
+    /* =======================================================
+      08-01. 基础选择器 / Basic Selector
+    ======================================================= */
+    const siteHeader = document.querySelector(".site-header");
+    const menuToggle = document.querySelector("#menuToggle");
+    const sideNav = document.querySelector("#leftmenu");
+    const menuBackdrop = document.querySelector("#menuBackdrop");
+    const shareButton = document.querySelector("#shareButton");
+
+    /* =======================================================
+      08-02. 侧边菜单开关 / Side Menu Toggle
+      -----------------------------------------------------
+      openMenu(true) 打开菜单，openMenu(false) 关闭菜单。
+    ======================================================= */
+    function openMenu(shouldOpen) {
+      sideNav.classList.toggle("is-open", shouldOpen);
+      menuBackdrop.classList.toggle("is-open", shouldOpen);
+      sideNav.setAttribute("aria-hidden", String(!shouldOpen));
+      menuToggle.setAttribute("aria-expanded", String(shouldOpen));
+    }
+
+    menuToggle.addEventListener("click", () => {
+      const shouldOpen = menuToggle.getAttribute("aria-expanded") !== "true";
+      openMenu(shouldOpen);
+    });
+
+    menuBackdrop.addEventListener("click", () => openMenu(false));
+
+    sideNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => openMenu(false));
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        openMenu(false);
+      }
+    });
+
+    /* =======================================================
+      08-03. 分享按钮 / Share Button
+      -----------------------------------------------------
+      优先使用浏览器原生分享；不支持时复制当前链接。
+      Uses native browser sharing when available; 
+      Otherwise copies the current link.
+    ======================================================= */
+    var toast = document.createElement("div");
+    toast.style.cssText = "position:fixed;z-index:999;bottom:80px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;background:rgba(7,19,29,0.9);color:#fff;font-size:14px;pointer-events:none;opacity:0;transition:opacity 0.3s ease;white-space:nowrap;";
+    toast.textContent = "链接已复制";
+    document.body.appendChild(toast);
+
+    async function copyPageLink() {
+      try {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(window.location.href);
+        } else {
+          var ta = document.createElement("textarea");
+          ta.value = window.location.href;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        toast.style.opacity = "1";
+        setTimeout(function () { toast.style.opacity = "0"; }, 1800);
+      } catch (e) {
+        console.info("Copy unavailable:", e);
+      }
+    }
+
+    shareButton.addEventListener("click", copyPageLink);
+
+    /* =======================================================
+      08-05. 滚动时顶部栏变色 / Solid Header On Scroll
+      -----------------------------------------------------
+      After scrolling 80px, the header becomes solid for readability.
+    ======================================================= */
+    var coverEl = document.getElementById("cover");
+    var coverCaption = document.getElementById("coverCaption");
+
+    function updateHeader() {
+      siteHeader.classList.toggle("is-solid", window.scrollY > 80);
+      // 三阶段渐变：首屏亮 → 引语中灰度 → 正文暗
+      if (coverEl) {
+        var p = Math.min(window.scrollY / (window.innerHeight * 3), 1);
+        coverEl.style.opacity = String(Math.max(0.12, 1 - p * 0.88));
+      }
+      // 封面说明文字：滚动即消失
+      if (coverCaption) {
+        coverCaption.classList.toggle("is-hidden", window.scrollY > 20);
+      }
+    }
+
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
+
+    /* =======================================================
+      08-07. 建筑特征卡片画廊 / Feature Card Gallery
+      -------------------------------------------------------
+      左右两列卡片环绕中央建筑立面图，SVG 直线连接标记位置。
+      卡片默认小尺寸，hover 时放大。
+    ======================================================= */
+    (function () {
+      var IMG_BASE = "新艺术建筑风格图解/";
+
+      var features = [
+        { id: "1", title: "兼具实用与美观的木制屋檐", text: "屋檐不只是遮雨，木构件被做成轻巧的层次，实用里带着温和的手工感。", area: { x: 6.80, y: 42.95 }, img: "0-兼具实用与美观的木制屋檐.JPG" },
+        { id: "2", title: "方额圆角窗 / 椭圆额直角窗", text: "窗洞把直线和圆角揉在一起，规整但不生硬。这样的窗型让立面多了柔和的节奏。", area: { x: 11.56, y: 51.19 }, img: "1-方额圆角窗.png" },
+        { id: "3", title: "富有浪漫主义的雕饰", text: "柱头和雕饰带一点植物感，装饰不抢戏，却把入口和转角衬得更浪漫。", area: { x: 9.17, y: 72.23 }, img: "2-富有浪漫主义的雕饰.JPG" },
+        { id: "4", title: "曲线铁艺装饰", text: "铁艺最适合新艺术的线条：卷曲、伸展，像藤蔓一样把阳台和护栏带活。", area: { x: 31.17, y: 76.74 }, img: "3-曲线铁艺装饰.JPG" },
+        { id: "5", title: "优美大方的女儿墙和金属装饰绣边", text: "女儿墙的轮廓被收得很优雅，再配上细细的金属边，屋顶线就不会显得平。", area: { x: 45.92, y: 31.50 }, img: "4-优美大方的女儿墙和金属装饰绣边.JPG" },
+        { id: "6", title: "门和曲线的结合", text: "门洞边缘顺着曲线过渡，开口像被轻轻推开。硬朗的入口因此多了一点亲近感。", area: { x: 45.06, y: 68.84 }, img: "5-门和曲线的结合.png" },
+        { id: "7", title: "屋顶的金属线条装饰", text: "屋顶上的金属线条很细，却能把天际线拉得更精神。它让屋面从远处看也有辨识度。", area: { x: 59.06, y: 36.04 }, img: "6-屋顶的金属线条装饰.JPG" },
+        { id: "8", title: "优雅的窗楣", text: "窗楣用弧线压住窗头，既有重量感，也不显笨重。重复出现时，整排窗会更有韵律。", area: { x: 64.90, y: 47.45 }, img: "7-优雅的窗楣.png" },
+        { id: "9", title: "偶尔可见精美的人像装饰", text: "人像装饰像是给建筑加了表情，远看只是点缀，近看才发现很讲究。", area: { x: 85.08, y: 33.79 }, img: "8-偶尔可见精美的人像装饰.JPG" },
+        { id: "10", title: "柔和流畅的构件交接", text: "这些构件交接处没有硬碰硬，而是用弧线慢慢过渡。新艺术最迷人的地方，常常就在这种细节里。", area: { x: 85.08, y: 55.69 }, img: "9-柔和流畅的构件交接.png" },
+        { id: "11", title: "悬挑式雨篷", text: "悬挑雨篷负责遮挡风雨，也顺手把入口标出来。金属支架的曲线让功能件不只是功能件。", area: { x: 86.70, y: 72.23 }, img: "10-悬挑式雨篷.JPG" },
+        { id: "12", title: "优雅精致的室内楼梯", text: "楼梯栏杆把重复的小构件做得很精细，走近时会有明显的手工质感。它让室内动线也延续了立面的装饰语言。", area: { x: 54.30, y: 76.74 }, img: "11-优雅精致的室内楼梯.JPG" }
+      ];
+
+      var leftEl = document.getElementById("featureCardsLeft");
+      var bottomL = document.getElementById("featureCardsBottomL");
+      var bottomR = document.getElementById("featureCardsBottomR");
+      var rightEl = document.getElementById("featureCardsRight");
+      var buildingEl = document.getElementById("featureBuilding");
+      var linesSvg = document.getElementById("featureLines");
+
+      if (!leftEl || !bottomL || !bottomR || !rightEl || !buildingEl) return;
+
+      // 分组：1-4 左，5-8 下，9-12 右
+      function renderCard(f, container) {
+        var card = document.createElement("div");
+        card.className = "feature-card";
+        card.setAttribute("data-feature", f.id);
+
+        var num = document.createElement("span");
+        num.className = "feature-card__num";
+        num.textContent = f.id;
+
+        var img = document.createElement("img");
+        img.className = "feature-card__thumb";
+        img.src = IMG_BASE + f.img;
+        img.alt = f.title;
+        img.loading = "eager";
+
+        var title = document.createElement("div");
+        title.className = "feature-card__title";
+        title.textContent = f.title;
+
+        card.appendChild(img);
+        card.appendChild(num);
+        card.appendChild(title);
+        container.appendChild(card);
+      }
+
+      features.forEach(function (f) {
+        var id = parseInt(f.id);
+        if (id <= 4) { renderCard(f, leftEl); }
+        else if (id <= 6) { renderCard(f, bottomL); }
+        else if (id <= 8) { renderCard(f, bottomR); }
+        else { renderCard(f, rightEl); }
+      });
+
+      // 渲染建筑图上的标记圆点（大号，带编号）
+      features.forEach(function (f) {
+        var dot = document.createElement("div");
+        dot.className = "feature-marker";
+        dot.style.setProperty("--x", f.area.x);
+        dot.style.setProperty("--y", f.area.y);
+        dot.setAttribute("data-feature", f.id);
+        buildingEl.appendChild(dot);
+
+        var label = document.createElement("span");
+        label.className = "feature-marker__num";
+        label.style.setProperty("--x", f.area.x);
+        label.style.setProperty("--y", f.area.y);
+        label.textContent = f.id;
+        buildingEl.appendChild(label);
+      });
+
+      // 绘制 SVG 连线：左列从右边缘 → 标记，右列从左边缘 → 标记，下列从顶边缘 → 标记
+      function drawLines() {
+        if (!linesSvg) return;
+        var buildingRect = buildingEl.getBoundingClientRect();
+        if (buildingRect.width === 0) return;
+
+        linesSvg.setAttribute("viewBox", "0 0 " + buildingRect.width + " " + buildingRect.height);
+
+        var html = "";
+        features.forEach(function (f) {
+          var mx = (f.area.x / 100) * buildingRect.width;
+          var my = (f.area.y / 100) * buildingRect.height;
+
+          var card = document.querySelector('.feature-card[data-feature="' + f.id + '"]');
+          if (!card) return;
+
+          var cardRect = card.getBoundingClientRect();
+          var id = parseInt(f.id);
+          var x1, y1;
+
+          if (id <= 4) {
+            x1 = cardRect.right - buildingRect.left;
+            y1 = cardRect.top + cardRect.height / 2 - buildingRect.top;
+          } else if (id <= 8) {
+            x1 = cardRect.left + cardRect.width / 2 - buildingRect.left;
+            y1 = cardRect.top - buildingRect.top;
+          } else {
+            // 右列：从卡片左边缘中央 → 标记
+            x1 = cardRect.left - buildingRect.left;
+            y1 = cardRect.top + cardRect.height / 2 - buildingRect.top;
+          }
+
+          html += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + mx + '" y2="' + my + '" data-feature="' + f.id + '" />';
+        });
+
+        linesSvg.innerHTML = html;
+      }
+
+      // 初始绘制 & 窗口变化时重绘
+      drawLines();
+      var drawTimer;
+      window.addEventListener("resize", function () {
+        clearTimeout(drawTimer);
+        drawTimer = setTimeout(drawLines, 200);
+      });
+
+      // hover 卡片时：连线变粗变亮 + 标记放大高亮 + 编号高亮
+      document.querySelectorAll(".feature-card").forEach(function (card) {
+        card.addEventListener("mouseenter", function () {
+          var id = card.getAttribute("data-feature");
+          var line = linesSvg.querySelector('line[data-feature="' + id + '"]');
+          var marker = buildingEl.querySelector('.feature-marker[data-feature="' + id + '"]');
+          var label = buildingEl.querySelector('.feature-marker__num[data-feature="' + id + '"]');
+          if (line) { line.classList.add("is-highlight"); }
+          if (marker) { marker.classList.add("is-highlight"); }
+          if (label) { label.classList.add("is-highlight"); }
+        });
+
+        card.addEventListener("mouseleave", function () {
+          var id = card.getAttribute("data-feature");
+          var line = linesSvg.querySelector('line[data-feature="' + id + '"]');
+          var marker = buildingEl.querySelector('.feature-marker[data-feature="' + id + '"]');
+          var label = buildingEl.querySelector('.feature-marker__num[data-feature="' + id + '"]');
+          if (line) { line.classList.remove("is-highlight"); }
+          if (marker) { marker.classList.remove("is-highlight"); }
+          if (label) { label.classList.remove("is-highlight"); }
+        });
+      });
+    })();
+
+    /* =======================================================
+      08-08. 散点图侧边照片 / Dot Map Side Photos
+      -------------------------------------------------------
+      从 assets/side/ 读取照片，均匀分布在散点图两侧。
+      卡片与地图上标记点通过 SVG 线条连接。
+    ======================================================= */
+    (function () {
+      var leftEl = document.getElementById("dotSideLeft");
+      var rightEl = document.getElementById("dotSideRight");
+      if (!leftEl || !rightEl) return;
+
+      var IMG_BASE = "assets/side/";
+      // 照片 + 对应地图坐标（百分比，基于 2209×2185 原图）
+      var photos = [
+        { file: "东省特别区地方法院.jpg", label: "东省特别区地方法院", x: 33.2, y: 34.8, side: "L" },
+        { file: "中东铁路技术学校.jpg", label: "中东铁路技术学校", x: 53.2, y: 78.5, side: "R" },
+        { file: "中东铁路管理局宾馆.jpg", label: "中东铁路管理局宾馆", x: 49.0, y: 58.7, side: "R" },
+        { file: "买卖街92号.jpg", label: "买卖街92号", x: 39.0, y: 38.2, side: "L" },
+        { file: "原中东铁路警察管理局.jpg", label: "原中东铁路警察管理局", x: 53.8, y: 57.6, side: "R" },
+        { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原高级官员住宅 (红军街38号)", x: 60.4, y: 67.9, side: "R" },
+        { file: "原中东铁路高级官员住宅（西大直街）.jpg", label: "原高级官员住宅 (西大直街)", x: 61.0, y: 28.0, side: "R" },
+        { file: "原哈尔滨工业大学宿舍.jpg", label: "原哈尔滨工业大学宿舍", x: 48.3, y: 84.9, side: "R" },
+        { file: "原意大利领事馆.jpg", label: "原意大利领事馆", x: 40.1, y: 75.3, side: "L" },
+        { file: "哈尔滨火车站（史）.jpg", label: "哈尔滨火车站（史）", x: 42.5, y: 56.5, side: "L" },
+        { file: "日满商会.jpg", label: "日满商会", x: 59.1, y: 54.7, side: "L" },
+        { file: "阿基谢耶夫洋行.jpg", label: "阿基谢耶夫洋行", x: 19.7, y: 32.8, side: "L" }
+      ];
+
+      // 渲染卡片
+      function makeCard(p, container) {
+        var card = document.createElement("div");
+        card.className = "dot-map-card";
+        card.setAttribute("data-dot", p.label);
+        var img = document.createElement("img");
+        img.src = IMG_BASE + p.file;
+        img.alt = p.label;
+        img.loading = "eager";
+        var label = document.createElement("span");
+        label.className = "dot-map-card__label";
+        label.textContent = p.label;
+        card.appendChild(img);
+        card.appendChild(label);
+        container.appendChild(card);
+      }
+
+      for (var i = 0; i < photos.length; i++) {
+        var target = photos[i].side === "L" ? leftEl : rightEl;
+        makeCard(photos[i], target);
+      }
+
+      // 添加 SVG 连线层和交互标记框
+      var center = document.querySelector(".dot-map-center");
+      if (!center) return;
+      var img = center.querySelector(".dot-map-img");
+      if (!img) return;
+      center.style.position = "relative";
+
+      // 交互标记框：覆盖在散点图上方，可 hover
+      var markerLayer = document.createElement("div");
+      markerLayer.className = "dot-map-markers";
+      markerLayer.style.cssText = "position:absolute;inset:0;z-index:3;pointer-events:none;";
+      center.appendChild(markerLayer);
+
+      // HTML 交互标记框
+      photos.forEach(function (p) {
+        var marker = document.createElement("div");
+        marker.className = "dot-map-marker";
+        marker.setAttribute("data-dot", p.label);
+        marker.style.cssText = "position:absolute;left:" + p.x + "%;top:" + p.y +
+          "%;width:3%;height:2.5%;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;" +
+          "border:2px solid rgba(80,45,20,0.65);border-radius:2px;background:rgba(80,45,20,0.12);" +
+          "transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),border-color 0.3s,background 0.3s,box-shadow 0.3s;";
+        markerLayer.appendChild(marker);
+      });
+
+      // hover 联动：卡片 ↔ 标记框同步跳动放大
+      var allCards = document.querySelectorAll(".dot-map-card");
+      var allMarkers = document.querySelectorAll(".dot-map-marker");
+      function getElements(label) {
+        var card = document.querySelector('.dot-map-card[data-dot="' + label + '"]');
+        var marker = markerLayer.querySelector('.dot-map-marker[data-dot="' + label + '"]');
+        return { card: card, marker: marker };
+      }
+
+      function highlight(label) {
+        var els = getElements(label);
+        if (els.card) { els.card.style.transform = "scale(2)"; els.card.style.zIndex = "10"; els.card.style.overflow = "visible"; }
+        if (els.marker) { els.marker.style.transform = "translate(-50%,-50%) scale(2.5)"; els.marker.style.borderColor = "rgba(80,45,20,0.95)"; els.marker.style.background = "rgba(80,45,20,0.30)"; els.marker.style.boxShadow = "0 0 12px rgba(80,45,20,0.5)"; }
+      }
+
+      function unhighlight(label) {
+        var els = getElements(label);
+        if (els.card) { els.card.style.transform = ""; els.card.style.zIndex = ""; els.card.style.overflow = ""; }
+        if (els.marker) { els.marker.style.transform = "translate(-50%,-50%)"; els.marker.style.borderColor = "rgba(80,45,20,0.65)"; els.marker.style.background = "rgba(80,45,20,0.12)"; els.marker.style.boxShadow = ""; }
+      }
+
+      // 绑定卡片 hover
+      allCards.forEach(function (card) {
+        var label = card.getAttribute("data-dot");
+        card.addEventListener("mouseenter", function () { highlight(label); });
+        card.addEventListener("mouseleave", function () { unhighlight(label); });
+      });
+
+      // 绑定标记框 hover
+      allMarkers.forEach(function (marker) {
+        var label = marker.getAttribute("data-dot");
+        marker.addEventListener("mouseenter", function () { highlight(label); });
+        marker.addEventListener("mouseleave", function () { unhighlight(label); });
+      });
+
+    })();
+
+    /* =======================================================
+      08-08-B. 手机端标记框点击弹出大图
+    ======================================================= */
+    (function () {
+      var isMobile = window.innerWidth < 768;
+      if (!isMobile) return;
+
+      var backdrop = document.getElementById("mobileBackdrop");
+      var preview = document.getElementById("mobilePreview");
+      var previewImg = document.getElementById("mobilePreviewImg");
+      var previewLabel = document.getElementById("mobilePreviewLabel");
+      if (!backdrop || !preview) return;
+
+      var IMG_BASE = "assets/side/";
+      var photoMap = {};
+      var photos = [
+        { file: "东省特别区地方法院.jpg", label: "东省特别区地方法院" },
+        { file: "中东铁路技术学校.jpg", label: "中东铁路技术学校" },
+        { file: "中东铁路管理局宾馆.jpg", label: "中东铁路管理局宾馆" },
+        { file: "买卖街92号.jpg", label: "买卖街92号" },
+        { file: "原中东铁路警察管理局.jpg", label: "原中东铁路警察管理局" },
+        { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原高级官员住宅 (红军街38号)" },
+        { file: "原中东铁路高级官员住宅（西大直街）.jpg", label: "原高级官员住宅 (西大直街)" },
+        { file: "原哈尔滨工业大学宿舍.jpg", label: "原哈尔滨工业大学宿舍" },
+        { file: "原意大利领事馆.jpg", label: "原意大利领事馆" },
+        { file: "哈尔滨火车站（史）.jpg", label: "哈尔滨火车站（史）" },
+        { file: "日满商会.jpg", label: "日满商会" },
+        { file: "阿基谢耶夫洋行.jpg", label: "阿基谢耶夫洋行" }
+      ];
+      photos.forEach(function (p) { photoMap[p.label] = p; });
+
+      function showPreview(label) {
+        var p = photoMap[label];
+        if (!p) return;
+        previewImg.src = IMG_BASE + p.file;
+        previewLabel.textContent = p.label;
+        preview.classList.add("is-shown");
+        backdrop.classList.add("is-shown");
+      }
+
+      function hidePreview() {
+        preview.classList.remove("is-shown");
+        backdrop.classList.remove("is-shown");
+        previewImg.src = "";
+      }
+
+      // 所有标记框点击
+      document.addEventListener("click", function (e) {
+        var marker = e.target.closest(".dot-map-marker");
+        if (marker) {
+          var label = marker.getAttribute("data-dot");
+          if (label) showPreview(label);
+          return;
+        }
+        if (e.target === backdrop || e.target.closest(".mobile-preview-backdrop")) {
+          hidePreview();
+        }
+      });
+
+      backdrop.addEventListener("click", hidePreview);
+    })();
+
+    /* =======================================================
+      08-09. 桑基图加载遮罩 / Sankey Loading Shield
+      -----------------------------------------------------
+      桑基图 60% 进入视口时开始 5s 倒计时，期间阻挡鼠标交互。
+      5s countdown starts when 80% of the Sankey section is
+      visible; mouse interaction blocked during that time.
+    ======================================================= */
+    (function () {
+      var shield = document.getElementById("sankeyShield");
+      var section = document.getElementById("sankey-diagram");
+      if (!shield || !section) return;
+
+      var timerStarted = false;
+
+      var observer = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting && !timerStarted) {
+          timerStarted = true;
+          observer.unobserve(section);
+          setTimeout(function () {
+            shield.classList.add("is-gone");
+          }, 5000);
+        }
+      }, { threshold: 0.6 });
+
+      observer.observe(section);
+    })();
+
+    /* =======================================================
+      08-10. 侧边浮动图集 / Floating Side Gallery
+      -------------------------------------------------------
+      页面两侧随滚动时隐时现的色块占位，后续可替换为实景图片。
+    ======================================================= */
+    (function () {
+      var leftEl  = document.getElementById("sideLeft");
+      var rightEl = document.getElementById("sideRight");
+      if (!leftEl || !rightEl) return;
+
+      var PALETTE = [
+        "#983b31","#64261f","#49786d","#c06a2c","#d8a84e",
+        "#cfe6ef","#4f5c65","#8a4f22","#b3672a","#1f5c54"
+      ];
+
+      // 每个色块：{ zone:[scrollStart, scrollEnd], side:"L"/"R", top:%, w:px, h:px, color }
+      var cards = [];
+      var pageH = Math.max(document.body.scrollHeight, 8000);
+      var vw = window.innerWidth;
+      var margin = Math.max(16, (vw - 1120) / 2 - 20); // 内容区外的可用宽度
+
+      // 生成 10 个色块，稀疏分布，交替左右，从上到下 #1 ~ #10
+      for (var i = 0; i < 10; i++) {
+        var zoneCenter = pageH * 0.05 + (i / 9) * pageH * 0.88; // 5%~93% 均匀分布
+        var zoneWidth  = 900 + Math.random() * 600;              // 宽区间，缓慢淡入淡出
+        cards.push({
+          zone: [Math.max(0, zoneCenter - zoneWidth/2), Math.min(pageH, zoneCenter + zoneWidth/2)],
+          side: i % 2 === 0 ? "L" : "R",
+          top: 10 + (i / 9) * 70,              // 垂直位置均匀分布
+          w: 240 + Math.random() * 160,        // 宽度 240~400
+          h: 200 + Math.random() * 200,        // 高度 200~400
+          color: PALETTE[i % PALETTE.length],
+          num: i + 1
+        });
+      }
+      // 删掉 #1 和 #10
+      cards = cards.filter(function (c) { return c.num !== 1 && c.num !== 10; });
+      // 在 #2 上方补一个 #1（首屏大图划过后开始渐显，持续长度与其他一致）
+      var c2 = cards[0]; // #2 现在是第一个
+      var zoneW = 900 + Math.random() * 600;
+      cards.unshift({
+        zone: [window.innerHeight * 0.95, window.innerHeight * 0.95 + zoneW],
+        side: "L",
+        top: Math.max(4, c2.top - 12),
+        w: 180 + Math.random() * 140,
+        h: 140 + Math.random() * 160,
+        color: PALETTE[7],
+        num: 1
+      });
+
+      function positionCards() {
+        vw = window.innerWidth;
+        var contentW = 1120;
+        var contentLeft = (vw - contentW) / 2;
+        var contentRight = contentLeft + contentW;
+        var tooNarrow = vw < 1300;
+        var gap = 4;
+        var closeNums = [1, 2, 4, 6, 7];
+
+        var all = document.querySelectorAll(".side-card");
+        for (var k = 0; k < all.length; k++) {
+          var el = all[k];
+          var c = cards[Number(el.dataset.idx)];
+          if (tooNarrow) { el.style.display = "none"; continue; }
+          el.style.display = "";
+          var g = closeNums.indexOf(c.num) >= 0 ? 25 : gap;
+          if (c.side === "L") {
+            el.style.left = Math.max(8, contentLeft - c.w - g) + "px";
+            el.style.right = "auto";
+          } else {
+            // 确保右侧卡片不超出视口
+            var idealLeft = contentRight + g;
+            var maxLeft = vw - c.w - 8;
+            el.style.left = Math.min(idealLeft, maxLeft) + "px";
+            el.style.right = "auto";
+          }
+        }
+      }
+
+      // 创建 DOM
+      var fragments = { L: document.createDocumentFragment(), R: document.createDocumentFragment() };
+      cards.forEach(function (c, idx) {
+        var div = document.createElement("div");
+        div.className = "side-card";
+        div.style.top = c.top + "%";
+        div.style.width = c.w + "px";
+        div.style.height = c.h + "px";
+        var ext = (c.num === 8 || c.num === 9) ? ".JPG" : ".png";
+        div.style.backgroundImage = "url('assets/side/%23" + c.num + ext + "')";
+        div.style.backgroundSize = "cover";
+        div.style.backgroundPosition = "center";
+        // #5 逆时针旋转 90 度（rotate 属性不影响 transform 动画）
+        if (c.num === 5) div.style.rotate = "-90deg";
+        // 从外侧向内侧渐变透明：末尾 ~120px 过渡到全透
+        var maskGrad;
+        if (c.num === 5) {
+          maskGrad = "linear-gradient(to bottom, black 0%, black calc(100% - 100px), transparent 100%)";
+        } else if (c.side === "L") {
+          maskGrad = "linear-gradient(to right, black 0%, black calc(100% - 100px), transparent 100%)";
+        } else {
+          maskGrad = "linear-gradient(to left, black 0%, black calc(100% - 100px), transparent 100%)";
+        }
+        div.style.webkitMaskImage = maskGrad;
+        div.style.maskImage = maskGrad;
+        div.dataset.idx = String(idx);
+        fragments[c.side].appendChild(div);
+      });
+      document.body.appendChild(fragments.L);
+      document.body.appendChild(fragments.R);
+      // 移除空的 side-gallery 容器
+      leftEl.remove();
+      rightEl.remove();
+
+      positionCards();
+      window.addEventListener("resize", positionCards);
+
+      // 跟随小人进度显示：9 张图均匀分布在 0→1，首尾留间隙避免开头出现/结尾不消失
+      var totalCards = cards.length;
+      var cardElements = [];
+      for (var i = 0; i < totalCards; i++) {
+        cardElements.push(document.querySelector('.side-card[data-idx="' + i + '"]'));
+      }
+
+      function updateSideCards() {
+        var p = window.__revealProgress;
+        // 小人未开始（p 为 undefined 或 0）时不显示任何卡片
+        if (!p || p <= 0.001) {
+          for (var j = 0; j < totalCards; j++) {
+            if (cardElements[j]) cardElements[j].classList.remove("is-visible");
+          }
+          return;
+        }
+        var span = 0.45 / totalCards; // 每张卡的半宽（略微重叠）
+        for (var i = 0; i < totalCards; i++) {
+          var center = 0.015 + (i / (totalCards - 1)) * 0.93; // 0.015 → 0.945
+          var inZone = p >= center - span && p <= center + span;
+          if (cardElements[i]) cardElements[i].classList.toggle("is-visible", inZone);
+        }
+      }
+
+      setInterval(updateSideCards, 200);
+
+      positionCards();
+      window.addEventListener("resize", positionCards);
+    })();
+  </script>
+
+  <!-- =========================================================
+    09. 全屏查看图表 / Chart Fullscreen Toggle
+    ---------------------------------------------------------
+    点击图表右上角全屏按钮。
+    - 普通图表/iframe：克隆内容到遮罩层 → 横屏查看。
+    - 特征图卡片画廊：无需全屏（卡片已直接展示）。
+  ========================================================== -->
+  <script>
+    (function () {
+      var overlay = document.getElementById("fsOverlay");
+      var stage = document.getElementById("fsStage");
+      var closeBtn = document.getElementById("fsClose");
+      var hint = document.getElementById("fsHint");
+      var isOpen = false;
+      var activeMode = null; // "clone"
+
+      function openFS(container) {
+        if (isOpen) return;
+        openCloneFS(container);
+
+        overlay.classList.add("is-open");
+        overlay.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        isOpen = true;
+
+        tryFullscreenLock();
+      }
+
+      function openCloneFS(container) {
+        activeMode = "clone";
+        overlay.style.background = "";
+        var clone = container.cloneNode(true);
+        var fsBtns = clone.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < fsBtns.length; i++) { fsBtns[i].remove(); }
+        clone.style.maxHeight = "none";
+        clone.style.overflow = "visible";
+        clone.style.position = "static";
+        clone.style.width = "100%";
+        clone.style.height = "100%";
+        var iframes = clone.querySelectorAll("iframe");
+        for (var j = 0; j < iframes.length; j++) {
+          var src = iframes[j].getAttribute("src");
+          if (src) { iframes[j].setAttribute("src", src); }
+        }
+        stage.innerHTML = "";
+        stage.appendChild(clone);
+
+        applyMobileRotation();
+      }
+
+      function applyMobileRotation() {
+        var isMobile = window.innerWidth < 768;
+        if (isMobile) {
+          stage.classList.add("is-landscape");
+          hint.textContent = "旋转手机以获得最佳观看体验";
+          hint.classList.add("is-visible");
+          clearTimeout(window.__fsHintTimer);
+          window.__fsHintTimer = setTimeout(function () {
+            hint.classList.remove("is-visible");
+          }, 3500);
+        }
+      }
+
+      function closeFS() {
+        if (!isOpen) return;
+        stage.innerHTML = "";
+
+        overlay.classList.remove("is-open");
+        overlay.setAttribute("aria-hidden", "true");
+        overlay.style.background = "";
+        stage.classList.remove("is-landscape");
+        hint.classList.remove("is-visible");
+        hint.textContent = "旋转手机以获得最佳观看体验";
+        document.body.style.overflow = "";
+        isOpen = false;
+        activeMode = null;
+
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          try {
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+          } catch (e) {}
+        }
+      }
+
+      function tryFullscreenLock() {
+        var el = overlay;
+        try {
+          if (el.requestFullscreen) {
+            el.requestFullscreen().then(function () {
+              tryFSOrientation();
+            }).catch(function () {});
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+            tryFSOrientation();
+          }
+        } catch (e) {}
+      }
+
+      function tryFSOrientation() {
+        try {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(function () {});
+          }
+        } catch (e) {}
+      }
+
+      // 绑定所有全屏按钮
+      function bindFSButtons() {
+        var buttons = document.querySelectorAll(".chart-fs-btn");
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].addEventListener("click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var container = this.closest(".fs-container");
+            if (container) { openFS(container); }
+          });
+        }
+      }
+
+      bindFSButtons();
+      closeBtn.addEventListener("click", function (e) { e.stopPropagation(); closeFS(); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isOpen) { closeFS(); }
+      });
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) { closeFS(); }
+      });
+      window.addEventListener("orientationchange", function () {
+        if (isOpen) { closeFS(); }
+      });
+    })();
+  </script>
+</body>
+
+</html>
