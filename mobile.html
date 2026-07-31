@@ -1451,8 +1451,17 @@
       .feature-card__title { font-size: 9px; }
       .feature-card__num { font-size: 10px; width: 16px; height: 16px; line-height: 16px; }
 
-      .feature-marker,
-      .feature-marker__num,
+      /* 特征图标记手机端可见可点击 */
+      .feature-marker {
+        width: 10px !important;
+        height: 10px !important;
+        margin: -5px 0 0 -5px !important;
+      }
+
+      .feature-marker__num {
+        display: none;
+      }
+
       .feature-lines {
         display: none;
       }
@@ -3243,12 +3252,46 @@
         previewImg.src = "";
       }
 
-      // 所有标记框点击
+      // 特征图标记映射
+      var FEATURE_IMG_BASE = "新艺术建筑风格图解/";
+      var featureMap = {};
+      var featureData = [
+        { id: "1", title: "兼具实用与美观的木制屋檐", img: "0-兼具实用与美观的木制屋檐.JPG" },
+        { id: "2", title: "方额圆角窗 / 椭圆额直角窗", img: "1-方额圆角窗.png" },
+        { id: "3", title: "富有浪漫主义的雕饰", img: "2-富有浪漫主义的雕饰.JPG" },
+        { id: "4", title: "曲线铁艺装饰", img: "3-曲线铁艺装饰.JPG" },
+        { id: "5", title: "优美大方的女儿墙和金属装饰绣边", img: "4-优美大方的女儿墙和金属装饰绣边.JPG" },
+        { id: "6", title: "门和曲线的结合", img: "5-门和曲线的结合.png" },
+        { id: "7", title: "屋顶的金属线条装饰", img: "6-屋顶的金属线条装饰.JPG" },
+        { id: "8", title: "优雅的窗楣", img: "7-优雅的窗楣.png" },
+        { id: "9", title: "偶尔可见精美的人像装饰", img: "8-偶尔可见精美的人像装饰.JPG" },
+        { id: "10", title: "柔和流畅的构件交接", img: "9-柔和流畅的构件交接.png" },
+        { id: "11", title: "悬挑式雨篷", img: "10-悬挑式雨篷.JPG" },
+        { id: "12", title: "优雅精致的室内楼梯", img: "11-优雅精致的室内楼梯.JPG" }
+      ];
+      featureData.forEach(function (f) { featureMap[f.id] = f; });
+
+      function showFeaturePreview(id) {
+        var f = featureMap[id];
+        if (!f) return;
+        previewImg.src = FEATURE_IMG_BASE + f.img;
+        previewLabel.textContent = f.title;
+        preview.classList.add("is-shown");
+        backdrop.classList.add("is-shown");
+      }
+
+      // 所有标记框点击（散点图 + 特征图）
       document.addEventListener("click", function (e) {
-        var marker = e.target.closest(".dot-map-marker");
-        if (marker) {
-          var label = marker.getAttribute("data-dot");
+        var dotMarker = e.target.closest(".dot-map-marker");
+        if (dotMarker) {
+          var label = dotMarker.getAttribute("data-dot");
           if (label) showPreview(label);
+          return;
+        }
+        var featureMarker = e.target.closest(".feature-marker");
+        if (featureMarker) {
+          var id = featureMarker.getAttribute("data-feature");
+          if (id) showFeaturePreview(id);
           return;
         }
         if (e.target === backdrop || e.target.closest(".mobile-preview-backdrop")) {
