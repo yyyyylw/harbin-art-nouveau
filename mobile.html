@@ -1955,87 +1955,142 @@
         width: min(100% - 28px, var(--article-width));
       }
 
+      /* ---- 全局间距 ---- */
+      .standard {
+        padding: 48px 14px 40px;
+      }
+
+      .header-inner {
+        min-height: 56px;
+      }
+
+      .brand-title {
+        font-size: 15px;
+      }
+
+      .intro-box {
+        width: min(100% - 28px, 1120px);
+        padding: 100px 0 60px;
+      }
+
+      .kicker {
+        font-size: 16px;
+        margin-bottom: 12px;
+      }
+
+      .kicker::before,
+      .kicker::after {
+        width: 20px;
+      }
+
+      .intro-box h1 {
+        font-size: 28px;
+        line-height: 1.2;
+      }
+
+      .intro-box h2 {
+        font-size: 15px;
+        margin-top: 10px;
+      }
+
+      /* ---- 图表页 ---- */
       .viz-slide {
-        padding: 70px 14px 80px;
+        padding: 56px 14px 60px;
         min-height: 100svh;
         height: auto;
       }
 
       .viz-panel {
-        width: min(100% - 28px, 980px);
+        width: min(100% - 20px, 980px);
       }
 
       .viz-panel .flourish-panel,
       .viz-panel .flourish-embed {
-        min-height: 420px;
+        min-height: 340px;
+      }
+
+      /* ---- 特征图 ---- */
+      .feature-gallery {
+        padding: 40px 12px 50px;
+      }
+
+      .feature-gallery__intro p {
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      /* ---- 散点图 ---- */
+      .dot-map-credit {
+        font-size: 9px;
+      }
+
+      /* ---- 章节 ---- */
+      .chapter-section {
+        padding-bottom: 40px;
+      }
+
+      .heading h3 {
+        font-size: 24px;
+      }
+
+      .heading h5 {
+        font-size: 13px;
       }
 
       .row {
         grid-template-columns: 1fr;
+        gap: 12px;
       }
 
       .column,
       .column a,
       .column img {
-        min-height: 220px;
+        min-height: 200px;
       }
 
-      /* 封面说明文字 */
-      .cover-caption {
-        bottom: 16px;
-        left: 16px;
-        font-size: 10px;
+      .chapters {
+        width: min(100% - 24px, 420px);
       }
 
-      /* 引言标题 */
-      .new-intro__heading {
-        font-size: 22px;
-      }
-
-      .new-intro p {
-        font-size: 15px;
-      }
-
-      /* 特征图导语 */
-      .feature-gallery__intro p {
-        font-size: 12px;
-      }
-
-      /* 散点图标注 */
-      .dot-map-credit {
-        font-size: 9px;
-      }
-
-      .dot-map-card__label {
-        font-size: 8px;
-      }
-
-      /* 图表说明文字 */
-      .viz-intro p {
+      .subheading {
         font-size: 13px;
       }
 
-      /* 入场加载环缩小 */
+      /* ---- 引言 ---- */
+      .new-intro__heading {
+        font-size: 20px;
+        margin-bottom: 16px;
+      }
+
+      .new-intro p {
+        font-size: 14px;
+        margin: 14px 0;
+        line-height: 1.6;
+      }
+
+      /* ---- 图表说明文字 ---- */
+      .viz-intro p {
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      /* ---- 入场加载环 ---- */
       .loader__ring-wrap {
-        width: 64px;
-        height: 64px;
+        width: 60px;
+        height: 60px;
       }
 
       .loader__arrows svg {
-        width: 14px;
-        height: 14px;
+        width: 13px;
+        height: 13px;
       }
 
-      /* 侧边照片隐藏，只保留标记框 */
-      .dot-map-side {
-        display: none;
-      }
-
+      /* ---- 侧边照片隐藏，只保留标记框 ---- */
+      .dot-map-side,
       .dot-map-card {
         display: none;
       }
 
-      /* 标记框手机端放大，方便点击 */
       .dot-map-marker {
         width: 8% !important;
         height: 6% !important;
@@ -2045,43 +2100,45 @@
         z-index: 10 !important;
       }
 
-      /* 特征图侧边卡片隐藏 */
+      /* ---- 特征图侧边卡片隐藏 ---- */
       .feature-cards--left,
       .feature-cards--right,
-      .feature-cards--bottom {
-        display: none;
-      }
-
+      .feature-cards--bottom,
       .feature-bottom-row {
         display: none;
       }
 
-      /* 章节卡片单列小尺寸 */
-      .row {
-        grid-template-columns: 1fr;
+      .feature-marker {
+        width: 14px !important;
+        height: 14px !important;
+        margin: -7px 0 0 -7px !important;
+        pointer-events: auto !important;
+        z-index: 10 !important;
       }
 
-      .column,
-      .column a,
-      .column img {
-        min-height: 180px;
+      .feature-marker__num,
+      .feature-lines {
+        display: none;
       }
 
-      .chapters {
-        width: min(100% - 24px, 400px);
+      /* ---- 封面说明 ---- */
+      .cover-caption {
+        bottom: 14px;
+        left: 14px;
+        font-size: 10px;
       }
 
-      /* 手机端弹出大图 */
+      /* ---- 弹出大图 ---- */
       .mobile-preview {
         position: fixed;
         z-index: 9999;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 90vw;
-        max-height: 50vh;
+        width: 92vw;
+        max-height: 55vh;
         background: rgba(0, 0, 0, 0.95);
-        border: 1px solid rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 6px;
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
@@ -2094,26 +2151,25 @@
 
       .mobile-preview img {
         width: 100%;
-        height: auto;
-        max-height: 50vh;
+        max-height: 48vh;
         object-fit: contain;
         display: block;
       }
 
       .mobile-preview__label {
-        padding: 6px 10px;
+        padding: 8px 10px;
         color: rgba(255, 255, 255, 0.85);
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
         text-align: center;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.75);
       }
 
       .mobile-preview-backdrop {
         position: fixed;
         inset: 0;
         z-index: 9998;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.55);
         display: none;
       }
 
