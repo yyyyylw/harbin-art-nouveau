@@ -1453,9 +1453,11 @@
 
       /* 特征图标记手机端可见可点击 */
       .feature-marker {
-        width: 10px !important;
-        height: 10px !important;
-        margin: -5px 0 0 -5px !important;
+        width: 14px !important;
+        height: 14px !important;
+        margin: -7px 0 0 -7px !important;
+        pointer-events: auto !important;
+        z-index: 10 !important;
       }
 
       .feature-marker__num {
@@ -2035,9 +2037,12 @@
 
       /* 标记框手机端放大，方便点击 */
       .dot-map-marker {
-        width: 6% !important;
-        height: 5% !important;
-        border-width: 2px !important;
+        width: 8% !important;
+        height: 6% !important;
+        border-width: 3px !important;
+        border-color: rgba(80,45,20,0.9) !important;
+        background: rgba(80,45,20,0.25) !important;
+        z-index: 10 !important;
       }
 
       /* 特征图侧边卡片隐藏 */
@@ -3154,7 +3159,7 @@
       // 交互标记框：覆盖在散点图上方，可 hover
       var markerLayer = document.createElement("div");
       markerLayer.className = "dot-map-markers";
-      markerLayer.style.cssText = "position:absolute;inset:0;z-index:3;pointer-events:none;";
+      markerLayer.style.cssText = "position:absolute;inset:0;z-index:3;pointer-events:auto;";
       center.appendChild(markerLayer);
 
       // HTML 交互标记框
@@ -3210,9 +3215,6 @@
       08-08-B. 手机端标记框点击弹出大图
     ======================================================= */
     (function () {
-      var isMobile = window.innerWidth < 768;
-      if (!isMobile) return;
-
       var backdrop = document.getElementById("mobileBackdrop");
       var preview = document.getElementById("mobilePreview");
       var previewImg = document.getElementById("mobilePreviewImg");
@@ -3281,15 +3283,17 @@
       }
 
       // 所有标记框点击（散点图 + 特征图）
-      document.addEventListener("click", function (e) {
+      function handleTap(e) {
         var dotMarker = e.target.closest(".dot-map-marker");
         if (dotMarker) {
+          e.preventDefault();
           var label = dotMarker.getAttribute("data-dot");
           if (label) showPreview(label);
           return;
         }
         var featureMarker = e.target.closest(".feature-marker");
         if (featureMarker) {
+          e.preventDefault();
           var id = featureMarker.getAttribute("data-feature");
           if (id) showFeaturePreview(id);
           return;
@@ -3297,7 +3301,10 @@
         if (e.target === backdrop || e.target.closest(".mobile-preview-backdrop")) {
           hidePreview();
         }
-      });
+      }
+
+      document.addEventListener("click", handleTap);
+      document.addEventListener("touchstart", handleTap, { passive: false });
 
       backdrop.addEventListener("click", hidePreview);
     })();
