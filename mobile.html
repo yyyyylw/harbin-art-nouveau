@@ -3227,18 +3227,18 @@
       var IMG_BASE = "assets/side/";
       // 照片 + 对应地图坐标（百分比，基于 2209×2185 原图）
       var photos = [
-        { file: "东省特别区地方法院.jpg", label: "东省特别区地方法院", x: 33.2, y: 34.8, side: "L" },
-        { file: "原中东铁路高级官员住宅（西大直街）.jpg", label: "原高级官员住宅 (西大直街)", x: 61.0, y: 28.0, side: "R" },
-        { file: "中东铁路管理局宾馆.jpg", label: "中东铁路管理局宾馆", x: 49.0, y: 58.7, side: "R" },
-        { file: "买卖街92号.jpg", label: "买卖街92号", x: 39.0, y: 38.2, side: "L" },
-        { file: "原中东铁路警察管理局.jpg", label: "原中东铁路警察管理局", x: 53.8, y: 57.6, side: "R" },
-        { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原高级官员住宅 (红军街38号)", x: 60.4, y: 67.9, side: "R" },
-        { file: "中东铁路技术学校.jpg", label: "中东铁路技术学校", x: 53.2, y: 78.5, side: "R" },
-        { file: "原哈尔滨工业大学宿舍.jpg", label: "原哈尔滨工业大学宿舍", x: 48.3, y: 84.9, side: "R" },
-        { file: "原意大利领事馆.jpg", label: "原意大利领事馆", x: 40.1, y: 75.3, side: "L" },
-        { file: "哈尔滨火车站（史）.jpg", label: "哈尔滨火车站（史）", x: 42.5, y: 56.5, side: "L" },
+        { file: "阿基谢耶夫洋行.jpg", label: "阿基谢耶夫洋行", x: 19.70, y: 32.80, side: "L" },
+        { file: "东省特别区地方法院.jpg", label: "东省特别区地方法院", x: 32.81, y: 34.98, side: "L" },
+        { file: "买卖街92号.jpg", label: "买卖街92号", x: 39.39, y: 38.20, side: "L" },
         { file: "日满商会.jpg", label: "日满商会", x: 59.1, y: 54.7, side: "L" },
-        { file: "阿基谢耶夫洋行.jpg", label: "阿基谢耶夫洋行", x: 19.7, y: 32.8, side: "L" }
+        { file: "哈尔滨火车站（史）.jpg", label: "哈尔滨火车站（史）", x: 42.5, y: 56.5, side: "L" },
+        { file: "原意大利领事馆.jpg", label: "原意大利领事馆", x: 40.70, y: 75.39, side: "L" },
+        { file: "中东铁路管理局宾馆.jpg", label: "中东铁路管理局宾馆", x: 48.80, y: 58.70, side: "R" },
+        { file: "原中东铁路警察管理局.jpg", label: "原中东铁路警察管理局", x: 53.76, y: 57.39, side: "R" },
+        { file: "原中东铁路高级官员住宅（红军街38号）.JPG", label: "原高级官员住宅 (红军街38号)", x: 60.4, y: 67.9, side: "R" },
+        { file: "中东铁路技术学校.jpg", label: "中东铁路技术学校", x: 52.92, y: 78.70, side: "R" },
+        { file: "原中东铁路高级官员住宅（西大直街）.jpg", label: "原高级官员住宅 (西大直街)", x: 46.80, y: 79.17, side: "R" },
+        { file: "原哈尔滨工业大学宿舍.jpg", label: "原哈尔滨工业大学宿舍", x: 47.82, y: 85.47, side: "R" }
       ];
 
       // 渲染卡片
@@ -3323,65 +3323,6 @@
         marker.addEventListener("mouseleave", function () { unhighlight(label); });
       });
 
-      // ---- 调试：拖拽标记框 ----
-      var debugBtn = document.createElement("button");
-      debugBtn.textContent = "调试";
-      debugBtn.style.cssText = "position:absolute;bottom:8px;right:8px;z-index:20;padding:4px 10px;" +
-        "border:1px solid rgba(255,255,255,0.5);border-radius:4px;background:rgba(0,0,0,0.7);" +
-        "color:#ff0;font-size:12px;cursor:pointer;";
-      debugBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        var isOn = markerLayer.classList.toggle("is-debug");
-        debugBtn.style.background = isOn ? "rgba(80,45,20,0.8)" : "rgba(0,0,0,0.7)";
-        if (isOn) { console.log("=== 拖拽标记框，松开输出坐标 ==="); }
-      });
-      center.appendChild(debugBtn);
-
-      var dragging = null, dragSX = 0, dragSY = 0, origL = 0, origT = 0;
-      allMarkers.forEach(function (m) {
-        m.addEventListener("mousedown", function (e) {
-          if (!markerLayer.classList.contains("is-debug")) return;
-          dragging = this;
-          var r = markerLayer.getBoundingClientRect();
-          dragSX = e.clientX; dragSY = e.clientY;
-          origL = parseFloat(this.style.left); origT = parseFloat(this.style.top);
-          this.style.zIndex = "30"; this.style.borderColor = "#ff0";
-          e.preventDefault();
-        });
-        m.addEventListener("touchstart", function (e) {
-          if (!markerLayer.classList.contains("is-debug")) return;
-          dragging = this;
-          var r = markerLayer.getBoundingClientRect();
-          dragSX = e.touches[0].clientX; dragSY = e.touches[0].clientY;
-          origL = parseFloat(this.style.left); origT = parseFloat(this.style.top);
-          this.style.zIndex = "30"; this.style.borderColor = "#ff0";
-          e.preventDefault();
-        }, { passive: false });
-      });
-      document.addEventListener("mousemove", function (e) {
-        if (!dragging) return;
-        var r = markerLayer.getBoundingClientRect();
-        dragging.style.left = (origL + ((e.clientX - dragSX) / r.width) * 100) + "%";
-        dragging.style.top  = (origT + ((e.clientY - dragSY) / r.height) * 100) + "%";
-      });
-      document.addEventListener("touchmove", function (e) {
-        if (!dragging) return;
-        var r = markerLayer.getBoundingClientRect();
-        dragging.style.left = (origL + ((e.touches[0].clientX - dragSX) / r.width) * 100) + "%";
-        dragging.style.top  = (origT + ((e.touches[0].clientY - dragSY) / r.height) * 100) + "%";
-      }, { passive: false });
-      document.addEventListener("mouseup", function () {
-        if (!dragging) return;
-        console.log(dragging.getAttribute("data-dot") + ": x=" + parseFloat(dragging.style.left).toFixed(2) + ", y=" + parseFloat(dragging.style.top).toFixed(2));
-        dragging.style.zIndex = ""; dragging.style.borderColor = "";
-        dragging = null;
-      });
-      document.addEventListener("touchend", function () {
-        if (!dragging) return;
-        console.log(dragging.getAttribute("data-dot") + ": x=" + parseFloat(dragging.style.left).toFixed(2) + ", y=" + parseFloat(dragging.style.top).toFixed(2));
-        dragging.style.zIndex = ""; dragging.style.borderColor = "";
-        dragging = null;
-      });
 
     })();
 
